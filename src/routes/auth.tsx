@@ -47,12 +47,18 @@ function AuthPage() {
         },
       });
       setBusy(false);
-      if (error) return toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       toast.success("أهلاً بك في مكتبة زينة");
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       setBusy(false);
-      if (error) return toast.error("بيانات الدخول غير صحيحة");
+      if (error) {
+        toast.error("بيانات الدخول غير صحيحة");
+        return;
+      }
       toast.success("مرحباً بعودتك");
     }
   }

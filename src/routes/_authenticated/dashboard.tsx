@@ -81,7 +81,10 @@ function Dashboard() {
       .from("profiles")
       .update({ full_name: fullName.trim(), bio: bio.trim(), avatar_url: avatar.trim() || null })
       .eq("id", user.id);
-    if (error) return toast.error("تعذّر حفظ التعديلات");
+    if (error) {
+      toast.error("تعذّر حفظ التعديلات");
+      return;
+    }
     toast.success("حُفظت بياناتك بنجاح");
     void qc.invalidateQueries({ queryKey: ["profile", user.id] });
   }
