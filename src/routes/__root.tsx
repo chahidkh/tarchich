@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import heroImage from "../assets/hero-library.jpg";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "../lib/cart";
 import { SiteHeader } from "../components/site-header";
@@ -129,9 +130,25 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        <SiteHeader />
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
+        <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
+          <img
+            src={heroImage}
+            alt=""
+            className="size-full object-cover opacity-[0.5] brightness-[1.8]"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(120% 80% at 50% 0%, oklch(0.22 0.04 60 / 0.35), oklch(0.17 0.028 55 / 0.85) 70%)",
+            }}
+          />
+        </div>
+        <div className="relative z-10">
+          <SiteHeader />
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </div>
         <CartDrawer />
         <HakeemDrawer />
         <Toaster position="top-center" richColors />

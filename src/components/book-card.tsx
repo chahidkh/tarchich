@@ -65,7 +65,7 @@ export function BookCard({ book }: { book: Book }) {
       </article>
 
       <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent className="bg-card">
+        <DialogContent className="glass border-gold/20">
           <DialogHeader className="text-right">
             <DialogTitle className="font-display text-2xl text-gold">{book.title}</DialogTitle>
             <DialogDescription>{book.author}</DialogDescription>

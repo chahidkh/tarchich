@@ -121,7 +121,7 @@
 }
 
 @utility glass {
-  background-color: oklch(0.17 0.028 55 / 0.45);
+  background-color: oklch(0.17 0.028 55 / 0.8);
   backdrop-filter: blur(14px);
   border: 1px solid var(--color-border);
 }
