@@ -134,13 +134,13 @@ function RootComponent() {
           <img
             src={heroImage}
             alt=""
-            className="size-full object-cover opacity-[0.32] brightness-[1.4]"
+            className="size-full object-cover opacity-[0.5] brightness-[1.8]"
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(120% 80% at 50% 0%, oklch(0.22 0.04 60 / 0.55), oklch(0.17 0.028 55 / 0.92) 70%)",
+                "radial-gradient(120% 80% at 50% 0%, oklch(0.22 0.04 60 / 0.35), oklch(0.17 0.028 55 / 0.85) 70%)",
             }}
           />
         </div>
