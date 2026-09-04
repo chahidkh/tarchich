@@ -92,8 +92,8 @@
   --gradient-gold: linear-gradient(135deg, var(--gold-soft), var(--gold) 45%, oklch(0.6 0.12 70));
   --gradient-veil: linear-gradient(
     180deg,
-    oklch(0.17 0.028 55 / 0.35) 0%,
-    oklch(0.17 0.028 55 / 0.8) 60%,
+    oklch(0.17 0.028 55 / 0.15) 0%,
+    oklch(0.17 0.028 55 / 0.55) 55%,
     oklch(0.17 0.028 55) 100%
   );
   --shadow-glow: 0 0 40px -8px oklch(0.78 0.13 85 / 0.4);

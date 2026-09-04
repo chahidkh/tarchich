@@ -50,7 +50,7 @@ function Home() {
           alt="مكتبة عريقة بأرفف خشبية مقوّسة وإضاءة ذهبية دافئة"
           width={1920}
           height={1088}
-          className="absolute inset-0 -z-10 size-full object-cover"
+          className="absolute inset-0 -z-10 size-full object-cover brightness-[1.7]"
         />
         <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-veil)" }} />
 
@@ -58,7 +58,7 @@ function Home() {
           <p className="font-kufi text-sm tracking-[0.3em] text-gold-soft">منصة المعرفة العربية</p>
           <h1 className="mt-6 text-5xl leading-[1.35] text-parchment sm:text-7xl">مكتبة زينة</h1>
           <div className="gold-rule mx-auto mt-6 w-40" />
-          <p className="mt-6 text-lg leading-9 text-muted-foreground">
+          <p className="mt-6 text-lg leading-9 text-parchment/85">
             حيث يلتقي عبقُ المخطوط بذكاء العصر. كتبٌ منتقاة، مجلسٌ ثقافي يومي، وحكيمٌ يصحبك في اختيار قراءتك.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
