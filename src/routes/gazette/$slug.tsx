@@ -48,11 +48,12 @@ function Article() {
   const { data: post, isLoading } = useQuery({
     queryKey: ["gazette-post", slug],
     queryFn: async () => {
+      const isUuid = /^[0-9a-f-]{36}$/i.test(slug);
       const { data, error } = await supabase
         .from("posts")
         .select(GAZETTE_FIELDS)
         .eq("section", "gazette")
-        .or(`slug.eq.${slug},id.eq.${slug}`)
+        .eq(isUuid ? "id" : "slug", slug)
         .maybeSingle();
       if (error) throw error;
       return data as GazettePost | null;
