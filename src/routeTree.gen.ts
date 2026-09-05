@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as MajlisRouteImport } from './routes/majlis'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as ApiPublicAssetSplatRouteImport } from './routes/api/public/asset/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -45,6 +46,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicAssetSplatRoute = ApiPublicAssetSplatRouteImport.update({
+  id: '/api/public/asset/$',
+  path: '/api/public/asset/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/majlis': typeof MajlisRoute
   '/store': typeof StoreRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/majlis': typeof MajlisRoute
   '/store': typeof StoreRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +76,15 @@ export interface FileRoutesById {
   '/majlis': typeof MajlisRoute
   '/store': typeof StoreRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/majlis' | '/store' | '/dashboard'
+  fullPaths:
+    '/' | '/auth' | '/majlis' | '/store' | '/dashboard' | '/api/public/asset/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/majlis' | '/store' | '/dashboard'
+  to:
+    '/' | '/auth' | '/majlis' | '/store' | '/dashboard' | '/api/public/asset/$'
   id:
     | '__root__'
     | '/'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | '/majlis'
     | '/store'
     | '/_authenticated/dashboard'
+    | '/api/public/asset/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -90,6 +102,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   MajlisRoute: typeof MajlisRoute
   StoreRoute: typeof StoreRoute
+  ApiPublicAssetSplatRoute: typeof ApiPublicAssetSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -136,6 +149,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/asset/$': {
+      id: '/api/public/asset/$'
+      path: '/api/public/asset/$'
+      fullPath: '/api/public/asset/$'
+      preLoaderRoute: typeof ApiPublicAssetSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -156,6 +176,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   MajlisRoute: MajlisRoute,
   StoreRoute: StoreRoute,
+  ApiPublicAssetSplatRoute: ApiPublicAssetSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
