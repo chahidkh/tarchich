@@ -32,7 +32,7 @@ export async function uploadAsset(bucket: "book-assets" | "site-assets", file: F
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     cacheControl: "31536000",
     upsert: false,
-    contentType: file.type || undefined,
+    ...(file.type ? { contentType: file.type } : {}),
   });
   if (error) throw error;
   return `/api/public/asset/${bucket}/${path}`;
