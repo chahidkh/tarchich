@@ -7,6 +7,7 @@ import { BooksPanel } from "@/components/admin/books-panel";
 import { ContentPanel } from "@/components/admin/content-panel";
 import { CommunityPanel } from "@/components/admin/community-panel";
 import { UsersPanel } from "@/components/admin/users-panel";
+import { AdsPanel } from "@/components/admin/ads-panel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
