@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 const NAV = [
   { to: "/", label: "الرئيسية" },
   { to: "/store", label: "متجر الكتب" },
+  { to: "/gazette", label: "الجريدة" },
   { to: "/majlis", label: "المجلس الثقافي" },
 ];
 
