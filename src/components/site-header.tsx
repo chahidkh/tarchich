@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingBag, BookOpen, User, LogOut } from "lucide-react";
+import { ShoppingBag, BookOpen, User, LogOut, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { useSession } from "@/hooks/use-session";
+import { useIsAdmin } from "@/hooks/use-admin";
 import { supabase } from "@/integrations/supabase/client";
 
 const NAV = [
@@ -13,7 +13,7 @@ const NAV = [
 
 export function SiteHeader() {
   const { count, setOpen } = useCart();
-  const { user } = useSession();
+  const { user, isAdmin } = useIsAdmin();
   const navigate = useNavigate();
 
   async function signOut() {
@@ -57,6 +57,13 @@ export function SiteHeader() {
 
           {user ? (
             <>
+              {isAdmin && (
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/admin">
+                    <ShieldCheck className="size-4" /> الإشراف
+                  </Link>
+                </Button>
+              )}
               <Button asChild variant="outline" size="sm">
                 <Link to="/dashboard">
                   <User className="size-4" /> حسابي

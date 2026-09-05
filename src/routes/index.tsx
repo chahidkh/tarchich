@@ -34,7 +34,9 @@ function Home() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("books")
-        .select("id,title,author,description,price,cover_image_url,category,badge,stock")
+        .select("id,title,author,description,price,cover_image_url,category,badge,stock,external_url,copyright_notice,sample_pdf_url")
+        .eq("is_visible", true)
+        .eq("is_featured", true)
         .order("created_at", { ascending: true })
         .limit(3);
       if (error) throw error;

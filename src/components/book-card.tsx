@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { BookOpen } from "lucide-react";
+import { BookOpen, ExternalLink, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useCart } from "@/lib/cart";
@@ -15,6 +15,9 @@ export type Book = {
   category: string | null;
   badge: string | null;
   stock: number;
+  external_url?: string | null;
+  copyright_notice?: string | null;
+  sample_pdf_url?: string | null;
 };
 
 export function BookCard({ book }: { book: Book }) {
@@ -75,9 +78,30 @@ export function BookCard({ book }: { book: Book }) {
             <span className="text-muted-foreground">{book.category}</span>
             <span className="text-muted-foreground">المتوفر: {book.stock} نسخة</span>
           </div>
-          <Button onClick={addToCart}>
-            <BookOpen className="size-4" /> اقتنِ الكتاب — {Number(book.price).toFixed(2)} ر.س
-          </Button>
+          {book.copyright_notice && (
+            <p className="rounded-md border border-gold/20 bg-card/60 p-3 text-[11px] leading-6 text-muted-foreground">
+              {book.copyright_notice}
+            </p>
+          )}
+          <div className="flex flex-col gap-2">
+            <Button onClick={addToCart}>
+              <BookOpen className="size-4" /> اقتنِ الكتاب — {Number(book.price).toFixed(2)} ر.س
+            </Button>
+            {book.sample_pdf_url && (
+              <Button asChild variant="outline">
+                <a href={book.sample_pdf_url} target="_blank" rel="noreferrer">
+                  <FileText className="size-4" /> اقرأ نموذجاً من الكتاب
+                </a>
+              </Button>
+            )}
+            {book.external_url && (
+              <Button asChild variant="outline">
+                <a href={book.external_url} target="_blank" rel="noreferrer noopener sponsored">
+                  <ExternalLink className="size-4" /> الشراء من المتجر الخارجي
+                </a>
+              </Button>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </>
