@@ -21,7 +21,7 @@ export function HakeemDrawer() {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
-      content: "مرحباً بك في مكتبة زينة. أنا حكيمها، سلني عن كتابٍ أو فكرة أو حالٍ تبحث لها عن قراءة.",
+      content: "مرحباً بك في مكتبة ترشيش. أنا حكيمها، سلني عن كتابٍ أو فكرة أو حالٍ تبحث لها عن قراءة.",
     },
   ]);
   const ask = useServerFn(askHakeem);
@@ -56,7 +56,7 @@ export function HakeemDrawer() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="flex w-full flex-col bg-card sm:max-w-md">
           <SheetHeader className="text-right">
-            <SheetTitle className="font-display text-2xl text-gold">حكيم زينة</SheetTitle>
+            <SheetTitle className="font-display text-2xl text-gold">حكيم ترشيش</SheetTitle>
             <SheetDescription>مستشارك في الكتب والمعرفة، بعربيةٍ أصيلة.</SheetDescription>
           </SheetHeader>
 

@@ -214,6 +214,7 @@ export type Database = {
           is_published: boolean
           media_type: string | null
           media_url: string | null
+          section: string
           slug: string | null
           title: string
           views: number
@@ -229,6 +230,7 @@ export type Database = {
           is_published?: boolean
           media_type?: string | null
           media_url?: string | null
+          section?: string
           slug?: string | null
           title: string
           views?: number
@@ -244,6 +246,7 @@ export type Database = {
           is_published?: boolean
           media_type?: string | null
           media_url?: string | null
+          section?: string
           slug?: string | null
           title?: string
           views?: number
@@ -254,6 +257,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          cover_url: string | null
           created_at: string
           full_name: string | null
           id: string
@@ -263,6 +267,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          cover_url?: string | null
           created_at?: string
           full_name?: string | null
           id: string
@@ -272,6 +277,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          cover_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string

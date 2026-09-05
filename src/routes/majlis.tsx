@@ -1,22 +1,23 @@
 import { Fragment, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, MessageCircle, BadgeCheck, Send } from "lucide-react";
+import { Heart, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
+import { useProfiles } from "@/hooks/use-profiles";
+import { MemberBadge } from "@/components/member-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
 export const Route = createFileRoute("/majlis")({
   head: () => ({
     meta: [
-      { title: "المجلس الثقافي | مكتبة زينة" },
-      { name: "description", content: "مقالات يومية ومراجعات ونقاشات متشعّبة بين قرّاء مكتبة زينة." },
-      { property: "og:title", content: "المجلس الثقافي | مكتبة زينة" },
+      { title: "المجلس الثقافي | مكتبة ترشيش" },
+      { name: "description", content: "مقالات يومية ومراجعات ونقاشات متشعّبة بين قرّاء مكتبة ترشيش." },
+      { property: "og:title", content: "المجلس الثقافي | مكتبة ترشيش" },
       { property: "og:description", content: "مقالات يومية ونقاشات بين القرّاء والمؤلفين." },
     ],
   }),
@@ -34,6 +35,7 @@ type Post = {
 
 function Majlis() {
   const { user } = useSession();
+  const { byId } = useProfiles();
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -44,6 +46,7 @@ function Majlis() {
       const { data, error } = await supabase
         .from("posts")
         .select("id,author_id,title,content,media_url,created_at")
+        .eq("section", "majlis")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as Post[];
@@ -58,11 +61,6 @@ function Majlis() {
       return data;
     },
   });
-
-  const { data: ads } = useAds();
-  const inFeedAds = (ads ?? []).filter((a) => a.type === "in_feed");
-  const sponsoredAds = (ads ?? []).filter((a) => a.type === "sponsored_article");
-  const stickyAd = (ads ?? []).find((a) => a.type === "sticky_bottom");
 
   const publish = useMutation({
     mutationFn: async () => {
@@ -138,22 +136,16 @@ function Majlis() {
       )}
 
       <div className="space-y-6">
-        {sponsoredAds.map((ad) => (
-          <SponsoredAd key={ad.id} ad={ad} />
-        ))}
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 rounded-xl bg-secondary/50" />)
-          : posts?.map((p, idx) => {
+          : posts?.map((p) => {
               const count = likes?.filter((l) => l.post_id === p.id).length ?? 0;
               const mine = !!user && !!likes?.some((l) => l.post_id === p.id && l.user_id === user.id);
-              const ad = idx > 0 && idx % 3 === 0 ? inFeedAds[Math.floor(idx / 3) % Math.max(inFeedAds.length, 1)] : undefined;
               return (
                 <Fragment key={p.id}>
-                  {ad && <InFeedAd ad={ad} />}
                   <article className="glass rounded-xl p-6">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <BadgeCheck className="size-4 text-gold" />
-                    {p.author_id ? "عضو في المجلس" : "تحرير مكتبة زينة"}
+                    <MemberBadge profile={byId(p.author_id)} verified={!p.author_id} />
                     <span>·</span>
                     <time>{new Date(p.created_at).toLocaleDateString("ar")}</time>
                   </div>
@@ -173,7 +165,6 @@ function Majlis() {
               );
             })}
       </div>
-      {stickyAd && <StickyBottomAd ad={stickyAd} />}
     </main>
   );
 }
@@ -182,6 +173,7 @@ type Comment = { id: string; post_id: string; user_id: string; parent_id: string
 
 function Comments({ postId }: { postId: string }) {
   const { user } = useSession();
+  const { byId } = useProfiles();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
@@ -233,7 +225,8 @@ function Comments({ postId }: { postId: string }) {
         <div className="mt-4 space-y-3">
           {roots.map((c) => (
             <div key={c.id} className="rounded-lg border border-border bg-secondary/40 p-3">
-              <p className="text-sm leading-7">{c.content}</p>
+              <MemberBadge profile={byId(c.user_id)} fallback="عضو" />
+              <p className="mt-2 text-sm leading-7">{c.content}</p>
               <button
                 onClick={() => setReplyTo(c.id)}
                 className="mt-1 text-xs text-muted-foreground hover:text-gold"
@@ -244,9 +237,10 @@ function Comments({ postId }: { postId: string }) {
                 {comments
                   ?.filter((r) => r.parent_id === c.id)
                   .map((r) => (
-                    <p key={r.id} className="text-sm leading-7 text-muted-foreground">
-                      {r.content}
-                    </p>
+                    <div key={r.id}>
+                      <MemberBadge profile={byId(r.user_id)} fallback="عضو" />
+                      <p className="mt-1 text-sm leading-7 text-muted-foreground">{r.content}</p>
+                    </div>
                   ))}
               </div>
             </div>

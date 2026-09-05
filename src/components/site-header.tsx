@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 const NAV = [
   { to: "/", label: "الرئيسية" },
   { to: "/store", label: "متجر الكتب" },
+  { to: "/gazette", label: "الجريدة" },
   { to: "/majlis", label: "المجلس الثقافي" },
 ];
 
@@ -26,7 +27,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
           <BookOpen className="size-5 text-gold" />
-          <span className="font-display text-xl text-gold">مكتبة زينة</span>
+          <span className="font-display text-xl text-gold">مكتبة ترشيش</span>
         </Link>
 
         <nav className="hidden flex-1 items-center gap-6 md:flex">

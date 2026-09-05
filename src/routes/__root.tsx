@@ -83,12 +83,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "مكتبة زينة | منصة المعرفة والكتب العربية" },
+      { title: "مكتبة ترشيش | منصة المعرفة والكتب العربية" },
       {
         name: "description",
-        content: "مكتبة زينة: متجر كتب فاخر، مجلس ثقافي يومي، وحكيمٌ ذكي يرشدك إلى قراءتك القادمة.",
+        content: "مكتبة ترشيش: متجر كتب فاخر، مجلس ثقافي يومي، وحكيمٌ ذكي يرشدك إلى قراءتك القادمة.",
       },
-      { property: "og:title", content: "مكتبة زينة" },
+      { property: "og:title", content: "مكتبة ترشيش" },
       { property: "og:description", content: "متجر كتب فاخر ومجلس ثقافي عربي مع مستشار معرفي ذكي." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

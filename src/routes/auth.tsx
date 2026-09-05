@@ -12,10 +12,10 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "الدخول والتسجيل | مكتبة زينة" },
-      { name: "description", content: "انضم إلى مكتبة زينة لتتابع المجلس الثقافي وتقتني الكتب وتربح من الإحالة." },
-      { property: "og:title", content: "الدخول والتسجيل | مكتبة زينة" },
-      { property: "og:description", content: "أنشئ حسابك في مكتبة زينة بالبريد أو عبر جوجل." },
+      { title: "الدخول والتسجيل | مكتبة ترشيش" },
+      { name: "description", content: "انضم إلى مكتبة ترشيش لتتابع المجلس الثقافي وتقتني الكتب وتربح من الإحالة." },
+      { property: "og:title", content: "الدخول والتسجيل | مكتبة ترشيش" },
+      { property: "og:description", content: "أنشئ حسابك في مكتبة ترشيش بالبريد أو عبر جوجل." },
     ],
   }),
   component: AuthPage,
@@ -51,7 +51,7 @@ function AuthPage() {
         toast.error(error.message);
         return;
       }
-      toast.success("أهلاً بك في مكتبة زينة");
+      toast.success("أهلاً بك في مكتبة ترشيش");
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       setBusy(false);
