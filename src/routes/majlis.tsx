@@ -59,6 +59,11 @@ function Majlis() {
     },
   });
 
+  const { data: ads } = useAds();
+  const inFeedAds = (ads ?? []).filter((a) => a.type === "in_feed");
+  const sponsoredAds = (ads ?? []).filter((a) => a.type === "sponsored_article");
+  const stickyAd = (ads ?? []).find((a) => a.type === "sticky_bottom");
+
   const publish = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("auth");
@@ -133,11 +138,15 @@ function Majlis() {
       )}
 
       <div className="space-y-6">
+        {sponsoredAds.map((ad) => (
+          <SponsoredAd key={ad.id} ad={ad} />
+        ))}
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 rounded-xl bg-secondary/50" />)
-          : posts?.map((p) => {
+          : posts?.map((p, idx) => {
               const count = likes?.filter((l) => l.post_id === p.id).length ?? 0;
               const mine = !!user && !!likes?.some((l) => l.post_id === p.id && l.user_id === user.id);
+              const ad = idx > 0 && idx % 3 === 0 ? inFeedAds[Math.floor(idx / 3) % Math.max(inFeedAds.length, 1)] : undefined;
               return (
                 <article key={p.id} className="glass rounded-xl p-6">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
