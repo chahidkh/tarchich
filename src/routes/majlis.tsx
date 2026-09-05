@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
 export const Route = createFileRoute("/majlis")({
   head: () => ({
