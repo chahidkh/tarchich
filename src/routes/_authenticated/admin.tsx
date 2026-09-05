@@ -81,6 +81,9 @@ function Admin() {
         <TabsContent value="users">
           <UsersPanel />
         </TabsContent>
+        <TabsContent value="ads">
+          <AdsPanel />
+        </TabsContent>
       </Tabs>
     </main>
   );
