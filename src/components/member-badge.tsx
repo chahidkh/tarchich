@@ -8,7 +8,7 @@ export function MemberBadge({
   size = "sm",
   verified = false,
 }: {
-  profile?: PublicProfile;
+  profile?: PublicProfile | undefined;
   fallback?: string;
   size?: "sm" | "md";
   verified?: boolean;
