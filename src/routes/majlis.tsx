@@ -159,19 +159,21 @@ function Majlis() {
                   </div>
                   <h2 className="mt-3 text-2xl leading-relaxed">{p.title}</h2>
                   <p className="mt-3 whitespace-pre-line text-sm leading-8 text-muted-foreground">{p.content}</p>
-                  <div className="mt-5 flex items-center gap-4 border-t border-border pt-4">
-                    <button
-                      onClick={() => toggleLike.mutate(p.id)}
-                      className={`flex items-center gap-1 text-sm transition ${mine ? "text-gold" : "text-muted-foreground hover:text-gold"}`}
-                    >
-                      <Heart className={`size-4 ${mine ? "fill-current" : ""}`} /> {count}
-                    </button>
-                    <Comments postId={p.id} />
-                  </div>
-                </article>
+                    <div className="mt-5 flex items-center gap-4 border-t border-border pt-4">
+                      <button
+                        onClick={() => toggleLike.mutate(p.id)}
+                        className={`flex items-center gap-1 text-sm transition ${mine ? "text-gold" : "text-muted-foreground hover:text-gold"}`}
+                      >
+                        <Heart className={`size-4 ${mine ? "fill-current" : ""}`} /> {count}
+                      </button>
+                      <Comments postId={p.id} />
+                    </div>
+                  </article>
+                </Fragment>
               );
             })}
       </div>
+      {stickyAd && <StickyBottomAd ad={stickyAd} />}
     </main>
   );
 }
