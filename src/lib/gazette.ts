@@ -17,6 +17,33 @@ export type GazettePost = {
 export const GAZETTE_FIELDS =
   "id,title,slug,excerpt,content,media_url,category,views,is_featured,is_published,created_at";
 
+/** The publisher attributed on every Gazette article. */
+export const PUBLISHER = "مكتبة ترشيش";
+
+/** The only categories the Gazette uses. */
+export const GAZETTE_CATEGORIES = ["عاجل", "سياسة", "التاريخ", "الثقافة"] as const;
+export type GazetteCategory = (typeof GAZETTE_CATEGORIES)[number];
+
+const LEGACY_MAP: Record<string, GazetteCategory> = {
+  "التراث": "التاريخ",
+  "تراث": "التاريخ",
+  "تاريخ": "التاريخ",
+  "أعلام": "الثقافة",
+  "اعلام": "الثقافة",
+  "ثقافة": "الثقافة",
+  "أدب": "الثقافة",
+  "أخبار": "عاجل",
+  "اخبار": "عاجل",
+  "سياسية": "سياسة",
+};
+
+/** Maps any stored category onto the four supported Gazette categories. */
+export function normalizeCategory(value?: string | null): GazetteCategory {
+  const v = (value ?? "").trim();
+  if ((GAZETTE_CATEGORIES as readonly string[]).includes(v)) return v as GazetteCategory;
+  return LEGACY_MAP[v] ?? "الثقافة";
+}
+
 export function readingMinutes(content: string) {
   const words = content.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));

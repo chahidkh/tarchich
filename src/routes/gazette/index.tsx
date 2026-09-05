@@ -3,7 +3,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Newspaper } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchGazettePosts, readingMinutes, type GazettePost } from "@/lib/gazette";
+import {
+  GAZETTE_CATEGORIES,
+  PUBLISHER,
+  fetchGazettePosts,
+  normalizeCategory,
+  readingMinutes,
+  type GazettePost,
+} from "@/lib/gazette";
 import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
 export const Route = createFileRoute("/gazette/")({
