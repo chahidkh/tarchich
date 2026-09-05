@@ -130,12 +130,12 @@ function Gazette() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {rest.map((p, i) => (
-              <>
-                <Card key={p.id} post={p} />
-                {inFeed[Math.floor(i / 3)] && i > 0 && i % 3 === 2 && (
-                  <InFeedAd key={`ad-${i}`} ad={inFeed[Math.floor(i / 3) % inFeed.length]!} />
+              <Fragment key={p.id}>
+                <Card post={p} />
+                {inFeed.length > 0 && i > 0 && i % 3 === 2 && (
+                  <InFeedAd ad={inFeed[Math.floor(i / 3) % inFeed.length]!} />
                 )}
-              </>
+              </Fragment>
             ))}
           </div>
 
