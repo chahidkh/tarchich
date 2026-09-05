@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ROLES = ["reader", "vip", "author", "admin"] as const;
-const LABEL: Record<string, string> = { reader: "قارئ", vip: "عضوية زينة", author: "كاتب", admin: "مشرف" };
+const LABEL: Record<string, string> = { reader: "قارئ", vip: "عضوية ترشيش", author: "كاتب", admin: "مشرف" };
 
 export function UsersPanel() {
   const qc = useQueryClient();

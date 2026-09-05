@@ -11,12 +11,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "مكتبة زينة | مجلس المعرفة العربي" },
+      { title: "مكتبة ترشيش | مجلس المعرفة العربي" },
       {
         name: "description",
-        content: "مكتبة زينة: كتب مختارة بعناية، مقالات يومية، ومستشار معرفي ذكي بعربية أصيلة.",
+        content: "مكتبة ترشيش: كتب مختارة بعناية، مقالات يومية، ومستشار معرفي ذكي بعربية أصيلة.",
       },
-      { property: "og:title", content: "مكتبة زينة | مجلس المعرفة العربي" },
+      { property: "og:title", content: "مكتبة ترشيش | مجلس المعرفة العربي" },
       { property: "og:description", content: "كتب مختارة، مجلس ثقافي، وحكيمٌ يرشدك إلى قراءتك القادمة." },
     ],
   }),
@@ -58,7 +58,7 @@ function Home() {
 
         <div className="rise-in mx-auto max-w-3xl px-6 text-center">
           <p className="font-kufi text-sm tracking-[0.3em] text-gold-soft">منصة المعرفة العربية</p>
-          <h1 className="mt-6 text-5xl leading-[1.35] text-parchment sm:text-7xl">مكتبة زينة</h1>
+          <h1 className="mt-6 text-5xl leading-[1.35] text-parchment sm:text-7xl">مكتبة ترشيش</h1>
           <div className="gold-rule mx-auto mt-6 w-40" />
           <p className="mt-6 text-lg leading-9 text-parchment/85">
             حيث يلتقي عبقُ المخطوط بذكاء العصر. كتبٌ منتقاة، مجلسٌ ثقافي يومي، وحكيمٌ يصحبك في اختيار قراءتك.
@@ -96,7 +96,7 @@ function Home() {
       <section className="mx-auto max-w-6xl px-4 pb-20">
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { icon: Sparkles, title: "حكيم زينة", text: "مستشار معرفي يجيبك بعربية أصيلة ويرشّح لك بحسب حالك." },
+            { icon: Sparkles, title: "حكيم ترشيش", text: "مستشار معرفي يجيبك بعربية أصيلة ويرشّح لك بحسب حالك." },
             { icon: Users, title: "المجلس الثقافي", text: "مقالات يومية ونقاشات متشعّبة بين القرّاء والمؤلفين." },
             { icon: Feather, title: "برنامج الإحالة", text: "عمولة ١٠٪ على كل كتاب يُباع عبر رابطك الخاص." },
           ].map(({ icon: Icon, title, text }) => (
@@ -112,7 +112,7 @@ function Home() {
       <section className="mx-auto max-w-4xl px-4 pb-24">
         <div className="glass relative overflow-hidden rounded-2xl p-10 text-center">
           <Crown className="mx-auto size-6 text-gold" />
-          <h2 className="mt-4 text-3xl text-gold">عضوية مجلس زينة</h2>
+          <h2 className="mt-4 text-3xl text-gold">عضوية مجلس ترشيش</h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground">
             مقالات يومية حصرية، كتبٌ صوتية نادرة، واستشارات غير محدودة مع حكيم المكتبة.
           </p>
@@ -126,7 +126,7 @@ function Home() {
       </section>
 
       <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
-        مكتبة زينة — حيث تُصان المعرفة وتُروى.
+        مكتبة ترشيش — حيث تُصان المعرفة وتُروى.
       </footer>
     </main>
   );

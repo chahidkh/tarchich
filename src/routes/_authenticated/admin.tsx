@@ -12,9 +12,9 @@ import { AdsPanel } from "@/components/admin/ads-panel";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "لوحة الإشراف | مكتبة زينة" },
-      { name: "description", content: "لوحة تحكم مكتبة زينة: إدارة الكتب والملفات والمحتوى والأعضاء." },
-      { property: "og:title", content: "لوحة الإشراف | مكتبة زينة" },
+      { title: "لوحة الإشراف | مكتبة ترشيش" },
+      { name: "description", content: "لوحة تحكم مكتبة ترشيش: إدارة الكتب والملفات والمحتوى والأعضاء." },
+      { property: "og:title", content: "لوحة الإشراف | مكتبة ترشيش" },
       { property: "og:description", content: "إدارة شاملة لمتجر الكتب والمجلس الثقافي والأعضاء." },
     ],
   }),

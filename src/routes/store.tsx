@@ -10,9 +10,9 @@ import { useSiteSettings } from "@/lib/site-settings";
 export const Route = createFileRoute("/store")({
   head: () => ({
     meta: [
-      { title: "متجر الكتب | مكتبة زينة" },
+      { title: "متجر الكتب | مكتبة ترشيش" },
       { name: "description", content: "كتب رقمية وورقية منتقاة في التراث والأدب والفلسفة، مع معاينة فورية وشراء سريع." },
-      { property: "og:title", content: "متجر الكتب | مكتبة زينة" },
+      { property: "og:title", content: "متجر الكتب | مكتبة ترشيش" },
       { property: "og:description", content: "نفائس الكتب العربية بين يديك، رقمية وورقية." },
     ],
   }),
@@ -45,7 +45,7 @@ function Store() {
       {settings?.["store_banner_url"] && (
         <img
           src={settings["store_banner_url"]}
-          alt="بانر متجر مكتبة زينة"
+          alt="بانر متجر مكتبة ترشيش"
           className="mb-10 h-56 w-full rounded-2xl border border-gold/20 object-cover"
         />
       )}

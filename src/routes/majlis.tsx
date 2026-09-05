@@ -14,9 +14,9 @@ import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-s
 export const Route = createFileRoute("/majlis")({
   head: () => ({
     meta: [
-      { title: "المجلس الثقافي | مكتبة زينة" },
-      { name: "description", content: "مقالات يومية ومراجعات ونقاشات متشعّبة بين قرّاء مكتبة زينة." },
-      { property: "og:title", content: "المجلس الثقافي | مكتبة زينة" },
+      { title: "المجلس الثقافي | مكتبة ترشيش" },
+      { name: "description", content: "مقالات يومية ومراجعات ونقاشات متشعّبة بين قرّاء مكتبة ترشيش." },
+      { property: "og:title", content: "المجلس الثقافي | مكتبة ترشيش" },
       { property: "og:description", content: "مقالات يومية ونقاشات بين القرّاء والمؤلفين." },
     ],
   }),
@@ -153,7 +153,7 @@ function Majlis() {
                   <article className="glass rounded-xl p-6">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <BadgeCheck className="size-4 text-gold" />
-                    {p.author_id ? "عضو في المجلس" : "تحرير مكتبة زينة"}
+                    {p.author_id ? "عضو في المجلس" : "تحرير مكتبة ترشيش"}
                     <span>·</span>
                     <time>{new Date(p.created_at).toLocaleDateString("ar")}</time>
                   </div>

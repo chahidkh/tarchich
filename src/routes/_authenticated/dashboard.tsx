@@ -14,10 +14,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "لوحة حسابي | مكتبة زينة" },
+      { title: "لوحة حسابي | مكتبة ترشيش" },
       { name: "description", content: "ملفك الشخصي، مكتبتك المقتناة، رصيد الإحالة، ومشاركاتك في المجلس." },
-      { property: "og:title", content: "لوحة حسابي | مكتبة زينة" },
-      { property: "og:description", content: "إدارة ملفك ومقتنياتك ورصيد إحالاتك في مكتبة زينة." },
+      { property: "og:title", content: "لوحة حسابي | مكتبة ترشيش" },
+      { property: "og:description", content: "إدارة ملفك ومقتنياتك ورصيد إحالاتك في مكتبة ترشيش." },
     ],
   }),
   component: Dashboard,
