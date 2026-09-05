@@ -148,7 +148,9 @@ function Majlis() {
               const mine = !!user && !!likes?.some((l) => l.post_id === p.id && l.user_id === user.id);
               const ad = idx > 0 && idx % 3 === 0 ? inFeedAds[Math.floor(idx / 3) % Math.max(inFeedAds.length, 1)] : undefined;
               return (
-                <article key={p.id} className="glass rounded-xl p-6">
+                <Fragment key={p.id}>
+                  {ad && <InFeedAd ad={ad} />}
+                  <article className="glass rounded-xl p-6">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <BadgeCheck className="size-4 text-gold" />
                     {p.author_id ? "عضو في المجلس" : "تحرير مكتبة زينة"}
