@@ -92,7 +92,7 @@ export function AdsPanel() {
   async function handleUpload(file: File) {
     setUploading(true);
     try {
-      const url = await uploadAsset("site-assets", file);
+      const url = await uploadAsset("site-assets", file, "ads");
       setContent(url);
       toast.success("رُفعت صورة الإعلان");
     } catch (e) {

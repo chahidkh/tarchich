@@ -64,6 +64,9 @@ function Admin() {
           <TabsTrigger value="users" className="flex-1">
             الأعضاء
           </TabsTrigger>
+          <TabsTrigger value="ads" className="flex-1">
+            الإعلانات
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="books">
