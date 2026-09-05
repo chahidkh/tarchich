@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { bumpGazetteViews } from "@/lib/gazette.functions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GAZETTE_FIELDS, readingMinutes, type GazettePost } from "@/lib/gazette";
 import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
@@ -37,6 +39,7 @@ function useProgress() {
 function Article() {
   const { slug } = Route.useParams();
   const progress = useProgress();
+  const bumpViews = useServerFn(bumpGazetteViews);
   const { data: ads } = useAds();
   const inFeed = (ads ?? []).filter((a) => a.type === "in_feed");
   const sponsored = (ads ?? []).find((a) => a.type === "sponsored_article");
@@ -57,9 +60,8 @@ function Article() {
   });
 
   useEffect(() => {
-    if (post) void supabase.from("posts").update({ views: (post.views ?? 0) + 1 }).eq("id", post.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post?.id]);
+    if (post?.id) void bumpViews({ data: { id: post.id } }).catch(() => {});
+  }, [post?.id, bumpViews]);
 
   if (isLoading) {
     return (
