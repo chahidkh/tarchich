@@ -7,6 +7,7 @@ import { BooksPanel } from "@/components/admin/books-panel";
 import { ContentPanel } from "@/components/admin/content-panel";
 import { CommunityPanel } from "@/components/admin/community-panel";
 import { UsersPanel } from "@/components/admin/users-panel";
+import { AdsPanel } from "@/components/admin/ads-panel";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -63,6 +64,9 @@ function Admin() {
           <TabsTrigger value="users" className="flex-1">
             الأعضاء
           </TabsTrigger>
+          <TabsTrigger value="ads" className="flex-1">
+            الإعلانات
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="books">
@@ -76,6 +80,9 @@ function Admin() {
         </TabsContent>
         <TabsContent value="users">
           <UsersPanel />
+        </TabsContent>
+        <TabsContent value="ads">
+          <AdsPanel />
         </TabsContent>
       </Tabs>
     </main>

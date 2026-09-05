@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Heart, MessageCircle, BadgeCheck, Send } from "lucide-react";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
 export const Route = createFileRoute("/majlis")({
   head: () => ({
@@ -57,6 +58,11 @@ function Majlis() {
       return data;
     },
   });
+
+  const { data: ads } = useAds();
+  const inFeedAds = (ads ?? []).filter((a) => a.type === "in_feed");
+  const sponsoredAds = (ads ?? []).filter((a) => a.type === "sponsored_article");
+  const stickyAd = (ads ?? []).find((a) => a.type === "sticky_bottom");
 
   const publish = useMutation({
     mutationFn: async () => {
@@ -132,13 +138,19 @@ function Majlis() {
       )}
 
       <div className="space-y-6">
+        {sponsoredAds.map((ad) => (
+          <SponsoredAd key={ad.id} ad={ad} />
+        ))}
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-40 rounded-xl bg-secondary/50" />)
-          : posts?.map((p) => {
+          : posts?.map((p, idx) => {
               const count = likes?.filter((l) => l.post_id === p.id).length ?? 0;
               const mine = !!user && !!likes?.some((l) => l.post_id === p.id && l.user_id === user.id);
+              const ad = idx > 0 && idx % 3 === 0 ? inFeedAds[Math.floor(idx / 3) % Math.max(inFeedAds.length, 1)] : undefined;
               return (
-                <article key={p.id} className="glass rounded-xl p-6">
+                <Fragment key={p.id}>
+                  {ad && <InFeedAd ad={ad} />}
+                  <article className="glass rounded-xl p-6">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <BadgeCheck className="size-4 text-gold" />
                     {p.author_id ? "عضو في المجلس" : "تحرير مكتبة زينة"}
@@ -147,19 +159,21 @@ function Majlis() {
                   </div>
                   <h2 className="mt-3 text-2xl leading-relaxed">{p.title}</h2>
                   <p className="mt-3 whitespace-pre-line text-sm leading-8 text-muted-foreground">{p.content}</p>
-                  <div className="mt-5 flex items-center gap-4 border-t border-border pt-4">
-                    <button
-                      onClick={() => toggleLike.mutate(p.id)}
-                      className={`flex items-center gap-1 text-sm transition ${mine ? "text-gold" : "text-muted-foreground hover:text-gold"}`}
-                    >
-                      <Heart className={`size-4 ${mine ? "fill-current" : ""}`} /> {count}
-                    </button>
-                    <Comments postId={p.id} />
-                  </div>
-                </article>
+                    <div className="mt-5 flex items-center gap-4 border-t border-border pt-4">
+                      <button
+                        onClick={() => toggleLike.mutate(p.id)}
+                        className={`flex items-center gap-1 text-sm transition ${mine ? "text-gold" : "text-muted-foreground hover:text-gold"}`}
+                      >
+                        <Heart className={`size-4 ${mine ? "fill-current" : ""}`} /> {count}
+                      </button>
+                      <Comments postId={p.id} />
+                    </div>
+                  </article>
+                </Fragment>
               );
             })}
       </div>
+      {stickyAd && <StickyBottomAd ad={stickyAd} />}
     </main>
   );
 }
