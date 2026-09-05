@@ -19,10 +19,15 @@ export type Database = {
           author: string
           badge: string | null
           category: string | null
+          copyright_notice: string | null
           cover_image_url: string | null
           created_at: string
           description: string | null
+          external_url: string | null
+          full_pdf_url: string | null
           id: string
+          is_featured: boolean
+          is_visible: boolean
           price: number
           sample_pdf_url: string | null
           stock: number
@@ -32,10 +37,15 @@ export type Database = {
           author: string
           badge?: string | null
           category?: string | null
+          copyright_notice?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          external_url?: string | null
+          full_pdf_url?: string | null
           id?: string
+          is_featured?: boolean
+          is_visible?: boolean
           price?: number
           sample_pdf_url?: string | null
           stock?: number
@@ -45,10 +55,15 @@ export type Database = {
           author?: string
           badge?: string | null
           category?: string | null
+          copyright_notice?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          external_url?: string | null
+          full_pdf_url?: string | null
           id?: string
+          is_featured?: boolean
+          is_visible?: boolean
           price?: number
           sample_pdf_url?: string | null
           stock?: number
@@ -211,6 +226,27 @@ export type Database = {
           id?: string
           referral_code?: string | null
           wallet_balance?: number
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }

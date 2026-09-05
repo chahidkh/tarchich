@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BookCard, type Book } from "@/components/book-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { useSiteSettings } from "@/lib/site-settings";
 
 export const Route = createFileRoute("/store")({
   head: () => ({
@@ -20,13 +21,15 @@ export const Route = createFileRoute("/store")({
 
 function Store() {
   const [q, setQ] = useState("");
+  const { data: settings } = useSiteSettings();
 
   const { data, isLoading } = useQuery({
     queryKey: ["books"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("books")
-        .select("id,title,author,description,price,cover_image_url,category,badge,stock")
+        .select("id,title,author,description,price,cover_image_url,category,badge,stock,external_url,copyright_notice,sample_pdf_url")
+        .eq("is_visible", true)
         .order("created_at", { ascending: true });
       if (error) throw error;
       return data as Book[];
@@ -39,10 +42,19 @@ function Store() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-14">
+      {settings?.["store_banner_url"] && (
+        <img
+          src={settings["store_banner_url"]}
+          alt="بانر متجر مكتبة زينة"
+          className="mb-10 h-56 w-full rounded-2xl border border-gold/20 object-cover"
+        />
+      )}
       <header className="mb-10 text-center">
         <h1 className="text-4xl text-gold">قسم متجر الكتب</h1>
         <div className="gold-rule mx-auto mt-5 w-32" />
-        <p className="mt-4 text-sm text-muted-foreground">اقتنِ نسختك الرقمية فوراً، أو اطلب النسخة الورقية إلى بابك.</p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          {settings?.["store_description"] || "اقتنِ نسختك الرقمية فوراً، أو اطلب النسخة الورقية إلى بابك."}
+        </p>
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
