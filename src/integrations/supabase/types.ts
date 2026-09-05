@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ads: {
+        Row: {
+          code_or_image: string
+          created_at: string
+          id: string
+          is_active: boolean
+          link: string | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          code_or_image: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          link?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          code_or_image?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          link?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       books: {
         Row: {
           author: string
@@ -172,30 +205,48 @@ export type Database = {
       posts: {
         Row: {
           author_id: string | null
+          category: string | null
           content: string
           created_at: string
+          excerpt: string | null
           id: string
+          is_featured: boolean
+          is_published: boolean
           media_type: string | null
           media_url: string | null
+          slug: string | null
           title: string
+          views: number
         }
         Insert: {
           author_id?: string | null
+          category?: string | null
           content: string
           created_at?: string
+          excerpt?: string | null
           id?: string
+          is_featured?: boolean
+          is_published?: boolean
           media_type?: string | null
           media_url?: string | null
+          slug?: string | null
           title: string
+          views?: number
         }
         Update: {
           author_id?: string | null
+          category?: string | null
           content?: string
           created_at?: string
+          excerpt?: string | null
           id?: string
+          is_featured?: boolean
+          is_published?: boolean
           media_type?: string | null
           media_url?: string | null
+          slug?: string | null
           title?: string
+          views?: number
         }
         Relationships: []
       }
