@@ -96,6 +96,7 @@ function Dashboard() {
     }
     toast.success("حُفظت بياناتك بنجاح");
     void qc.invalidateQueries({ queryKey: ["profile", user.id] });
+    void qc.invalidateQueries({ queryKey: ["public-profiles"] });
   }
 
   async function upload(kind: "avatar" | "cover", file: File) {

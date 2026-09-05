@@ -21,7 +21,7 @@ export type Ad = {
 };
 
 export const AD_TYPE_LABEL: Record<Ad["type"], string> = {
-  in_feed: "داخل المجلس",
+  in_feed: "داخل الجريدة",
   sponsored_article: "مقال إعلاني",
   sticky_bottom: "شريط لاصق أسفل الشاشة",
 };
@@ -104,7 +104,8 @@ export function AdsPanel() {
 
   return (
     <section className="glass rounded-xl p-6">
-      <h2 className="font-display text-2xl text-gold">إدارة الإعلانات</h2>
+      <h2 className="font-display text-2xl text-gold">إعلانات الجريدة</h2>
+      <p className="mt-1 text-xs text-muted-foreground">تظهر هذه الإعلانات داخل قسم الجريدة فقط، ولا تظهر في الرئيسية أو المتجر أو المجلس.</p>
 
       <div className="mt-5 space-y-3 rounded-lg border border-border bg-card/60 p-4">
         <Input value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} placeholder="عنوان الإعلان" className="bg-background" />
