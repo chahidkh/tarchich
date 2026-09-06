@@ -39,7 +39,13 @@ function Card({ post }: { post: GazettePost }) {
         <img src={post.media_url} alt={post.title} loading="lazy" className="h-40 w-full object-cover" />
       )}
       <div className="flex flex-1 flex-col p-5">
-        <span className="text-[11px] tracking-widest text-gold-soft">{post.category ?? "أخبار"}</span>
+        <span
+          className={`text-[11px] tracking-widest ${
+            normalizeCategory(post.category) === "عاجل" ? "font-bold text-red-400" : "text-gold-soft"
+          }`}
+        >
+          {normalizeCategory(post.category)}
+        </span>
         <h3 className="mt-2 text-xl leading-relaxed transition group-hover:text-gold">{post.title}</h3>
         <p className="mt-2 line-clamp-3 flex-1 text-sm leading-7 text-muted-foreground">
           {post.excerpt ?? post.content}
@@ -60,12 +66,9 @@ function Gazette() {
   const inFeed = (ads ?? []).filter((a) => a.type === "in_feed");
   const sticky = (ads ?? []).find((a) => a.type === "sticky_bottom");
 
-  const categories = useMemo(
-    () => ["الكل", ...Array.from(new Set((posts ?? []).map((p) => p.category ?? "أخبار")))],
-    [posts],
-  );
+  const categories = useMemo(() => ["الكل", ...GAZETTE_CATEGORIES], []);
 
-  const list = (posts ?? []).filter((p) => cat === "الكل" || (p.category ?? "أخبار") === cat);
+  const list = (posts ?? []).filter((p) => cat === "الكل" || normalizeCategory(p.category) === cat);
   const hero = list.find((p) => p.is_featured) ?? list[0];
   const rest = list.filter((p) => p.id !== hero?.id);
 
@@ -77,6 +80,7 @@ function Gazette() {
         </h1>
         <div className="gold-rule mx-auto mt-5 w-32" />
         <p className="mt-4 text-sm text-muted-foreground">أخبارٌ ومقالاتٌ من ذاكرة التاريخ وحاضر الثقافة.</p>
+        <p className="mt-1 text-xs text-gold-soft">تصدر عن {PUBLISHER}</p>
       </header>
 
       {isLoading ? (

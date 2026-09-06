@@ -6,7 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { bumpGazetteViews } from "@/lib/gazette.functions";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GAZETTE_FIELDS, readingMinutes, type GazettePost } from "@/lib/gazette";
+import { GAZETTE_FIELDS, PUBLISHER, normalizeCategory, readingMinutes, type GazettePost } from "@/lib/gazette";
 import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
 export const Route = createFileRoute("/gazette/$slug")({
@@ -97,7 +97,13 @@ function Article() {
         </Link>
 
         <article className="glass rounded-2xl border-gold/30 p-6 sm:p-10">
-          <span className="text-[11px] tracking-widest text-gold-soft">{post.category ?? "أخبار"}</span>
+          <span
+            className={`text-[11px] tracking-widest ${
+              normalizeCategory(post.category) === "عاجل" ? "font-bold text-red-400" : "text-gold-soft"
+            }`}
+          >
+            {normalizeCategory(post.category)}
+          </span>
           <h1 className="mt-3 text-4xl leading-[1.5] text-gold">{post.title}</h1>
           <div className="gold-rule mt-5 w-32" />
           <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
@@ -105,6 +111,7 @@ function Article() {
             <span className="inline-flex items-center gap-1 text-gold-soft">
               <Clock className="size-3.5" /> {readingMinutes(post.content)} دقيقة قراءة
             </span>
+            <span className="text-gold-soft">نشر: {PUBLISHER}</span>
           </div>
 
           {post.media_url && (
