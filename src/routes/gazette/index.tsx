@@ -80,6 +80,7 @@ function Gazette() {
         </h1>
         <div className="gold-rule mx-auto mt-5 w-32" />
         <p className="mt-4 text-sm text-muted-foreground">أخبارٌ ومقالاتٌ من ذاكرة التاريخ وحاضر الثقافة.</p>
+        <p className="mt-1 text-xs text-gold-soft">تصدر عن {PUBLISHER}</p>
       </header>
 
       {isLoading ? (
