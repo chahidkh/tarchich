@@ -66,12 +66,9 @@ function Gazette() {
   const inFeed = (ads ?? []).filter((a) => a.type === "in_feed");
   const sticky = (ads ?? []).find((a) => a.type === "sticky_bottom");
 
-  const categories = useMemo(
-    () => ["الكل", ...Array.from(new Set((posts ?? []).map((p) => p.category ?? "أخبار")))],
-    [posts],
-  );
+  const categories = useMemo(() => ["الكل", ...GAZETTE_CATEGORIES], []);
 
-  const list = (posts ?? []).filter((p) => cat === "الكل" || (p.category ?? "أخبار") === cat);
+  const list = (posts ?? []).filter((p) => cat === "الكل" || normalizeCategory(p.category) === cat);
   const hero = list.find((p) => p.is_featured) ?? list[0];
   const rest = list.filter((p) => p.id !== hero?.id);
 
