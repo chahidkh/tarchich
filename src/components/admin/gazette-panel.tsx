@@ -1,10 +1,20 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Newspaper, Trash2, Upload } from "lucide-react";
+import { Newspaper, Sparkles, Trash2, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadAsset } from "@/lib/site-settings";
-import { fetchGazettePosts, slugify, type GazettePost } from "@/lib/gazette";
+import {
+  GAZETTE_CATEGORIES,
+  PUBLISHER,
+  fetchGazettePosts,
+  normalizeCategory,
+  slugify,
+  type GazetteCategory,
+  type GazettePost,
+} from "@/lib/gazette";
+import { composeGazetteArticle } from "@/lib/gazette-ai.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,11 +24,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function GazettePanel() {
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("أخبار");
+  const [category, setCategory] = useState<GazetteCategory>("الثقافة");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [media, setMedia] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [source, setSource] = useState("");
+
+  const compose = useServerFn(composeGazetteArticle);
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ["admin-gazette"],
@@ -30,6 +43,18 @@ export function GazettePanel() {
     void qc.invalidateQueries({ queryKey: ["gazette"] });
   };
 
+  const generate = useMutation({
+    mutationFn: () => compose({ data: { source: source.trim() } }),
+    onSuccess: (a) => {
+      setTitle(a.title);
+      setCategory(a.category);
+      setExcerpt(a.excerpt);
+      setContent(a.content);
+      toast.success(`صيغ المقال وصُنّف في «${a.category}»`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const create = useMutation({
     mutationFn: async () => {
       const { data: auth } = await supabase.auth.getUser();
@@ -39,7 +64,7 @@ export function GazettePanel() {
         excerpt: excerpt.trim() || null,
         content: content.trim(),
         media_url: media.trim() || null,
-        category: category.trim() || "أخبار",
+        category,
         section: "gazette",
         is_published: false,
         author_id: auth.user?.id ?? null,
@@ -51,6 +76,7 @@ export function GazettePanel() {
       setExcerpt("");
       setContent("");
       setMedia("");
+      setSource("");
       toast.success("أُضيف المقال كمسودّة");
       invalidate();
     },
@@ -96,9 +122,41 @@ export function GazettePanel() {
         <Newspaper className="size-5" /> إدارة الجريدة
       </h2>
 
+      <div className="mt-5 space-y-3 rounded-lg border border-gold/30 bg-card/60 p-4">
+        <p className="flex items-center gap-2 text-sm text-gold-soft">
+          <Sparkles className="size-4" /> المحرّر الذكي — يصوغ الخبر بصوت {PUBLISHER} ويصنّفه تلقائياً
+        </p>
+        <Textarea
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          placeholder="ألصق هنا نصّ الخبر أو موضوعه…"
+          className="min-h-28 bg-background"
+        />
+        <Button
+          variant="outline"
+          disabled={source.trim().length < 10 || generate.isPending}
+          onClick={() => generate.mutate()}
+        >
+          {generate.isPending ? "جارٍ التحرير…" : "توليد المقال وتصنيفه"}
+        </Button>
+      </div>
+
       <div className="mt-5 space-y-3 rounded-lg border border-border bg-card/60 p-4">
         <Input value={title} maxLength={160} onChange={(e) => setTitle(e.target.value)} placeholder="عنوان المقال" className="bg-background" />
-        <Input value={category} maxLength={40} onChange={(e) => setCategory(e.target.value)} placeholder="التصنيف (تاريخ، ثقافة، أخبار…)" className="bg-background" />
+        <div className="flex flex-wrap gap-2">
+          {GAZETTE_CATEGORIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              className={`rounded-full border px-4 py-1.5 text-sm transition ${
+                category === c ? "border-gold bg-gold/15 text-gold" : "border-border text-muted-foreground hover:text-gold"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
         <Textarea value={excerpt} maxLength={300} onChange={(e) => setExcerpt(e.target.value)} placeholder="مقتطف قصير" className="bg-background" />
         <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="نص المقال…" className="min-h-40 bg-background" />
         <div className="flex flex-wrap items-center gap-2">
@@ -129,7 +187,7 @@ export function GazettePanel() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm">{p.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    {p.category ?? "أخبار"} · {p.views} مشاهدة · {p.is_published ? "منشور" : "مسودّة"}
+                    {normalizeCategory(p.category)} · {p.views} مشاهدة · {p.is_published ? "منشور" : "مسودّة"}
                   </p>
                 </div>
                 <label className="flex items-center gap-2 text-xs text-muted-foreground">
