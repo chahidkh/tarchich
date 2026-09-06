@@ -39,7 +39,13 @@ function Card({ post }: { post: GazettePost }) {
         <img src={post.media_url} alt={post.title} loading="lazy" className="h-40 w-full object-cover" />
       )}
       <div className="flex flex-1 flex-col p-5">
-        <span className="text-[11px] tracking-widest text-gold-soft">{post.category ?? "أخبار"}</span>
+        <span
+          className={`text-[11px] tracking-widest ${
+            normalizeCategory(post.category) === "عاجل" ? "font-bold text-red-400" : "text-gold-soft"
+          }`}
+        >
+          {normalizeCategory(post.category)}
+        </span>
         <h3 className="mt-2 text-xl leading-relaxed transition group-hover:text-gold">{post.title}</h3>
         <p className="mt-2 line-clamp-3 flex-1 text-sm leading-7 text-muted-foreground">
           {post.excerpt ?? post.content}
