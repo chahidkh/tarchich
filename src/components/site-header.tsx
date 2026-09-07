@@ -41,15 +41,16 @@ export function SiteHeader() {
               to={n.to}
               className="text-sm text-muted-foreground transition-colors hover:text-gold [&.active]:text-gold"
             >
-              {n.label}
+              {t(n.key)}
             </Link>
           ))}
         </nav>
 
         <div className="ms-auto flex items-center gap-2">
+          <SettingsMenu />
           <button
             onClick={() => setOpen(true)}
-            aria-label="السلة"
+            aria-label={t("cart.title")}
             className="relative rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold"
           >
             <ShoppingBag className="size-4" />
