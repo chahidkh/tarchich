@@ -130,6 +130,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <PrefsProvider>
       <CartProvider>
         <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
           <img
