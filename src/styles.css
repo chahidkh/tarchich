@@ -165,3 +165,63 @@
     transform: none;
   }
 }
+
+/* ── Global preferences: reading themes, typography, zen & low-data ───────── */
+
+html {
+  font-size: calc(1rem * var(--font-scale, 1));
+}
+
+/* وضع المخطوطة القديمة — warm parchment with dark ink */
+html[data-theme="parchment"] {
+  --ink: oklch(0.28 0.03 60);
+  --background: oklch(0.93 0.035 85);
+  --foreground: oklch(0.28 0.035 55);
+  --card: oklch(0.96 0.03 88);
+  --card-foreground: oklch(0.28 0.035 55);
+  --popover: oklch(0.96 0.03 88);
+  --popover-foreground: oklch(0.28 0.035 55);
+  --primary: oklch(0.52 0.1 70);
+  --primary-foreground: oklch(0.97 0.02 85);
+  --secondary: oklch(0.89 0.035 85);
+  --secondary-foreground: oklch(0.3 0.035 55);
+  --muted: oklch(0.89 0.03 85);
+  --muted-foreground: oklch(0.42 0.035 60);
+  --accent: oklch(0.87 0.04 82);
+  --accent-foreground: oklch(0.28 0.035 55);
+  --border: oklch(0.52 0.1 70 / 28%);
+  --input: oklch(0.52 0.1 70 / 24%);
+  --ring: oklch(0.52 0.1 70 / 45%);
+  --gold: oklch(0.5 0.1 70);
+  --gold-soft: oklch(0.58 0.1 72);
+}
+
+html[data-theme="parchment"] .app-bg {
+  display: none;
+}
+
+html[data-theme="parchment"] .glass {
+  background-color: oklch(0.96 0.03 88 / 0.85);
+}
+
+html[data-font="kufi"] body,
+html[data-font="kufi"] h1,
+html[data-font="kufi"] h2,
+html[data-font="kufi"] h3 {
+  font-family: var(--font-kufi);
+}
+
+/* وضع التركيز — hide chrome while reading */
+html.zen .site-header {
+  display: none;
+}
+
+/* توفير البيانات — drop heavy decorative imagery */
+html[data-lowdata="true"] .app-bg img {
+  display: none;
+}
+
+html[data-lowdata="true"] img {
+  image-rendering: auto;
+  filter: saturate(0.95);
+}
