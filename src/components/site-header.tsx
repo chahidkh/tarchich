@@ -4,17 +4,21 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { supabase } from "@/integrations/supabase/client";
+import { SettingsMenu } from "@/components/settings-menu";
+import { useT, type TransKey } from "@/lib/i18n";
 
-const NAV = [
-  { to: "/", label: "الرئيسية" },
-  { to: "/store", label: "متجر الكتب" },
-  { to: "/gazette", label: "الجريدة" },
-  { to: "/majlis", label: "المجلس الثقافي" },
+const NAV: { to: string; key: TransKey }[] = [
+  { to: "/", key: "nav.home" },
+  { to: "/store", key: "nav.store" },
+  { to: "/gazette", key: "nav.gazette" },
+  { to: "/majlis", key: "nav.majlis" },
+  { to: "/contact", key: "nav.contact" },
 ];
 
 export function SiteHeader() {
   const { count, setOpen } = useCart();
   const { user, isAdmin } = useIsAdmin();
+  const { t } = useT();
   const navigate = useNavigate();
 
   async function signOut() {
