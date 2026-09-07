@@ -85,7 +85,7 @@ export function SiteHeader() {
             </>
           ) : (
             <Button asChild size="sm">
-              <Link to="/auth">انضم إلينا</Link>
+              <Link to="/auth">{t("nav.join")}</Link>
             </Button>
           )}
         </div>
