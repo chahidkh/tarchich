@@ -132,10 +132,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <PrefsProvider>
       <CartProvider>
-        <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
+        <div aria-hidden className="app-bg pointer-events-none fixed inset-0 z-0">
           <img
             src={heroImage}
             alt=""
+            loading="lazy"
             className="size-full object-cover opacity-[0.5] brightness-[1.8]"
           />
           <div
@@ -155,6 +156,7 @@ function RootComponent() {
         <HakeemDrawer />
         <Toaster position="top-center" richColors />
       </CartProvider>
+      </PrefsProvider>
     </QueryClientProvider>
   );
 }
