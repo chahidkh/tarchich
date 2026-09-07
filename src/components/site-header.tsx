@@ -66,13 +66,13 @@ export function SiteHeader() {
               {isAdmin && (
                 <Button asChild variant="outline" size="sm">
                   <Link to="/admin">
-                    <ShieldCheck className="size-4" /> الإشراف
+                    <ShieldCheck className="size-4" /> {t("nav.admin")}
                   </Link>
                 </Button>
               )}
               <Button asChild variant="outline" size="sm">
                 <Link to="/dashboard">
-                  <User className="size-4" /> حسابي
+                  <User className="size-4" /> {t("nav.account")}
                 </Link>
               </Button>
               <button
