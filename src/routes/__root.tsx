@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import heroImage from "../assets/hero-library.jpg";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "../lib/cart";
+import { PrefsProvider } from "../lib/prefs";
 import { SiteHeader } from "../components/site-header";
 import { CartDrawer } from "../components/cart-drawer";
 import { HakeemDrawer } from "../components/hakeem-drawer";
@@ -129,11 +130,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <PrefsProvider>
       <CartProvider>
-        <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
+        <div aria-hidden className="app-bg pointer-events-none fixed inset-0 z-0">
           <img
             src={heroImage}
             alt=""
+            loading="lazy"
             className="size-full object-cover opacity-[0.5] brightness-[1.8]"
           />
           <div
@@ -153,6 +156,7 @@ function RootComponent() {
         <HakeemDrawer />
         <Toaster position="top-center" richColors />
       </CartProvider>
+      </PrefsProvider>
     </QueryClientProvider>
   );
 }

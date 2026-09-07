@@ -4,17 +4,21 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { supabase } from "@/integrations/supabase/client";
+import { SettingsMenu } from "@/components/settings-menu";
+import { useT, type TransKey } from "@/lib/i18n";
 
-const NAV = [
-  { to: "/", label: "الرئيسية" },
-  { to: "/store", label: "متجر الكتب" },
-  { to: "/gazette", label: "الجريدة" },
-  { to: "/majlis", label: "المجلس الثقافي" },
+const NAV: { to: string; key: TransKey }[] = [
+  { to: "/", key: "nav.home" },
+  { to: "/store", key: "nav.store" },
+  { to: "/gazette", key: "nav.gazette" },
+  { to: "/majlis", key: "nav.majlis" },
+  { to: "/contact", key: "nav.contact" },
 ];
 
 export function SiteHeader() {
   const { count, setOpen } = useCart();
   const { user, isAdmin } = useIsAdmin();
+  const { t } = useT();
   const navigate = useNavigate();
 
   async function signOut() {
@@ -23,7 +27,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+    <header className="site-header sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
           <BookOpen className="size-5 text-gold" />
@@ -37,15 +41,16 @@ export function SiteHeader() {
               to={n.to}
               className="text-sm text-muted-foreground transition-colors hover:text-gold [&.active]:text-gold"
             >
-              {n.label}
+              {t(n.key)}
             </Link>
           ))}
         </nav>
 
         <div className="ms-auto flex items-center gap-2">
+          <SettingsMenu />
           <button
             onClick={() => setOpen(true)}
-            aria-label="السلة"
+            aria-label={t("cart.title")}
             className="relative rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold"
           >
             <ShoppingBag className="size-4" />
@@ -61,13 +66,13 @@ export function SiteHeader() {
               {isAdmin && (
                 <Button asChild variant="outline" size="sm">
                   <Link to="/admin">
-                    <ShieldCheck className="size-4" /> الإشراف
+                    <ShieldCheck className="size-4" /> {t("nav.admin")}
                   </Link>
                 </Button>
               )}
               <Button asChild variant="outline" size="sm">
                 <Link to="/dashboard">
-                  <User className="size-4" /> حسابي
+                  <User className="size-4" /> {t("nav.account")}
                 </Link>
               </Button>
               <button
@@ -80,7 +85,7 @@ export function SiteHeader() {
             </>
           ) : (
             <Button asChild size="sm">
-              <Link to="/auth">انضم إلينا</Link>
+              <Link to="/auth">{t("nav.join")}</Link>
             </Button>
           )}
         </div>
