@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { BookCard, type Book } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PriceTag } from "@/components/price-tag";
+import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
