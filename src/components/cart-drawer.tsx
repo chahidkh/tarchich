@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
+import { PriceTag } from "@/components/price-tag";
 
 export function CartDrawer() {
   const { items, remove, total, clear, open, setOpen } = useCart();
