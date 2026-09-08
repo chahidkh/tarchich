@@ -67,7 +67,7 @@ export function CartDrawer() {
         <div className="space-y-3 border-t border-border p-4">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">الإجمالي</span>
-            <span className="font-semibold text-gold">{total.toFixed(2)} ر.س</span>
+            <PriceTag amount={total} />
           </div>
           <Button className="w-full" disabled={items.length === 0 || busy} onClick={() => void checkout()}>
             {busy ? <Loader2 className="size-4 animate-spin" /> : "الدفع الفوري"}
