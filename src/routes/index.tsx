@@ -116,8 +116,9 @@ function Home() {
           <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground">
             مقالات يومية حصرية، كتبٌ صوتية نادرة، واستشارات غير محدودة مع حكيم المكتبة.
           </p>
-          <p className="mt-6 font-display text-4xl text-parchment">
-            ٤٩ <span className="text-base text-muted-foreground">ر.س / شهرياً</span>
+          <p className="mt-6 flex items-center justify-center gap-2 font-display text-3xl text-parchment">
+            <PriceTag amount={49} className="text-3xl" />
+            <span className="text-base text-muted-foreground">/ شهرياً</span>
           </p>
           <Button asChild className="mt-6" size="lg">
             <Link to="/auth">انضم إلى المجلس</Link>
@@ -125,9 +126,7 @@ function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
-        مكتبة ترشيش — حيث تُصان المعرفة وتُروى.
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
