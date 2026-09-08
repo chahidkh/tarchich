@@ -53,8 +53,8 @@ export function CartDrawer() {
             <div key={i.id} className="flex items-center gap-3 rounded-lg border border-border bg-secondary/40 p-3">
               <div className="flex-1">
                 <p className="text-sm font-medium">{i.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {i.qty} × {Number(i.price).toFixed(2)} ر.س
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  {i.qty} × <PriceTag amount={Number(i.price)} className="text-xs" />
                 </p>
               </div>
               <button onClick={() => remove(i.id)} aria-label="حذف" className="text-muted-foreground hover:text-destructive">
