@@ -85,9 +85,12 @@ export function BookCard({ book }: { book: Book }) {
             </p>
           )}
           <div className="flex flex-col gap-2">
-            <Button onClick={addToCart}>
-              <BookOpen className="size-4" /> اقتنِ الكتاب — {Number(book.price).toFixed(2)} ر.س
-            </Button>
+            <div className="flex items-center justify-between gap-3">
+              <Button className="flex-1" onClick={addToCart}>
+                <BookOpen className="size-4" /> اقتنِ الكتاب
+              </Button>
+              <PriceTag amount={Number(book.price)} />
+            </div>
             {book.sample_pdf_url && (
               <Button asChild variant="outline">
                 <a href={book.sample_pdf_url} target="_blank" rel="noreferrer">
