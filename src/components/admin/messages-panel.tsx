@@ -32,13 +32,13 @@ export function MessagesPanel() {
 
   async function markRead(id: string) {
     const { error } = await supabase.from("contact_messages").update({ is_read: true }).eq("id", id);
-    if (error) return toast.error("تعذّر التحديث");
+    if (error) { toast.error("تعذّر التحديث"); return; }
     void qc.invalidateQueries({ queryKey: ["contact-messages"] });
   }
 
   async function remove(id: string) {
     const { error } = await supabase.from("contact_messages").delete().eq("id", id);
-    if (error) return toast.error("تعذّر الحذف");
+    if (error) { toast.error("تعذّر الحذف"); return; }
     toast.success("حُذفت الرسالة");
     void qc.invalidateQueries({ queryKey: ["contact-messages"] });
   }
