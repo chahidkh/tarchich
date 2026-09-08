@@ -9,6 +9,7 @@ import { CommunityPanel } from "@/components/admin/community-panel";
 import { UsersPanel } from "@/components/admin/users-panel";
 import { AdsPanel } from "@/components/admin/ads-panel";
 import { GazettePanel } from "@/components/admin/gazette-panel";
+import { MessagesPanel } from "@/components/admin/messages-panel";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -76,6 +77,9 @@ function Admin() {
           <TabsTrigger value="ads" className="flex-1">
             الإعلانات
           </TabsTrigger>
+          <TabsTrigger value="messages" className="flex-1">
+            الرسائل
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="books">
@@ -95,6 +99,9 @@ function Admin() {
         </TabsContent>
         <TabsContent value="ads">
           <AdsPanel />
+        </TabsContent>
+        <TabsContent value="messages">
+          <MessagesPanel />
         </TabsContent>
       </Tabs>
     </main>

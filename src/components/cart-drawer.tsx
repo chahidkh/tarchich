@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/hooks/use-session";
 import { supabase } from "@/integrations/supabase/client";
+import { PriceTag } from "@/components/price-tag";
 
 export function CartDrawer() {
   const { items, remove, total, clear, open, setOpen } = useCart();
@@ -53,8 +54,8 @@ export function CartDrawer() {
             <div key={i.id} className="flex items-center gap-3 rounded-lg border border-border bg-secondary/40 p-3">
               <div className="flex-1">
                 <p className="text-sm font-medium">{i.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {i.qty} × {Number(i.price).toFixed(2)} ر.س
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  {i.qty} × <PriceTag amount={Number(i.price)} className="text-xs" />
                 </p>
               </div>
               <button onClick={() => remove(i.id)} aria-label="حذف" className="text-muted-foreground hover:text-destructive">
@@ -67,7 +68,7 @@ export function CartDrawer() {
         <div className="space-y-3 border-t border-border p-4">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">الإجمالي</span>
-            <span className="font-semibold text-gold">{total.toFixed(2)} ر.س</span>
+            <PriceTag amount={total} />
           </div>
           <Button className="w-full" disabled={items.length === 0 || busy} onClick={() => void checkout()}>
             {busy ? <Loader2 className="size-4 animate-spin" /> : "الدفع الفوري"}
