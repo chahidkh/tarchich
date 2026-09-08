@@ -59,7 +59,7 @@ export function BookCard({ book }: { book: Book }) {
           <p className="text-xs text-muted-foreground">{book.author}</p>
           <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{book.description}</p>
           <div className="mt-auto flex items-center justify-between pt-3">
-            <span className="font-semibold text-gold">{Number(book.price).toFixed(2)} ر.س</span>
+            <PriceTag amount={Number(book.price)} />
             <Button size="sm" onClick={addToCart}>
               أضف للسلة
             </Button>
