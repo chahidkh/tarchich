@@ -19,6 +19,8 @@ export type TransKey =
   | "nav.gazette"
   | "nav.majlis"
   | "nav.contact"
+  | "nav.privacy"
+  | "nav.terms"
   | "nav.account"
   | "nav.admin"
   | "nav.join"
@@ -55,6 +57,8 @@ const ar: Dict = {
   "nav.gazette": "الجريدة",
   "nav.majlis": "المجلس الثقافي",
   "nav.contact": "تواصل معنا",
+  "nav.privacy": "سياسة الخصوصية",
+  "nav.terms": "الشروط والأحكام",
   "nav.account": "حسابي",
   "nav.admin": "الإشراف",
   "nav.join": "انضم إلينا",
@@ -90,6 +94,8 @@ const en: Dict = {
   "nav.gazette": "The Gazette",
   "nav.majlis": "Cultural Forum",
   "nav.contact": "Contact",
+  "nav.privacy": "Privacy Policy",
+  "nav.terms": "Terms & Conditions",
   "nav.account": "Account",
   "nav.admin": "Admin",
   "nav.join": "Join us",
@@ -129,6 +135,8 @@ const fr = make({
   "nav.gazette": "La Gazette",
   "nav.majlis": "Forum culturel",
   "nav.contact": "Contact",
+  "nav.privacy": "Politique de confidentialité",
+  "nav.terms": "Conditions générales",
   "nav.account": "Mon compte",
   "nav.admin": "Administration",
   "nav.join": "Rejoignez-nous",
@@ -159,6 +167,8 @@ const it = make({
   "nav.gazette": "La Gazzetta",
   "nav.majlis": "Forum culturale",
   "nav.contact": "Contatti",
+  "nav.privacy": "Informativa sulla privacy",
+  "nav.terms": "Termini e condizioni",
   "nav.account": "Account",
   "nav.admin": "Amministrazione",
   "nav.join": "Unisciti a noi",
@@ -189,6 +199,8 @@ const pt = make({
   "nav.gazette": "A Gazeta",
   "nav.majlis": "Fórum cultural",
   "nav.contact": "Contato",
+  "nav.privacy": "Política de privacidade",
+  "nav.terms": "Termos e condições",
   "nav.account": "Minha conta",
   "nav.admin": "Administração",
   "nav.join": "Junte-se a nós",
@@ -219,6 +231,8 @@ const ja = make({
   "nav.gazette": "ガゼット",
   "nav.majlis": "文化フォーラム",
   "nav.contact": "お問い合わせ",
+  "nav.privacy": "プライバシーポリシー",
+  "nav.terms": "利用規約",
   "nav.account": "アカウント",
   "nav.admin": "管理",
   "nav.join": "参加する",
@@ -249,6 +263,8 @@ const zh = make({
   "nav.gazette": "报刊",
   "nav.majlis": "文化论坛",
   "nav.contact": "联系我们",
+  "nav.privacy": "隐私政策",
+  "nav.terms": "条款与条件",
   "nav.account": "我的账户",
   "nav.admin": "管理",
   "nav.join": "加入我们",
@@ -279,6 +295,8 @@ const ru = make({
   "nav.gazette": "Газета",
   "nav.majlis": "Культурный форум",
   "nav.contact": "Контакты",
+  "nav.privacy": "Политика конфиденциальности",
+  "nav.terms": "Условия использования",
   "nav.account": "Мой аккаунт",
   "nav.admin": "Админ",
   "nav.join": "Присоединиться",

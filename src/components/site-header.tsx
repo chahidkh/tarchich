@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingBag, BookOpen, User, LogOut, ShieldCheck } from "lucide-react";
+import { ShoppingBag, BookOpen, User, LogOut, ShieldCheck, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { useIsAdmin } from "@/hooks/use-admin";
@@ -20,6 +21,7 @@ export function SiteHeader() {
   const { user, isAdmin } = useIsAdmin();
   const { t } = useT();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -47,6 +49,14 @@ export function SiteHeader() {
         </nav>
 
         <div className="ms-auto flex items-center gap-2">
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={t("settings.title")}
+            aria-expanded={menuOpen}
+            className="rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold md:hidden"
+          >
+            {menuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+          </button>
           <SettingsMenu />
           <button
             onClick={() => setOpen(true)}
@@ -90,6 +100,23 @@ export function SiteHeader() {
           )}
         </div>
       </div>
+
+      {menuOpen && (
+        <nav className="border-t border-border bg-background/95 backdrop-blur-md md:hidden">
+          <div className="mx-auto flex max-w-6xl flex-col px-4 py-2">
+            {NAV.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                onClick={() => setMenuOpen(false)}
+                className="border-b border-border/50 py-3 text-sm text-muted-foreground transition-colors last:border-0 hover:text-gold [&.active]:text-gold"
+              >
+                {t(n.key)}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }
