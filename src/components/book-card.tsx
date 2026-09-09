@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useCart } from "@/lib/cart";
 import { PriceTag } from "@/components/price-tag";
 import { createBookCheckout } from "@/lib/checkout.functions";
+import { useSession } from "@/hooks/use-session";
 
 export type Book = {
   id: string;
@@ -25,6 +26,7 @@ export type Book = {
 
 export function BookCard({ book }: { book: Book }) {
   const { add, setOpen } = useCart();
+  const { user } = useSession();
   const [preview, setPreview] = useState(false);
   const [paying, setPaying] = useState(false);
   const checkout = useServerFn(createBookCheckout);
@@ -38,7 +40,14 @@ export function BookCard({ book }: { book: Book }) {
   async function buyNow() {
     setPaying(true);
     try {
-      const { url } = await checkout({ data: { bookId: book.id, origin: window.location.origin } });
+      const { url } = await checkout({
+        data: {
+          bookId: book.id,
+          origin: window.location.origin,
+          userId: user?.id ?? null,
+          referrer: localStorage.getItem("zaina-ref"),
+        },
+      });
       window.location.href = url;
     } catch (e) {
       toast.error((e as Error).message || "تعذّر فتح صفحة الدفع");
