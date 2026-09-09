@@ -61,7 +61,14 @@ function Store() {
     },
   });
 
-  const books = data?.books ?? [];
+  const live = q.trim().toLocaleLowerCase("ar");
+  const allBooks = data?.books ?? [];
+  // فلترة فورية أثناء الكتابة على القائمة المعروضة (قبل وصول نتائج الخادم)
+  const books = live
+    ? allBooks.filter((b) =>
+        `${b.title} ${b.author} ${b.category ?? ""}`.toLocaleLowerCase("ar").includes(live),
+      )
+    : allBooks;
   const total = data?.count ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 

@@ -86,7 +86,7 @@ export function BookCard({ book }: { book: Book }) {
       </article>
 
       <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent className="glass border-gold/20">
+        <DialogContent className="glass max-h-[90vh] overflow-y-auto border-gold/20">
           <DialogHeader className="text-right">
             <DialogTitle className="font-display text-2xl text-gold">{book.title}</DialogTitle>
             <DialogDescription>{book.author}</DialogDescription>
@@ -127,6 +127,8 @@ export function BookCard({ book }: { book: Book }) {
               </Button>
             )}
           </div>
+          {preview && <BookReviews bookId={book.id} />}
+
         </DialogContent>
       </Dialog>
     </>
