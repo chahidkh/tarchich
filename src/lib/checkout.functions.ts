@@ -10,6 +10,7 @@ function stripeKey() {
 }
 
 async function createSession(body: URLSearchParams) {
+  body.set("payment_method_types[0]", "card");
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: { Authorization: `Bearer ${stripeKey()}`, "Content-Type": "application/x-www-form-urlencoded" },
@@ -18,7 +19,7 @@ async function createSession(body: URLSearchParams) {
   const json = (await res.json()) as StripeSession;
   if (!res.ok || !json.url) {
     console.error("Stripe checkout failed", json.error);
-    throw new Error("تعذّر فتح صفحة الدفع، حاول لاحقاً");
+    throw new Error(json.error?.message ? `تعذّر فتح صفحة الدفع: ${json.error.message}` : "تعذّر فتح صفحة الدفع، حاول لاحقاً");
   }
   return { url: json.url };
 }
