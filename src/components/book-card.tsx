@@ -8,6 +8,8 @@ import { useCart } from "@/lib/cart";
 import { PriceTag } from "@/components/price-tag";
 import { createBookCheckout } from "@/lib/checkout.functions";
 import { useSession } from "@/hooks/use-session";
+import { BookCover } from "@/components/book-cover";
+import { BookReviews } from "@/components/book-reviews";
 
 export type Book = {
   id: string;
@@ -62,16 +64,7 @@ export function BookCard({ book }: { book: Book }) {
           onClick={() => setPreview(true)}
           className="relative flex aspect-4/5 w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_20%,oklch(0.3_0.05_60),oklch(0.19_0.03_55))]"
         >
-          {book.cover_image_url ? (
-            <img
-              src={book.cover_image_url}
-              alt={book.title}
-              loading="lazy"
-              className="size-full object-cover transition duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <span className="px-6 text-center font-display text-2xl leading-relaxed text-gold-soft">{book.title}</span>
-          )}
+          <BookCover src={book.cover_image_url} title={book.title} />
           {book.badge && (
             <span className="absolute top-3 end-3 rounded-full border border-gold/50 bg-background/80 px-3 py-1 text-[11px] text-gold">
               {book.badge}
@@ -93,7 +86,7 @@ export function BookCard({ book }: { book: Book }) {
       </article>
 
       <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent className="glass border-gold/20">
+        <DialogContent className="glass max-h-[90vh] overflow-y-auto border-gold/20">
           <DialogHeader className="text-right">
             <DialogTitle className="font-display text-2xl text-gold">{book.title}</DialogTitle>
             <DialogDescription>{book.author}</DialogDescription>
@@ -134,6 +127,8 @@ export function BookCard({ book }: { book: Book }) {
               </Button>
             )}
           </div>
+          {preview && <BookReviews bookId={book.id} />}
+
         </DialogContent>
       </Dialog>
     </>

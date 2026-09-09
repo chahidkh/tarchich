@@ -17,6 +17,10 @@ export function SiteFooter() {
         </a>
       </p>
       <p className="mt-3 flex flex-wrap items-center justify-center gap-3">
+        <Link to="/about" className="text-gold hover:underline">
+          {t("nav.about")}
+        </Link>
+        <span aria-hidden className="text-border">•</span>
         <Link to="/contact" className="text-gold hover:underline">
           {t("nav.contact")}
         </Link>

@@ -19,6 +19,7 @@ export type TransKey =
   | "nav.gazette"
   | "nav.majlis"
   | "nav.contact"
+  | "nav.about"
   | "nav.privacy"
   | "nav.terms"
   | "nav.account"
@@ -57,6 +58,7 @@ const ar: Dict = {
   "nav.gazette": "الجريدة",
   "nav.majlis": "المجلس الثقافي",
   "nav.contact": "تواصل معنا",
+  "nav.about": "من نحن",
   "nav.privacy": "سياسة الخصوصية",
   "nav.terms": "الشروط والأحكام",
   "nav.account": "حسابي",
@@ -94,6 +96,7 @@ const en: Dict = {
   "nav.gazette": "The Gazette",
   "nav.majlis": "Cultural Forum",
   "nav.contact": "Contact",
+  "nav.about": "About",
   "nav.privacy": "Privacy Policy",
   "nav.terms": "Terms & Conditions",
   "nav.account": "Account",
@@ -135,6 +138,7 @@ const fr = make({
   "nav.gazette": "La Gazette",
   "nav.majlis": "Forum culturel",
   "nav.contact": "Contact",
+  "nav.about": "À propos",
   "nav.privacy": "Politique de confidentialité",
   "nav.terms": "Conditions générales",
   "nav.account": "Mon compte",
@@ -167,6 +171,7 @@ const it = make({
   "nav.gazette": "La Gazzetta",
   "nav.majlis": "Forum culturale",
   "nav.contact": "Contatti",
+  "nav.about": "Chi siamo",
   "nav.privacy": "Informativa sulla privacy",
   "nav.terms": "Termini e condizioni",
   "nav.account": "Account",
@@ -199,6 +204,7 @@ const pt = make({
   "nav.gazette": "A Gazeta",
   "nav.majlis": "Fórum cultural",
   "nav.contact": "Contato",
+  "nav.about": "Sobre nós",
   "nav.privacy": "Política de privacidade",
   "nav.terms": "Termos e condições",
   "nav.account": "Minha conta",
@@ -231,6 +237,7 @@ const ja = make({
   "nav.gazette": "ガゼット",
   "nav.majlis": "文化フォーラム",
   "nav.contact": "お問い合わせ",
+  "nav.about": "私たちについて",
   "nav.privacy": "プライバシーポリシー",
   "nav.terms": "利用規約",
   "nav.account": "アカウント",
@@ -263,6 +270,7 @@ const zh = make({
   "nav.gazette": "报刊",
   "nav.majlis": "文化论坛",
   "nav.contact": "联系我们",
+  "nav.about": "关于我们",
   "nav.privacy": "隐私政策",
   "nav.terms": "条款与条件",
   "nav.account": "我的账户",
@@ -295,6 +303,7 @@ const ru = make({
   "nav.gazette": "Газета",
   "nav.majlis": "Культурный форум",
   "nav.contact": "Контакты",
+  "nav.about": "О нас",
   "nav.privacy": "Политика конфиденциальности",
   "nav.terms": "Условия использования",
   "nav.account": "Мой аккаунт",
