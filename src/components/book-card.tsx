@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { BookOpen, ExternalLink, FileText } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { BookOpen, CreditCard, ExternalLink, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useCart } from "@/lib/cart";
 import { PriceTag } from "@/components/price-tag";
+import { createBookCheckout } from "@/lib/checkout.functions";
 
 export type Book = {
   id: string;
