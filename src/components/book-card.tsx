@@ -25,6 +25,7 @@ export type Book = {
 
 export function BookCard({ book }: { book: Book }) {
   const { add, setOpen } = useCart();
+  const { user } = useSession();
   const [preview, setPreview] = useState(false);
   const [paying, setPaying] = useState(false);
   const checkout = useServerFn(createBookCheckout);

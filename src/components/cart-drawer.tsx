@@ -2,18 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/hooks/use-session";
-import { supabase } from "@/integrations/supabase/client";
 import { PriceTag } from "@/components/price-tag";
+import { createCartCheckout } from "@/lib/checkout.functions";
 
 export function CartDrawer() {
-  const { items, remove, total, clear, open, setOpen } = useCart();
+  const { items, remove, total, open, setOpen } = useCart();
   const { user } = useSession();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
+  const cartCheckout = useServerFn(createCartCheckout);
 
   async function checkout() {
     if (!user) {
@@ -23,22 +25,21 @@ export function CartDrawer() {
       return;
     }
     setBusy(true);
-    const referrer = typeof window !== "undefined" ? localStorage.getItem("zaina-ref") : null;
-    const { error } = await supabase.from("orders").insert({
-      user_id: user.id,
-      total_amount: total,
-      status: "completed",
-      referrer_code: referrer,
-      items: items.map((i) => ({ id: i.id, title: i.title, price: i.price, qty: i.qty })),
-    });
-    setBusy(false);
-    if (error) {
-      toast.error("تعذّر إتمام الطلب");
-      return;
+    try {
+      const referrer = localStorage.getItem("zaina-ref");
+      const { url } = await cartCheckout({
+        data: {
+          items: items.map((i) => ({ id: i.id, qty: i.qty })),
+          origin: window.location.origin,
+          userId: user.id,
+          referrer,
+        },
+      });
+      window.location.href = url;
+    } catch (e) {
+      setBusy(false);
+      toast.error((e as Error).message || "تعذّر فتح صفحة الدفع");
     }
-    clear();
-    setOpen(false);
-    toast.success("تم إتمام طلبك بنجاح، نسخُك في انتظارك بلوحة الحساب");
   }
 
   return (
