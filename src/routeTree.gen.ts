@@ -17,6 +17,7 @@ import { Route as MajlisRouteImport } from './routes/majlis'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout/success'
 import { Route as GazetteIndexRouteImport } from './routes/gazette/index'
 import { Route as GazetteSlugRouteImport } from './routes/gazette/$slug'
 import { Route as ApiPublicAssetSplatRouteImport } from './routes/api/public/asset/$'
@@ -60,6 +61,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GazetteIndexRoute = GazetteIndexRouteImport.update({
   id: '/gazette/',
   path: '/gazette/',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/store': typeof StoreRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/gazette/$slug': typeof GazetteSlugRoute
   '/gazette/': typeof GazetteIndexRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/store': typeof StoreRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/gazette/$slug': typeof GazetteSlugRoute
   '/gazette': typeof GazetteIndexRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/store': typeof StoreRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/gazette/$slug': typeof GazetteSlugRoute
   '/gazette/': typeof GazetteIndexRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/admin'
     | '/dashboard'
+    | '/checkout/success'
     | '/gazette/$slug'
     | '/gazette/'
     | '/api/public/asset/$'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/admin'
     | '/dashboard'
+    | '/checkout/success'
     | '/gazette/$slug'
     | '/gazette'
     | '/api/public/asset/$'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/checkout/success'
     | '/gazette/$slug'
     | '/gazette/'
     | '/api/public/asset/$'
@@ -161,6 +173,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   MajlisRoute: typeof MajlisRoute
   StoreRoute: typeof StoreRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   GazetteSlugRoute: typeof GazetteSlugRoute
   GazetteIndexRoute: typeof GazetteIndexRoute
   ApiPublicAssetSplatRoute: typeof ApiPublicAssetSplatRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/checkout/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gazette/': {
       id: '/gazette/'
       path: '/gazette'
@@ -268,6 +288,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   MajlisRoute: MajlisRoute,
   StoreRoute: StoreRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
   GazetteSlugRoute: GazetteSlugRoute,
   GazetteIndexRoute: GazetteIndexRoute,
   ApiPublicAssetSplatRoute: ApiPublicAssetSplatRoute,

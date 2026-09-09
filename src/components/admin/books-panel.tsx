@@ -225,6 +225,13 @@ export function BooksPanel() {
         </Button>
       </section>
 
+      <CsvImport
+        onDone={() => {
+          void qc.invalidateQueries({ queryKey: ["admin-books"] });
+          void qc.invalidateQueries({ queryKey: ["books"] });
+        }}
+      />
+
       <section className="glass rounded-xl p-6">
         <h2 className="font-display text-2xl text-gold">إدارة الكتب</h2>
         <div className="mt-5 space-y-3">
@@ -306,6 +313,140 @@ export function BooksPanel() {
         </div>
       </section>
     </div>
+  );
+}
+
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let quoted = false;
+  const src = text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    if (quoted) {
+      if (c === '"') {
+        if (src[i + 1] === '"') {
+          cell += '"';
+          i++;
+        } else quoted = false;
+      } else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ",") {
+      row.push(cell);
+      cell = "";
+    } else if (c === "\n") {
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = "";
+    } else cell += c;
+  }
+  if (cell || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+  return rows.filter((r) => r.some((v) => v.trim() !== ""));
+}
+
+const CSV_ALIASES: Record<string, string> = {
+  title: "title",
+  العنوان: "title",
+  اسم_الكتاب: "title",
+  author: "author",
+  المؤلف: "author",
+  description: "description",
+  الوصف: "description",
+  price: "price",
+  السعر: "price",
+  category: "category",
+  التصنيف: "category",
+  badge: "badge",
+  الشارة: "badge",
+  stock: "stock",
+  المخزون: "stock",
+  cover_image_url: "cover_image_url",
+  cover: "cover_image_url",
+  الغلاف: "cover_image_url",
+  pdf: "full_pdf_url",
+  full_pdf_url: "full_pdf_url",
+  ملف_الكتاب: "full_pdf_url",
+  sample_pdf_url: "sample_pdf_url",
+  external_url: "external_url",
+  رابط_خارجي: "external_url",
+  copyright_notice: "copyright_notice",
+};
+
+function CsvImport({ onDone }: { onDone: () => void }) {
+  const [status, setStatus] = useState<string | null>(null);
+  const [running, setRunning] = useState(false);
+
+  async function handleFile(file?: File | null) {
+    if (!file) return;
+    setRunning(true);
+    setStatus("جارٍ قراءة الملف…");
+    try {
+      const rows = parseCsv(await file.text());
+      if (rows.length < 2) throw new Error("الملف لا يحتوي على بيانات كافية");
+      const header = (rows[0] ?? []).map((h) => CSV_ALIASES[h.trim().toLowerCase().replace(/\s+/g, "_")] ?? "");
+      if (!header.includes("title")) throw new Error("يجب أن يحتوي الملف على عمود العنوان (title / العنوان)");
+
+      const records = rows.slice(1).map((r) => {
+        const rec: Record<string, unknown> = { title: "", author: "غير معروف", price: 0, stock: 0 };
+        header.forEach((key, i) => {
+          if (!key) return;
+          const raw = (r[i] ?? "").trim();
+          if (raw === "") return;
+          if (key === "price") rec["price"] = Number(raw.replace(/[^\d.]/g, "")) || 0;
+          else if (key === "stock") rec["stock"] = parseInt(raw, 10) || 0;
+          else rec[key] = raw;
+        });
+        return rec;
+      }).filter((r) => String(r["title"]).trim() !== "");
+
+      let done = 0;
+      for (let i = 0; i < records.length; i += 200) {
+        const chunk = records.slice(i, i + 200);
+        const { error } = await supabase.from("books").insert(chunk as never);
+        if (error) throw new Error(`فشل الاستيراد عند السجل ${i + 1}: ${error.message}`);
+        done += chunk.length;
+        setStatus(`تم استيراد ${done} من ${records.length}…`);
+      }
+      setStatus(`اكتمل الاستيراد: ${done} كتاباً`);
+      toast.success(`تم استيراد ${done} كتاباً بنجاح`);
+      onDone();
+    } catch (e) {
+      setStatus(null);
+      toast.error((e as Error).message);
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  return (
+    <section className="glass rounded-xl p-6">
+      <h2 className="font-display text-2xl text-gold">استيراد جماعي من ملف CSV</h2>
+      <p className="mt-1 text-xs leading-6 text-muted-foreground">
+        ارفع ملف CSV يحتوي على آلاف الكتب دفعة واحدة. الأعمدة المدعومة:
+        <span dir="ltr" className="mx-1 text-gold-soft">
+          title, author, description, price, category, badge, stock, cover_image_url, full_pdf_url, sample_pdf_url,
+          external_url
+        </span>
+        (أو مرادفاتها العربية: العنوان، المؤلف، الوصف، السعر، التصنيف، المخزون، الغلاف، ملف_الكتاب).
+      </p>
+      <label className="mt-4 flex w-fit cursor-pointer items-center gap-2 rounded-md border border-dashed border-gold/40 px-4 py-2 text-sm text-gold-soft transition hover:border-gold">
+        <Upload className="size-4" />
+        {running ? "جارٍ الاستيراد…" : "اختر ملف CSV"}
+        <input
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          disabled={running}
+          onChange={(e) => void handleFile(e.target.files?.[0] ?? null)}
+        />
+      </label>
+      {status && <p className="mt-3 text-xs text-muted-foreground">{status}</p>}
+    </section>
   );
 }
 

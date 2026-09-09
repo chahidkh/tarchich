@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { BookOpen, ExternalLink, FileText } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { BookOpen, CreditCard, ExternalLink, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useCart } from "@/lib/cart";
 import { PriceTag } from "@/components/price-tag";
+import { createBookCheckout } from "@/lib/checkout.functions";
 
 export type Book = {
   id: string;
@@ -24,11 +26,24 @@ export type Book = {
 export function BookCard({ book }: { book: Book }) {
   const { add, setOpen } = useCart();
   const [preview, setPreview] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const checkout = useServerFn(createBookCheckout);
 
   function addToCart() {
     add({ id: book.id, title: book.title, price: Number(book.price), cover_image_url: book.cover_image_url });
     toast.success("تمت إضافة الكتاب إلى السلة بنجاح");
     setOpen(true);
+  }
+
+  async function buyNow() {
+    setPaying(true);
+    try {
+      const { url } = await checkout({ data: { bookId: book.id, origin: window.location.origin } });
+      window.location.href = url;
+    } catch (e) {
+      toast.error((e as Error).message || "تعذّر فتح صفحة الدفع");
+      setPaying(false);
+    }
   }
 
   return (
@@ -91,6 +106,10 @@ export function BookCard({ book }: { book: Book }) {
               </Button>
               <PriceTag amount={Number(book.price)} />
             </div>
+            <Button variant="outline" disabled={paying || Number(book.price) <= 0} onClick={() => void buyNow()}>
+              {paying ? <Loader2 className="size-4 animate-spin" /> : <CreditCard className="size-4" />}
+              {paying ? "جارٍ فتح صفحة الدفع…" : "شراء الكتاب الآن"}
+            </Button>
             {book.sample_pdf_url && (
               <Button asChild variant="outline">
                 <a href={book.sample_pdf_url} target="_blank" rel="noreferrer">
