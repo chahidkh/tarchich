@@ -225,6 +225,13 @@ export function BooksPanel() {
         </Button>
       </section>
 
+      <CsvImport
+        onDone={() => {
+          void qc.invalidateQueries({ queryKey: ["admin-books"] });
+          void qc.invalidateQueries({ queryKey: ["books"] });
+        }}
+      />
+
       <section className="glass rounded-xl p-6">
         <h2 className="font-display text-2xl text-gold">إدارة الكتب</h2>
         <div className="mt-5 space-y-3">
