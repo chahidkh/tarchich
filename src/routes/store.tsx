@@ -19,26 +19,51 @@ export const Route = createFileRoute("/store")({
   component: Store,
 });
 
+const PAGE_SIZE = 24;
+
 function Store() {
   const [q, setQ] = useState("");
+  const [term, setTerm] = useState("");
+  const [page, setPage] = useState(0);
   const { data: settings } = useSiteSettings();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["books"],
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setTerm(q.trim());
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [q]);
+
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["books", term, page],
+    placeholderData: (prev) => prev,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("books")
-        .select("id,title,author,description,price,cover_image_url,category,badge,stock,external_url,copyright_notice,sample_pdf_url")
-        .eq("is_visible", true)
-        .order("created_at", { ascending: true });
+        .select(
+          "id,title,author,description,price,cover_image_url,category,badge,stock,external_url,copyright_notice,sample_pdf_url",
+          { count: "exact" },
+        )
+        .eq("is_visible", true);
+
+      if (term) {
+        const safe = term.replace(/[,()]/g, " ");
+        query = query.or(`title.ilike.%${safe}%,author.ilike.%${safe}%,category.ilike.%${safe}%`);
+      }
+
+      const { data, error, count } = await query
+        .order("created_at", { ascending: true })
+        .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
       if (error) throw error;
-      return data as Book[];
+      return { books: (data ?? []) as Book[], count: count ?? 0 };
     },
   });
 
-  const books = (data ?? []).filter(
-    (b) => b.title.includes(q) || b.author.includes(q) || (b.category ?? "").includes(q),
-  );
+  const books = data?.books ?? [];
+  const total = data?.count ?? 0;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-14">
