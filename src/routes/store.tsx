@@ -97,6 +97,20 @@ function Store() {
       {!isLoading && books.length === 0 && (
         <p className="py-16 text-center text-sm text-muted-foreground">لا نتائج مطابقة لبحثك.</p>
       )}
+
+      {total > PAGE_SIZE && (
+        <nav className="mt-12 flex items-center justify-center gap-4 text-sm">
+          <Button variant="outline" disabled={page === 0 || isFetching} onClick={() => setPage((p) => p - 1)}>
+            السابق
+          </Button>
+          <span className="text-muted-foreground">
+            صفحة {page + 1} من {pages} — {total} كتاب
+          </span>
+          <Button variant="outline" disabled={page + 1 >= pages || isFetching} onClick={() => setPage((p) => p + 1)}>
+            التالي
+          </Button>
+        </nav>
+      )}
     </main>
   );
 }
