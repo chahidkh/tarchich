@@ -106,6 +106,10 @@ export function BookCard({ book }: { book: Book }) {
               </Button>
               <PriceTag amount={Number(book.price)} />
             </div>
+            <Button variant="outline" disabled={paying || Number(book.price) <= 0} onClick={() => void buyNow()}>
+              {paying ? <Loader2 className="size-4 animate-spin" /> : <CreditCard className="size-4" />}
+              {paying ? "جارٍ فتح صفحة الدفع…" : "شراء الكتاب الآن"}
+            </Button>
             {book.sample_pdf_url && (
               <Button asChild variant="outline">
                 <a href={book.sample_pdf_url} target="_blank" rel="noreferrer">
