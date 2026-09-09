@@ -10,12 +10,6 @@ function stripeKey() {
 }
 
 async function createSession(body: URLSearchParams) {
-  const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${stripeKey()}`, "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
-async function createSession(body: URLSearchParams) {
   body.set("payment_method_types[0]", "card");
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
