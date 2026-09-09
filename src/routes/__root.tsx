@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import heroImage from "../assets/hero-library.jpg";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "../lib/cart";
-import { PrefsProvider } from "../lib/prefs";
+import { PrefsProvider } from "@/lib/prefs";
 import { SiteHeader } from "../components/site-header";
 import { CartDrawer } from "../components/cart-drawer";
 import { HakeemDrawer } from "../components/hakeem-drawer";
