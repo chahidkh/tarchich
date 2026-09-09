@@ -16,9 +16,17 @@ export function SiteFooter() {
           {SUPPORT_EMAIL}
         </a>
       </p>
-      <p className="mt-3">
+      <p className="mt-3 flex flex-wrap items-center justify-center gap-3">
         <Link to="/contact" className="text-gold hover:underline">
           {t("nav.contact")}
+        </Link>
+        <span aria-hidden className="text-border">•</span>
+        <Link to="/privacy" className="text-gold hover:underline">
+          {t("nav.privacy")}
+        </Link>
+        <span aria-hidden className="text-border">•</span>
+        <Link to="/terms" className="text-gold hover:underline">
+          {t("nav.terms")}
         </Link>
       </p>
     </footer>
