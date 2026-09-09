@@ -14,7 +14,9 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as MajlisRouteImport } from './routes/majlis'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as StoreRouteImport } from './routes/store'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout/success'
@@ -46,9 +48,19 @@ const MajlisRoute = MajlisRouteImport.update({
   path: '/majlis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StoreRoute = StoreRouteImport.update({
   id: '/store',
   path: '/store',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -87,7 +99,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/majlis': typeof MajlisRoute
+  '/privacy': typeof PrivacyRoute
   '/store': typeof StoreRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -100,7 +114,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/majlis': typeof MajlisRoute
+  '/privacy': typeof PrivacyRoute
   '/store': typeof StoreRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -115,7 +131,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/majlis': typeof MajlisRoute
+  '/privacy': typeof PrivacyRoute
   '/store': typeof StoreRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -130,7 +148,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/majlis'
+    | '/privacy'
     | '/store'
+    | '/terms'
     | '/admin'
     | '/dashboard'
     | '/checkout/success'
@@ -143,7 +163,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/majlis'
+    | '/privacy'
     | '/store'
+    | '/terms'
     | '/admin'
     | '/dashboard'
     | '/checkout/success'
@@ -157,7 +179,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/majlis'
+    | '/privacy'
     | '/store'
+    | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/checkout/success'
@@ -172,7 +196,9 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   MajlisRoute: typeof MajlisRoute
+  PrivacyRoute: typeof PrivacyRoute
   StoreRoute: typeof StoreRoute
+  TermsRoute: typeof TermsRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   GazetteSlugRoute: typeof GazetteSlugRoute
   GazetteIndexRoute: typeof GazetteIndexRoute
@@ -216,11 +242,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MajlisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/store': {
       id: '/store'
       path: '/store'
       fullPath: '/store'
       preLoaderRoute: typeof StoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -287,7 +327,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   MajlisRoute: MajlisRoute,
+  PrivacyRoute: PrivacyRoute,
   StoreRoute: StoreRoute,
+  TermsRoute: TermsRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
   GazetteSlugRoute: GazetteSlugRoute,
   GazetteIndexRoute: GazetteIndexRoute,
