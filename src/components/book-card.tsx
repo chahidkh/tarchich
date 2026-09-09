@@ -26,11 +26,24 @@ export type Book = {
 export function BookCard({ book }: { book: Book }) {
   const { add, setOpen } = useCart();
   const [preview, setPreview] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const checkout = useServerFn(createBookCheckout);
 
   function addToCart() {
     add({ id: book.id, title: book.title, price: Number(book.price), cover_image_url: book.cover_image_url });
     toast.success("تمت إضافة الكتاب إلى السلة بنجاح");
     setOpen(true);
+  }
+
+  async function buyNow() {
+    setPaying(true);
+    try {
+      const { url } = await checkout({ data: { bookId: book.id, origin: window.location.origin } });
+      window.location.href = url;
+    } catch (e) {
+      toast.error((e as Error).message || "تعذّر فتح صفحة الدفع");
+      setPaying(false);
+    }
   }
 
   return (
