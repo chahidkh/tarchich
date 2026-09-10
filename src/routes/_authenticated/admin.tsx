@@ -14,6 +14,7 @@ import { GazettePanel } from "@/components/admin/gazette-panel";
 import { MessagesPanel } from "@/components/admin/messages-panel";
 import { SourcesPanel } from "@/components/admin/sources-panel";
 import { AdminArticleComposer } from "@/components/admin/admin-article-composer";
+import { ErrorsPanel } from "@/components/admin/errors-panel";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -137,6 +138,9 @@ function Admin() {
         </TabsContent>
         <TabsContent value="design">
           <DesignPanel />
+        </TabsContent>
+        <TabsContent value="errors">
+          <ErrorsPanel />
         </TabsContent>
 
       </Tabs>
