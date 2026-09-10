@@ -37,7 +37,7 @@ const KEY = "tarshish-prefs";
 export function PrefsProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
   const [stored, setStored] = useState<Partial<Prefs>>({});
-  const { data: siteSettings } = useSiteSettings();
+
 
   useEffect(() => {
     try {
