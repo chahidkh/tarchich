@@ -79,14 +79,8 @@ function Admin() {
           <TabsTrigger value="ads" className="flex-1">
             الإعلانات
           </TabsTrigger>
-          <TabsTrigger value="messages" className="flex-1">
+        <TabsTrigger value="messages" className="flex-1">
             الرسائل
-          </TabsTrigger>
-          <TabsTrigger value="sources" className="flex-1">
-            المصادر
-          </TabsTrigger>
-          <TabsTrigger value="composer" className="flex-1">
-            المحرّر الذكي
           </TabsTrigger>
         </TabsList>
 
@@ -94,7 +88,28 @@ function Admin() {
           <BooksPanel />
         </TabsContent>
         <TabsContent value="gazette">
-          <GazettePanel />
+          <Tabs defaultValue="gazette-main" dir="rtl">
+            <TabsList className="mx-auto mb-6 flex w-full max-w-xl">
+              <TabsTrigger value="gazette-main" className="flex-1">
+                المقالات
+              </TabsTrigger>
+              <TabsTrigger value="gazette-sources" className="flex-1">
+                المصادر
+              </TabsTrigger>
+              <TabsTrigger value="gazette-composer" className="flex-1">
+                المحرّر الذكي
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="gazette-main">
+              <GazettePanel />
+            </TabsContent>
+            <TabsContent value="gazette-sources">
+              <SourcesPanel />
+            </TabsContent>
+            <TabsContent value="gazette-composer">
+              <AdminArticleComposer />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
         <TabsContent value="content">
           <ContentPanel />
