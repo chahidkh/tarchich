@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { I18nProvider, LANGUAGES, type LangCode } from "@/lib/i18n";
-import { useSiteSettings } from "@/lib/site-settings";
 
 
 export type ThemeMode = "gold" | "parchment";
