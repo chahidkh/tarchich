@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -129,6 +130,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // الصفحة الرئيسية فقط: صورة الخلفية تظهر بوضوح تام بلا طبقة تعتيم.
+  const isHome = useRouterState({ select: (s) => s.location.pathname === "/" });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -136,15 +139,23 @@ function RootComponent() {
       <CartProvider>
         <SiteThemeOverrides />
         <div aria-hidden className="app-bg pointer-events-none fixed inset-0 z-0">
-          <LibraryBackdrop className="size-full object-cover opacity-[0.5] brightness-[1.8]" />
-
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(120% 80% at 50% 0%, oklch(0.22 0.04 60 / 0.35), oklch(0.17 0.028 55 / 0.85) 70%)",
-            }}
+          <LibraryBackdrop
+            className={
+              isHome
+                ? "size-full object-cover"
+                : "size-full object-cover opacity-[0.5] brightness-[1.8]"
+            }
           />
+
+          {!isHome && (
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(120% 80% at 50% 0%, oklch(0.22 0.04 60 / 0.35), oklch(0.17 0.028 55 / 0.85) 70%)",
+              }}
+            />
+          )}
         </div>
         <div className="relative z-10">
           <SiteHeader />
