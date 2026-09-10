@@ -121,7 +121,7 @@ function Article() {
           <div className="mt-6 space-y-5">
             {paragraphs.map((para, i) => (
               <div key={i}>
-                <p className="whitespace-pre-line text-[17px] leading-9 text-parchment/90">{para}</p>
+                <p className="article-body whitespace-pre-line text-[17px] leading-9 text-parchment/90">{para}</p>
                 {i === 1 && inFeed[0] && (
                   <div className="mt-5">
                     <InFeedAd ad={inFeed[0]} />
