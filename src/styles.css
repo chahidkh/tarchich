@@ -202,7 +202,7 @@ html[data-theme="parchment"] .glass {
 }
 
 /* نص المقالات في وضع المخطوطة — حبر ذهبي غامق فوق الخلفية الفاتحة */
-html[data-theme="parchment"] .article-body {
+html[data-theme="parchment"] article .article-body {
   color: var(--gold);
 }
 
