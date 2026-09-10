@@ -179,6 +179,36 @@ export type Database = {
         }
         Relationships: []
       }
+      content_sources: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          license_note: string | null
+          name: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          license_note?: string | null
+          name: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          license_note?: string | null
+          name?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
