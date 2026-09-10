@@ -23,6 +23,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout/success'
 import { Route as GazetteIndexRouteImport } from './routes/gazette/index'
 import { Route as GazetteSlugRouteImport } from './routes/gazette/$slug'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicAssetSplatRouteImport } from './routes/api/public/asset/$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -94,6 +95,11 @@ const GazetteSlugRoute = GazetteSlugRouteImport.update({
   path: '/gazette/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAssetSplatRoute = ApiPublicAssetSplatRouteImport.update({
   id: '/api/public/asset/$',
   path: '/api/public/asset/$',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/checkout/success': typeof CheckoutSuccessRoute
   '/gazette/$slug': typeof GazetteSlugRoute
   '/gazette/': typeof GazetteIndexRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
 }
 export interface FileRoutesByTo {
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/checkout/success': typeof CheckoutSuccessRoute
   '/gazette/$slug': typeof GazetteSlugRoute
   '/gazette': typeof GazetteIndexRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
 }
 export interface FileRoutesById {
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/checkout/success': typeof CheckoutSuccessRoute
   '/gazette/$slug': typeof GazetteSlugRoute
   '/gazette/': typeof GazetteIndexRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
 }
 export interface FileRouteTypes {
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/checkout/success'
     | '/gazette/$slug'
     | '/gazette/'
+    | '/api/public/stripe-webhook'
     | '/api/public/asset/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/checkout/success'
     | '/gazette/$slug'
     | '/gazette'
+    | '/api/public/stripe-webhook'
     | '/api/public/asset/$'
   id:
     | '__root__'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/checkout/success'
     | '/gazette/$slug'
     | '/gazette/'
+    | '/api/public/stripe-webhook'
     | '/api/public/asset/$'
   fileRoutesById: FileRoutesById
 }
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   GazetteSlugRoute: typeof GazetteSlugRoute
   GazetteIndexRoute: typeof GazetteIndexRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicAssetSplatRoute: typeof ApiPublicAssetSplatRoute
 }
 
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GazetteSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/asset/$': {
       id: '/api/public/asset/$'
       path: '/api/public/asset/$'
@@ -354,6 +374,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutSuccessRoute: CheckoutSuccessRoute,
   GazetteSlugRoute: GazetteSlugRoute,
   GazetteIndexRoute: GazetteIndexRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicAssetSplatRoute: ApiPublicAssetSplatRoute,
 }
 export const routeTree = rootRouteImport

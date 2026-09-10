@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/use-session";
 import { useProfiles, AvatarInitial } from "@/hooks/use-profiles";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 type Review = {
   id: string;
@@ -73,6 +74,11 @@ export function BookReviews({ bookId }: { bookId: string }) {
     if (!user) return;
     if (rating < 1) {
       toast.error("اختر تقييماً من 1 إلى 5 نجوم");
+      return;
+    }
+    const limit = checkRateLimit("review", 3, 60_000);
+    if (!limit.allowed) {
+      toast.error(`محاولات كثيرة بسرعة، انتظر ${limit.retryInSec} ثانية.`);
       return;
     }
     setSaving(true);

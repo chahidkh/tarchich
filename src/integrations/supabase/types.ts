@@ -378,6 +378,24 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_events: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

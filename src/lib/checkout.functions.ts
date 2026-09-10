@@ -117,7 +117,10 @@ export const createCartCheckout = createServerFn({ method: "POST" })
   });
 
 /**
- * Verifies a completed Stripe session and records the order only once payment succeeded.
+ * Reads the order status for a finished Stripe session.
+ * The Stripe webhook is the source of truth; this only reports what is stored.
+ * If the webhook has not landed yet, it verifies with Stripe once and stores the
+ * order itself so a purchase is never lost.
  */
 export const confirmCheckout = createServerFn({ method: "POST" })
   .inputValidator((input: { sessionId: string }) => {
@@ -125,6 +128,11 @@ export const confirmCheckout = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data }) => {
+    const { findOrderBySession, recordPaidSession } = await import("@/lib/orders.server");
+
+    const order = await findOrderBySession(data.sessionId);
+    if (order) return { paid: true as const, total: Number(order.total_amount ?? 0) };
+
     const res = await fetch(`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(data.sessionId)}`, {
       headers: { Authorization: `Bearer ${stripeKey()}` },
     });
@@ -132,35 +140,12 @@ export const confirmCheckout = createServerFn({ method: "POST" })
     if (!res.ok) throw new Error("تعذّر التحقق من عملية الدفع");
     if (session.payment_status !== "paid") return { paid: false as const };
 
-    const meta = session.metadata ?? {};
-    const userId = meta["user_id"];
-    const total = Number(session.amount_total ?? 0) / 100;
+    const result = await recordPaidSession({
+      id: session.id,
+      ...(session.payment_status ? { payment_status: session.payment_status } : {}),
+      ...(session.amount_total !== undefined ? { amount_total: session.amount_total } : {}),
+      ...(session.metadata ? { metadata: session.metadata } : {}),
+    });
 
-    if (userId) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: existing } = await supabaseAdmin
-        .from("orders")
-        .select("id")
-        .eq("user_id", userId)
-        .contains("items", { session_id: session.id })
-        .maybeSingle();
-
-      if (!existing) {
-        let items: unknown = [];
-        try {
-          items = JSON.parse(meta["items"] ?? "[]");
-        } catch {
-          items = [];
-        }
-        await supabaseAdmin.from("orders").insert({
-          user_id: userId,
-          total_amount: total,
-          status: "paid",
-          referrer_code: meta["referrer_code"] ?? null,
-          items: { session_id: session.id, books: items } as never,
-        });
-      }
-    }
-
-    return { paid: true as const, total };
+    return { paid: true as const, total: result.total };
   });
