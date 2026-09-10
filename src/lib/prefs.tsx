@@ -91,9 +91,10 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
         setPrefs(DEFAULTS);
         setStored({});
       },
+      hasStored,
     }),
-    [prefs, dir],
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [prefs, dir, stored],
   );
 
   return (
