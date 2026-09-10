@@ -1,5 +1,11 @@
-import goldImage from "@/assets/hero-library.jpg";
-import parchmentImage from "@/assets/hero-library-parchment.jpg";
+import { useSiteSettings } from "@/lib/site-settings";
+import {
+  DEFAULT_GOLD_BG,
+  DEFAULT_PARCHMENT_BG,
+  DESIGN_KEYS,
+  resolveBackground,
+} from "@/lib/backgrounds";
+
 
 type Props = {
   className?: string;
@@ -9,9 +15,15 @@ type Props = {
 
 /**
  * خلفية المكتبة المشتركة — تتبدّل تلقائياً حسب data-theme على عنصر html.
- * gold => الصورة الداكنة الأصلية، parchment => الصورة الفاتحة.
+ * gold => الصورة الداكنة، parchment => الصورة الفاتحة.
+ * يمكن لصاحب الموقع تغيير الصورتين من لوحة التصميم (site_settings).
  */
 export function LibraryBackdrop({ className = "", alt = "", eager = false }: Props) {
+  const { data } = useSiteSettings();
+  const goldImage = resolveBackground(data?.[DESIGN_KEYS.bgGold], DEFAULT_GOLD_BG);
+  const parchmentImage = resolveBackground(data?.[DESIGN_KEYS.bgParchment], DEFAULT_PARCHMENT_BG);
+
+
   return (
     <>
       <img

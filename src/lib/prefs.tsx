@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { I18nProvider, LANGUAGES, type LangCode } from "@/lib/i18n";
+import { useSiteSettings } from "@/lib/site-settings";
+
 
 export type ThemeMode = "gold" | "parchment";
 export type FontFamilyMode = "naskh" | "kufi";
@@ -35,24 +37,47 @@ const KEY = "tarshish-prefs";
 
 export function PrefsProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
+  const [stored, setStored] = useState<Partial<Prefs>>({});
+  const { data: siteSettings } = useSiteSettings();
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) setPrefs({ ...DEFAULTS, ...(JSON.parse(raw) as Partial<Prefs>) });
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<Prefs>;
+        setStored(parsed);
+        setPrefs({ ...DEFAULTS, ...parsed });
+      }
     } catch {
       /* ignore */
     }
   }, []);
 
+  // إعدادات التصميم العامة (يضبطها صاحب الموقع) تُطبَّق كقيم ابتدائية فقط،
+  // ويبقى تفضيل المستخدم الشخصي المحفوظ أعلى أولوية.
+  useEffect(() => {
+    if (!siteSettings) return;
+    const font = siteSettings["site_default_font"];
+    const scale = Number(siteSettings["site_default_font_scale"]);
+    setPrefs((p) => ({
+      ...p,
+      ...(font === "naskh" || font === "kufi" ? (stored.fontFamily ? {} : { fontFamily: font }) : {}),
+      ...(Number.isFinite(scale) && scale > 0 && !stored.fontScale ? { fontScale: scale } : {}),
+    }));
+  }, [siteSettings, stored]);
+
+
   const dir = (LANGUAGES.find((l) => l.code === prefs.lang)?.dir ?? "rtl") as "rtl" | "ltr";
 
   useEffect(() => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(prefs));
+      localStorage.setItem(KEY, JSON.stringify(stored));
     } catch {
       /* ignore */
     }
+  }, [stored]);
+
+  useEffect(() => {
     const root = document.documentElement;
     root.setAttribute("lang", prefs.lang);
     root.setAttribute("dir", dir);
@@ -67,10 +92,17 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
     () => ({
       ...prefs,
       dir,
-      set: (key, val) => setPrefs((p) => ({ ...p, [key]: val })),
-      reset: () => setPrefs(DEFAULTS),
+      set: (key, val) => {
+        setPrefs((p) => ({ ...p, [key]: val }));
+        setStored((s) => ({ ...s, [key]: val }));
+      },
+      reset: () => {
+        setPrefs(DEFAULTS);
+        setStored({});
+      },
     }),
     [prefs, dir],
+
   );
 
   return (

@@ -28,7 +28,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="site-header sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+    <header className="site-header sticky top-0 z-40 border-b border-border bg-background/60 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
         <Link to="/" className="flex items-center gap-2">
           <BookOpen className="size-5 text-gold" />

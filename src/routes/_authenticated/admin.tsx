@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BooksPanel } from "@/components/admin/books-panel";
 import { ContentPanel } from "@/components/admin/content-panel";
+import { DesignPanel } from "@/components/admin/design-panel";
+
 import { CommunityPanel } from "@/components/admin/community-panel";
 import { UsersPanel } from "@/components/admin/users-panel";
 import { AdsPanel } from "@/components/admin/ads-panel";
@@ -82,7 +84,11 @@ function Admin() {
         <TabsTrigger value="messages" className="flex-1">
             الرسائل
           </TabsTrigger>
+          <TabsTrigger value="design" className="flex-1">
+            التصميم
+          </TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="books">
           <BooksPanel />
@@ -126,6 +132,10 @@ function Admin() {
         <TabsContent value="messages">
           <MessagesPanel />
         </TabsContent>
+        <TabsContent value="design">
+          <DesignPanel />
+        </TabsContent>
+
       </Tabs>
     </main>
   );

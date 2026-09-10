@@ -18,6 +18,8 @@ import { SiteHeader } from "../components/site-header";
 import { CartDrawer } from "../components/cart-drawer";
 import { HakeemDrawer } from "../components/hakeem-drawer";
 import { Toaster } from "../components/ui/sonner";
+import { SiteThemeOverrides } from "@/components/site-theme-overrides";
+
 
 function NotFoundComponent() {
   return (
@@ -132,8 +134,10 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <PrefsProvider>
       <CartProvider>
+        <SiteThemeOverrides />
         <div aria-hidden className="app-bg pointer-events-none fixed inset-0 z-0">
           <LibraryBackdrop className="size-full object-cover opacity-[0.5] brightness-[1.8]" />
+
           <div
             className="absolute inset-0"
             style={{
