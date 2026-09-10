@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useT } from "@/lib/i18n";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { SUPPORT_EMAIL, SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/contact")({
@@ -41,6 +42,11 @@ function Contact() {
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "تحقق من البيانات");
+      return;
+    }
+    const limit = checkRateLimit("contact", 2, 60_000);
+    if (!limit.allowed) {
+      toast.error(`أرسلت رسائل كثيرة بسرعة، انتظر ${limit.retryInSec} ثانية.`);
       return;
     }
     setBusy(true);

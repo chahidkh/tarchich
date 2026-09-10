@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/use-session";
 import { useProfiles, AvatarInitial } from "@/hooks/use-profiles";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 type Review = {
   id: string;
