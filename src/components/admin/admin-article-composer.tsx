@@ -52,7 +52,7 @@ export function AdminArticleComposer() {
   function submit() {
     const text = input.trim();
     if (!text || send.isPending) return;
-    const history = [...messages.filter((m) => m.role === "user" || messages.indexOf(m) > 0), { role: "user" as const, content: text }];
+    const history: ChatMessage[] = [...messages.slice(1), { role: "user", content: text }];
     setMessages((m) => [...m, { role: "user", content: text }]);
     setInput("");
     send.mutate(history.slice(-12));

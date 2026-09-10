@@ -10,6 +10,8 @@ import { UsersPanel } from "@/components/admin/users-panel";
 import { AdsPanel } from "@/components/admin/ads-panel";
 import { GazettePanel } from "@/components/admin/gazette-panel";
 import { MessagesPanel } from "@/components/admin/messages-panel";
+import { SourcesPanel } from "@/components/admin/sources-panel";
+import { AdminArticleComposer } from "@/components/admin/admin-article-composer";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
