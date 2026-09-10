@@ -9,7 +9,7 @@ import { DESIGN_KEYS } from "@/lib/backgrounds";
  */
 export function SiteThemeOverrides() {
   const { data } = useSiteSettings();
-  const { theme } = usePrefs();
+  const { theme, hasStored } = usePrefs();
 
   useEffect(() => {
     const root = document.documentElement;
