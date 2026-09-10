@@ -49,11 +49,9 @@ function Home() {
   return (
     <main>
       <section className="relative isolate flex min-h-[88vh] items-center justify-center overflow-hidden">
-        <img
-          src={heroImage}
+        <LibraryBackdrop
+          eager
           alt="مكتبة عريقة بأرفف خشبية مقوّسة وإضاءة ذهبية دافئة"
-          width={1920}
-          height={1088}
           className="absolute inset-0 -z-10 size-full object-cover brightness-[1.7]"
         />
         <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-veil)" }} />
