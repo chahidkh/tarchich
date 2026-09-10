@@ -9,7 +9,7 @@ import { DESIGN_KEYS } from "@/lib/backgrounds";
  */
 export function SiteThemeOverrides() {
   const { data } = useSiteSettings();
-  const { theme } = usePrefs();
+  const { theme, hasStored } = usePrefs();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -27,7 +27,17 @@ export function SiteThemeOverrides() {
     apply("--primary", gold);
     apply("--background", bg);
     apply("--foreground", fg);
-  }, [data, theme]);
+
+    // الخط والحجم الافتراضيان للموقع — يُطبَّقان فقط إن لم يختر الزائر تفضيلاً خاصاً به.
+    const font = pick("site_default_font");
+    if ((font === "naskh" || font === "kufi") && !hasStored("fontFamily")) {
+      root.dataset["font"] = font;
+    }
+    const scale = Number(pick("site_default_font_scale"));
+    if (Number.isFinite(scale) && scale > 0 && !hasStored("fontScale")) {
+      root.style.setProperty("--font-scale", String(scale));
+    }
+  }, [data, theme, hasStored]);
 
   return null;
 }

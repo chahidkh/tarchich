@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { I18nProvider, LANGUAGES, type LangCode } from "@/lib/i18n";
-import { useSiteSettings } from "@/lib/site-settings";
 
 
 export type ThemeMode = "gold" | "parchment";
@@ -30,6 +29,7 @@ type Ctx = Prefs & {
   set: <K extends keyof Prefs>(key: K, value: Prefs[K]) => void;
   dir: "rtl" | "ltr";
   reset: () => void;
+  hasStored: (k: keyof Prefs) => boolean;
 };
 
 const PrefsCtx = createContext<Ctx | null>(null);
@@ -38,7 +38,7 @@ const KEY = "tarshish-prefs";
 export function PrefsProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
   const [stored, setStored] = useState<Partial<Prefs>>({});
-  const { data: siteSettings } = useSiteSettings();
+
 
   useEffect(() => {
     try {
@@ -53,18 +53,9 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // إعدادات التصميم العامة (يضبطها صاحب الموقع) تُطبَّق كقيم ابتدائية فقط،
-  // ويبقى تفضيل المستخدم الشخصي المحفوظ أعلى أولوية.
-  useEffect(() => {
-    if (!siteSettings) return;
-    const font = siteSettings["site_default_font"];
-    const scale = Number(siteSettings["site_default_font_scale"]);
-    setPrefs((p) => ({
-      ...p,
-      ...(font === "naskh" || font === "kufi" ? (stored.fontFamily ? {} : { fontFamily: font }) : {}),
-      ...(Number.isFinite(scale) && scale > 0 && !stored.fontScale ? { fontScale: scale } : {}),
-    }));
-  }, [siteSettings, stored]);
+  /** true إذا كان المستخدم قد اختار هذا التفضيل بنفسه (يتجاوز إعداد الموقع العام). */
+  const hasStored = (k: keyof Prefs) => stored[k] !== undefined;
+
 
 
   const dir = (LANGUAGES.find((l) => l.code === prefs.lang)?.dir ?? "rtl") as "rtl" | "ltr";
@@ -100,9 +91,10 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
         setPrefs(DEFAULTS);
         setStored({});
       },
+      hasStored,
     }),
-    [prefs, dir],
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [prefs, dir, stored],
   );
 
   return (
