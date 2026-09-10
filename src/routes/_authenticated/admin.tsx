@@ -10,6 +10,8 @@ import { UsersPanel } from "@/components/admin/users-panel";
 import { AdsPanel } from "@/components/admin/ads-panel";
 import { GazettePanel } from "@/components/admin/gazette-panel";
 import { MessagesPanel } from "@/components/admin/messages-panel";
+import { SourcesPanel } from "@/components/admin/sources-panel";
+import { AdminArticleComposer } from "@/components/admin/admin-article-composer";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -80,6 +82,12 @@ function Admin() {
           <TabsTrigger value="messages" className="flex-1">
             الرسائل
           </TabsTrigger>
+          <TabsTrigger value="sources" className="flex-1">
+            المصادر
+          </TabsTrigger>
+          <TabsTrigger value="composer" className="flex-1">
+            المحرّر الذكي
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="books">
@@ -102,6 +110,12 @@ function Admin() {
         </TabsContent>
         <TabsContent value="messages">
           <MessagesPanel />
+        </TabsContent>
+        <TabsContent value="sources">
+          <SourcesPanel />
+        </TabsContent>
+        <TabsContent value="composer">
+          <AdminArticleComposer />
         </TabsContent>
       </Tabs>
     </main>
