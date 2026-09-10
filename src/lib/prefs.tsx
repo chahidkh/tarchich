@@ -29,6 +29,7 @@ type Ctx = Prefs & {
   set: <K extends keyof Prefs>(key: K, value: Prefs[K]) => void;
   dir: "rtl" | "ltr";
   reset: () => void;
+  hasStored: (k: keyof Prefs) => boolean;
 };
 
 const PrefsCtx = createContext<Ctx | null>(null);
