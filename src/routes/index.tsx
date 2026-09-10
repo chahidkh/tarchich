@@ -82,9 +82,9 @@ function Home() {
           <p className="mt-3 text-sm text-muted-foreground">نفائس اخترناها لك من أعمدة التراث والفكر</p>
         </header>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(165px,1fr))]">
           {isLoading
-            ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-96 rounded-xl bg-secondary/50" />)
+            ? Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-xl bg-secondary/50" />)
             : books?.map((b) => <BookCard key={b.id} book={b} />)}
         </div>
 

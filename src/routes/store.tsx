@@ -72,9 +72,21 @@ function Store() {
   const total = data?.count ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  // تجميع الكتب حسب التصنيف (مع الحفاظ على ترتيب الظهور)
+  const grouped = (() => {
+    const map = new Map<string, Book[]>();
+    for (const b of books) {
+      const cat = b.category?.trim() || "متنوعات";
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push(b);
+    }
+    return [...map.entries()];
+  })();
+
+  const gridCls = "grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(165px,1fr))]";
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-14">
+    <main className="mx-auto max-w-7xl px-4 py-14">
       {settings?.["store_banner_url"] && (
         <img
           src={settings["store_banner_url"]}
@@ -96,11 +108,38 @@ function Store() {
         />
       </header>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-96 rounded-xl bg-secondary/50" />)
-          : books.map((b) => <BookCard key={b.id} book={b} />)}
-      </div>
+      {isLoading ? (
+        <div className={gridCls}>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <Skeleton key={i} className="h-80 rounded-xl bg-secondary/50" />
+          ))}
+        </div>
+      ) : live ? (
+        // أثناء البحث: شبكة واحدة عادية بدون تقسيم
+        <div className={gridCls}>
+          {books.map((b) => (
+            <BookCard key={b.id} book={b} />
+          ))}
+        </div>
+      ) : (
+        // بدون بحث: أقسام حسب التصنيف
+        <div className="space-y-12">
+          {grouped.map(([cat, catBooks]) => (
+            <section key={cat}>
+              <header className="mb-5 flex items-center gap-4">
+                <h2 className="shrink-0 text-2xl text-gold">{cat}</h2>
+                <div className="gold-rule flex-1" />
+                <span className="shrink-0 text-xs text-muted-foreground">{catBooks.length} كتاب</span>
+              </header>
+              <div className={gridCls}>
+                {catBooks.map((b) => (
+                  <BookCard key={b.id} book={b} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
 
       {!isLoading && books.length === 0 && (
         <p className="py-16 text-center text-sm text-muted-foreground">لا نتائج مطابقة لبحثك.</p>

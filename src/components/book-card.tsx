@@ -59,10 +59,10 @@ export function BookCard({ book }: { book: Book }) {
 
   return (
     <>
-      <article className="glass group flex flex-col overflow-hidden rounded-xl transition duration-300 hover:border-gold/50 hover:shadow-[var(--shadow-glow)]">
+      <article className="glass group flex flex-col overflow-hidden rounded-xl transition duration-300 ease-out hover:-rotate-1 hover:scale-[1.03] hover:border-gold/50 hover:shadow-[var(--shadow-glow),var(--shadow-deep)]">
         <button
           onClick={() => setPreview(true)}
-          className="relative flex aspect-4/5 w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_20%,oklch(0.3_0.05_60),oklch(0.19_0.03_55))]"
+          className="relative flex aspect-3/4 w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_20%,oklch(0.3_0.05_60),oklch(0.19_0.03_55))]"
         >
           <BookCover src={book.cover_image_url} title={book.title} />
           {book.badge && (
@@ -72,11 +72,11 @@ export function BookCard({ book }: { book: Book }) {
           )}
         </button>
 
-        <div className="flex flex-1 flex-col gap-2 p-4">
-          <h3 className="font-display text-lg leading-snug">{book.title}</h3>
-          <p className="text-xs text-muted-foreground">{book.author}</p>
-          <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{book.description}</p>
-          <div className="mt-auto flex items-center justify-between pt-3">
+        <div className="flex flex-1 flex-col gap-1.5 p-3">
+          <h3 className="font-display text-base leading-snug">{book.title}</h3>
+          <p className="text-[11px] text-muted-foreground">{book.author}</p>
+          <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">{book.description}</p>
+          <div className="mt-auto flex items-center justify-between pt-2">
             <PriceTag amount={Number(book.price)} />
             <Button size="sm" onClick={addToCart}>
               أضف للسلة
