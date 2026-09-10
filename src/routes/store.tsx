@@ -83,7 +83,7 @@ function Store() {
     return [...map.entries()];
   })();
 
-  const gridCls = "grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]";
+  const gridCls = "grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(165px,1fr))]";
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-14">
