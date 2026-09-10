@@ -76,6 +76,11 @@ export function BookReviews({ bookId }: { bookId: string }) {
       toast.error("اختر تقييماً من 1 إلى 5 نجوم");
       return;
     }
+    const limit = checkRateLimit("review", 3, 60_000);
+    if (!limit.allowed) {
+      toast.error(`محاولات كثيرة بسرعة، انتظر ${limit.retryInSec} ثانية.`);
+      return;
+    }
     setSaving(true);
     const payload = { book_id: bookId, user_id: user.id, rating, comment: comment.trim() || null };
     const { error } = mine
