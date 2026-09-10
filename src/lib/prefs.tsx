@@ -52,18 +52,9 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // إعدادات التصميم العامة (يضبطها صاحب الموقع) تُطبَّق كقيم ابتدائية فقط،
-  // ويبقى تفضيل المستخدم الشخصي المحفوظ أعلى أولوية.
-  useEffect(() => {
-    if (!siteSettings) return;
-    const font = siteSettings["site_default_font"];
-    const scale = Number(siteSettings["site_default_font_scale"]);
-    setPrefs((p) => ({
-      ...p,
-      ...(font === "naskh" || font === "kufi" ? (stored.fontFamily ? {} : { fontFamily: font }) : {}),
-      ...(Number.isFinite(scale) && scale > 0 && !stored.fontScale ? { fontScale: scale } : {}),
-    }));
-  }, [siteSettings, stored]);
+  /** true إذا كان المستخدم قد اختار هذا التفضيل بنفسه (يتجاوز إعداد الموقع العام). */
+  const hasStored = (k: keyof Prefs) => stored[k] !== undefined;
+
 
 
   const dir = (LANGUAGES.find((l) => l.code === prefs.lang)?.dir ?? "rtl") as "rtl" | "ltr";
