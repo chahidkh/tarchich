@@ -201,6 +201,11 @@ html[data-theme="parchment"] .glass {
   background-color: oklch(0.96 0.03 88 / 0.85);
 }
 
+/* نص المقالات في وضع المخطوطة — حبر ذهبي غامق فوق الخلفية الفاتحة */
+html[data-theme="parchment"] .article-body {
+  color: var(--gold);
+}
+
 html[data-font="kufi"] body,
 html[data-font="kufi"] h1,
 html[data-font="kufi"] h2,
