@@ -209,6 +209,33 @@ export type Database = {
         }
         Relationships: []
       }
+      error_logs: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          message: string
+          path: string | null
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          message: string
+          path?: string | null
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          message?: string
+          path?: string | null
+          source?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -474,6 +501,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      purge_old_error_logs: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "reader" | "vip" | "author" | "admin"
