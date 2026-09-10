@@ -238,3 +238,7 @@ html[data-theme="parchment"] .theme-bg-gold {
 html[data-theme="parchment"] .theme-bg-parchment {
   display: block;
 }
+
+html[data-theme="parchment"] .theme-bg-parchment {
+  filter: brightness(0.72) sepia(0.18);
+}
