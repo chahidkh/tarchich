@@ -87,6 +87,9 @@ function Admin() {
           <TabsTrigger value="design" className="flex-1">
             التصميم
           </TabsTrigger>
+          <TabsTrigger value="errors" className="flex-1">
+            سجل الأخطاء
+          </TabsTrigger>
         </TabsList>
 
 
