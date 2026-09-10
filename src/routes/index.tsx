@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Crown, Users, Feather } from "lucide-react";
-import heroImage from "@/assets/hero-library.jpg";
+import { LibraryBackdrop } from "@/components/library-backdrop";
 import { supabase } from "@/integrations/supabase/client";
 import { BookCard, type Book } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
