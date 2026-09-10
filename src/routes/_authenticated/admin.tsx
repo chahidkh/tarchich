@@ -111,6 +111,12 @@ function Admin() {
         <TabsContent value="messages">
           <MessagesPanel />
         </TabsContent>
+        <TabsContent value="sources">
+          <SourcesPanel />
+        </TabsContent>
+        <TabsContent value="composer">
+          <AdminArticleComposer />
+        </TabsContent>
       </Tabs>
     </main>
   );
