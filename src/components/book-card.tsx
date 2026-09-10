@@ -72,11 +72,11 @@ export function BookCard({ book }: { book: Book }) {
           )}
         </button>
 
-        <div className="flex flex-1 flex-col gap-2 p-4">
-          <h3 className="font-display text-lg leading-snug">{book.title}</h3>
-          <p className="text-xs text-muted-foreground">{book.author}</p>
-          <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{book.description}</p>
-          <div className="mt-auto flex items-center justify-between pt-3">
+        <div className="flex flex-1 flex-col gap-1.5 p-3">
+          <h3 className="font-display text-base leading-snug">{book.title}</h3>
+          <p className="text-[11px] text-muted-foreground">{book.author}</p>
+          <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">{book.description}</p>
+          <div className="mt-auto flex items-center justify-between pt-2">
             <PriceTag amount={Number(book.price)} />
             <Button size="sm" onClick={addToCart}>
               أضف للسلة
