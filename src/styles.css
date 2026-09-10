@@ -225,3 +225,20 @@ html[data-lowdata="true"] img {
   image-rendering: auto;
   filter: saturate(0.95);
 }
+
+/* تبديل خلفية المكتبة حسب نمط القراءة */
+.theme-bg-parchment {
+  display: none;
+}
+
+html[data-theme="parchment"] .theme-bg-gold {
+  display: none;
+}
+
+html[data-theme="parchment"] .theme-bg-parchment {
+  display: block;
+}
+
+html[data-theme="parchment"] .theme-bg-parchment {
+  filter: brightness(0.72) sepia(0.18);
+}

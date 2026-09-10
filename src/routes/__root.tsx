@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import heroImage from "../assets/hero-library.jpg";
+import { LibraryBackdrop } from "@/components/library-backdrop";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "../lib/cart";
 import { PrefsProvider } from "@/lib/prefs";
@@ -133,12 +133,7 @@ function RootComponent() {
       <PrefsProvider>
       <CartProvider>
         <div aria-hidden className="app-bg pointer-events-none fixed inset-0 z-0">
-          <img
-            src={heroImage}
-            alt=""
-            loading="lazy"
-            className="size-full object-cover opacity-[0.5] brightness-[1.8]"
-          />
+          <LibraryBackdrop className="size-full object-cover opacity-[0.5] brightness-[1.8]" />
           <div
             className="absolute inset-0"
             style={{

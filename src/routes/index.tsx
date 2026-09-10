@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Sparkles, Crown, Users, Feather } from "lucide-react";
-import heroImage from "@/assets/hero-library.jpg";
+import { LibraryBackdrop } from "@/components/library-backdrop";
 import { supabase } from "@/integrations/supabase/client";
 import { BookCard, type Book } from "@/components/book-card";
 import { Button } from "@/components/ui/button";
@@ -49,11 +49,9 @@ function Home() {
   return (
     <main>
       <section className="relative isolate flex min-h-[88vh] items-center justify-center overflow-hidden">
-        <img
-          src={heroImage}
+        <LibraryBackdrop
+          eager
           alt="مكتبة عريقة بأرفف خشبية مقوّسة وإضاءة ذهبية دافئة"
-          width={1920}
-          height={1088}
           className="absolute inset-0 -z-10 size-full object-cover brightness-[1.7]"
         />
         <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-veil)" }} />
