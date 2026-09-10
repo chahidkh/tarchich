@@ -206,6 +206,12 @@ html[data-theme="parchment"] article .article-body {
   color: var(--gold);
 }
 
+/* روابط التنقل العلوية في وضع المخطوطة — بني ذهبي غامق للقراءة */
+html[data-theme="parchment"] header nav a,
+html[data-theme="parchment"] .site-header nav a {
+  color: var(--gold);
+}
+
 html[data-font="kufi"] body,
 html[data-font="kufi"] h1,
 html[data-font="kufi"] h2,
