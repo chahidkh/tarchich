@@ -82,6 +82,12 @@ function Admin() {
           <TabsTrigger value="messages" className="flex-1">
             الرسائل
           </TabsTrigger>
+          <TabsTrigger value="sources" className="flex-1">
+            المصادر
+          </TabsTrigger>
+          <TabsTrigger value="composer" className="flex-1">
+            المحرّر الذكي
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="books">
