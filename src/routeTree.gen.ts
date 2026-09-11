@@ -25,6 +25,7 @@ import { Route as GazetteIndexRouteImport } from './routes/gazette/index'
 import { Route as GazetteSlugRouteImport } from './routes/gazette/$slug'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicAssetSplatRouteImport } from './routes/api/public/asset/$'
+import { Route as ApiPublicHooksGazetteAutoRouteImport } from './routes/api/public/hooks/gazette-auto'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -105,6 +106,12 @@ const ApiPublicAssetSplatRoute = ApiPublicAssetSplatRouteImport.update({
   path: '/api/public/asset/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksGazetteAutoRoute =
+  ApiPublicHooksGazetteAutoRouteImport.update({
+    id: '/api/public/hooks/gazette-auto',
+    path: '/api/public/hooks/gazette-auto',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/gazette/': typeof GazetteIndexRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
+  '/api/public/hooks/gazette-auto': typeof ApiPublicHooksGazetteAutoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,6 +147,7 @@ export interface FileRoutesByTo {
   '/gazette': typeof GazetteIndexRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
+  '/api/public/hooks/gazette-auto': typeof ApiPublicHooksGazetteAutoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -158,6 +167,7 @@ export interface FileRoutesById {
   '/gazette/': typeof GazetteIndexRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/asset/$': typeof ApiPublicAssetSplatRoute
+  '/api/public/hooks/gazette-auto': typeof ApiPublicHooksGazetteAutoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/gazette/'
     | '/api/public/stripe-webhook'
     | '/api/public/asset/$'
+    | '/api/public/hooks/gazette-auto'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/gazette'
     | '/api/public/stripe-webhook'
     | '/api/public/asset/$'
+    | '/api/public/hooks/gazette-auto'
   id:
     | '__root__'
     | '/'
@@ -212,6 +224,7 @@ export interface FileRouteTypes {
     | '/gazette/'
     | '/api/public/stripe-webhook'
     | '/api/public/asset/$'
+    | '/api/public/hooks/gazette-auto'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -229,6 +242,7 @@ export interface RootRouteChildren {
   GazetteIndexRoute: typeof GazetteIndexRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicAssetSplatRoute: typeof ApiPublicAssetSplatRoute
+  ApiPublicHooksGazetteAutoRoute: typeof ApiPublicHooksGazetteAutoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -345,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAssetSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/gazette-auto': {
+      id: '/api/public/hooks/gazette-auto'
+      path: '/api/public/hooks/gazette-auto'
+      fullPath: '/api/public/hooks/gazette-auto'
+      preLoaderRoute: typeof ApiPublicHooksGazetteAutoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -376,6 +397,7 @@ const rootRouteChildren: RootRouteChildren = {
   GazetteIndexRoute: GazetteIndexRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicAssetSplatRoute: ApiPublicAssetSplatRoute,
+  ApiPublicHooksGazetteAutoRoute: ApiPublicHooksGazetteAutoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
