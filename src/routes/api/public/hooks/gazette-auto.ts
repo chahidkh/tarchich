@@ -281,6 +281,7 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
               continue;
             }
             published.push(article.title);
+            fromThisSource += 1;
           }
         }
 
