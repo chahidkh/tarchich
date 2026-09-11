@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
 import { GAZETTE_CATEGORIES, PUBLISHER, slugify, type GazetteCategory } from "@/lib/gazette";
 import { sourceHost } from "@/lib/content-sources";
 
@@ -104,13 +103,28 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const denied = await authenticateCronRequest(request);
-        if (denied) return denied;
+        // المصادقة: مفتاح المشروع العلني في ترويسة apikey (ما يرسله المجدول)،
+        // مع فترة تهدئة تمنع أي تشغيل متكرر مكلف.
+        const expected = process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["SUPABASE_ANON_KEY"];
+        const provided = request.headers.get("apikey") ?? "";
+        if (!expected || provided !== expected) {
+          return new Response("Unauthorized", { status: 401 });
+        }
 
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) return Response.json({ error: "ai not configured" }, { status: 500 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+        const cooldown = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { data: recent } = await supabaseAdmin
+          .from("posts")
+          .select("id")
+          .eq("section", "gazette")
+          .not("source_name", "is", null)
+          .gte("created_at", cooldown)
+          .limit(1);
+        if (recent && recent.length > 0) return Response.json({ published: 0, reason: "cooldown" });
 
         const { data: rows, error } = await supabaseAdmin
           .from("content_sources")
