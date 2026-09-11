@@ -212,10 +212,8 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
           .eq("is_active", true);
         if (error) return Response.json({ error: error.message }, { status: 500 });
 
-        const sources = ((rows ?? []) as Source[]).filter(
-          (s) => OPEN_LICENSE.test(s.license_note ?? "") && !RESTRICTED.test(s.license_note ?? ""),
-        );
-        if (sources.length === 0) return Response.json({ published: 0, reason: "no open-licence sources" });
+        const sources = (rows ?? []) as Source[];
+        if (sources.length === 0) return Response.json({ published: 0, reason: "no active sources" });
 
         const published: string[] = [];
 
