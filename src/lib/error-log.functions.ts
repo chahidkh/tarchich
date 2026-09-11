@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertAdmin } from "@/lib/admin-guard";
 import { enforceRateLimit } from "@/lib/server-rate-limit";
 
 export type ErrorLogRow = {
@@ -46,10 +47,6 @@ export const logError = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-async function assertAdmin(context: { supabase: { rpc: (fn: string, args: unknown) => Promise<{ data: unknown; error: unknown }> }; userId: string }) {
-  const { data, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-  if (error || !data) throw new Error("Forbidden");
-}
 
 export const adminListErrors = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
