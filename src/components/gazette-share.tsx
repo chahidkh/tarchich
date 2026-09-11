@@ -48,7 +48,7 @@ export function GazetteShare({ title }: { title: string }) {
 }
 
 /** شارة صغيرة تُظهر المصدر الأصلي للمقال. */
-export function SourceBadge({ source }: { source?: string | null }) {
+export function SourceBadge({ source }: { source?: string | null | undefined }) {
   if (!source) return null;
   return (
     <span className="inline-flex items-center rounded-full border border-gold/30 bg-gold/10 px-2.5 py-0.5 text-[10px] tracking-wide text-gold-soft">
