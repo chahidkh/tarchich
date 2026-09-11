@@ -212,7 +212,8 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
           .eq("is_active", true);
         if (error) return Response.json({ error: error.message }, { status: 500 });
 
-        const sources = (rows ?? []) as Source[];
+        // ترتيب عشوائي كي تتنوّع المصادر بين تشغيلٍ وآخر بدل تكرار الأوائل دائماً.
+        const sources = ((rows ?? []) as Source[]).sort(() => Math.random() - 0.5);
         if (sources.length === 0) return Response.json({ published: 0, reason: "no active sources" });
 
         const published: string[] = [];
