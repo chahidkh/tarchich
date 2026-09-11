@@ -240,8 +240,11 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
             continue;
           }
 
+          // مقال واحد كحدٍّ أقصى من كل مصدر في التشغيل الواحد، ليتنوّع المحتوى.
+          let fromThisSource = 0;
           for (const item of items.slice(0, 6)) {
-            if (published.length >= MAX_PER_RUN) break;
+            if (published.length >= MAX_PER_RUN || fromThisSource >= 1) break;
+
 
             const { data: existing } = await supabaseAdmin
               .from("posts")
