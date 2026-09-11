@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
+import { enforceRateLimit } from "@/lib/server-rate-limit";
 
 const schema = z.object({
   messages: z
@@ -23,6 +25,15 @@ const SYSTEM = `أنت "حكيم ترشيش"، أمينُ مكتبة ترشيش 
 export const askHakeem = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
+    // Public AI endpoint: cap requests per visitor IP to prevent abuse.
+    let request: Request | undefined;
+    try {
+      request = getRequest();
+    } catch {
+      request = undefined;
+    }
+    enforceRateLimit("hakeem", request, 12, 60_000);
+
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) return { reply: "خدمة الحكيم غير متاحة حالياً، عد إلينا بعد قليل." };
 

@@ -16,24 +16,10 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
         const header = request.headers.get("stripe-signature") ?? "";
         const body = await request.text();
 
-        const parts = Object.fromEntries(
-          header.split(",").map((p) => {
-            const [k, ...v] = p.trim().split("=");
-            return [k ?? "", v.join("=")];
-          }),
-        ) as Record<string, string>;
-
-        const timestamp = parts["t"];
-        const signature = parts["v1"];
-        if (!timestamp || !signature) return new Response("Invalid signature header", { status: 400 });
-
-        // Reject replays older than 5 minutes.
-        const age = Math.abs(Date.now() / 1000 - Number(timestamp));
-        if (!Number.isFinite(age) || age > 300) return new Response("Timestamp out of tolerance", { status: 400 });
-
-        const { hmacSha256Hex, timingSafeEqualHex, recordPaidSession } = await import("@/lib/orders.server");
-        const expected = await hmacSha256Hex(secret, `${timestamp}.${body}`);
-        if (!timingSafeEqualHex(signature, expected)) return new Response("Invalid signature", { status: 401 });
+        const { verifyStripeSignature, recordPaidSession } = await import("@/lib/orders.server");
+        // Verifies HMAC and rejects replays older than 5 minutes.
+        const verified = await verifyStripeSignature(secret, header, body);
+        if (!verified.ok) return new Response(verified.reason, { status: verified.status });
 
         let event: { id?: string; type?: string; data?: { object?: Record<string, unknown> } };
         try {

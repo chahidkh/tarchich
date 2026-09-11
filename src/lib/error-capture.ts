@@ -6,6 +6,52 @@ const TTL_MS = 5_000;
 
 function record(error: unknown) {
   lastCapturedError = { error, at: Date.now() };
+  void persist(error);
+}
+
+// ---- Durable persistence -------------------------------------------------
+// The in-memory capture above only survives 5s; important errors are also
+// written to the error_logs table so an admin can review them later.
+let persisting = false;
+const recentlyPersisted = new Map<string, number>();
+const DEDUPE_MS = 30_000;
+
+function shortMessage(error: unknown): string {
+  if (error instanceof Error) return `${error.name}: ${error.message}`;
+  if (typeof error === "string") return error;
+  try {
+    return JSON.stringify(error) ?? String(error);
+  } catch {
+    return String(error);
+  }
+}
+
+async function persist(error: unknown) {
+  if (persisting) return; // never recurse through our own logging
+  const message = shortMessage(error).slice(0, 500);
+  if (!message || message === "undefined") return;
+
+  const now = Date.now();
+  for (const [key, at] of recentlyPersisted) if (now - at > DEDUPE_MS) recentlyPersisted.delete(key);
+  if (recentlyPersisted.has(message)) return;
+  recentlyPersisted.set(message, now);
+
+  persisting = true;
+  try {
+    const { logError } = await import("@/lib/error-log.functions");
+    await logError({
+      data: {
+        message,
+        source: typeof window === "undefined" ? "server" : "client",
+        detail: describeError(error).slice(0, 4000),
+        ...(typeof window === "undefined" ? {} : { path: window.location.pathname.slice(0, 300) }),
+      },
+    });
+  } catch {
+    /* logging must never break the app */
+  } finally {
+    persisting = false;
+  }
 }
 
 // h3's HTTPError serializes to {"status":500,"unhandled":true,"message":"HTTPError"} —
