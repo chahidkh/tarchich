@@ -250,7 +250,8 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
               .limit(1);
             if (existing && existing.length > 0) continue;
 
-            const article = await compose(apiKey, source, item);
+            const restricted = RESTRICTED.test(source.license_note ?? "");
+            const article = await compose(apiKey, source, item, restricted);
             if (!article) continue;
 
             const { data: dupe } = await supabaseAdmin
