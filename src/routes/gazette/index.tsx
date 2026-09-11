@@ -213,7 +213,7 @@ function Gazette() {
                     className="h-[320px] w-full object-cover transition duration-700 group-hover:scale-[1.03] md:h-[460px]"
                   />
                 ) : (
-                  <GazetteCover title={hero.title} className="h-[320px] w-full md:h-[460px]" />
+                  <GazetteCover title="" className="h-[320px] w-full md:h-[460px]" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-6 md:p-12">
