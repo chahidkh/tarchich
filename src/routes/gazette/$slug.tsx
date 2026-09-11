@@ -159,6 +159,37 @@ function Article() {
           </div>
         </article>
 
+        {(related ?? []).length > 0 && (
+          <section className="mt-10">
+            <h2 className="flex items-center gap-2 text-xl text-gold">مقالات ذات صلة</h2>
+            <div className="gold-rule mt-3 w-24" />
+            <div className="mt-5 grid gap-5 sm:grid-cols-3">
+              {(related ?? []).map((r) => (
+                <Link
+                  key={r.id}
+                  to="/gazette/$slug"
+                  params={{ slug: r.slug ?? r.id }}
+                  className="glass group flex flex-col overflow-hidden rounded-xl border-gold/25 transition hover:border-gold/60"
+                >
+                  {r.media_url ? (
+                    <img src={r.media_url} alt={r.title} loading="lazy" className="h-28 w-full object-cover" />
+                  ) : (
+                    <GazetteCover title={r.title} className="h-28 w-full" />
+                  )}
+                  <div className="p-4">
+                    <h3 className="line-clamp-2 text-sm leading-relaxed transition group-hover:text-gold">
+                      {r.title}
+                    </h3>
+                    <span className="mt-2 inline-flex items-center gap-1 text-[11px] text-gold-soft">
+                      <Clock className="size-3" /> {readingMinutes(r.content)} دقيقة قراءة
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         {sponsored && (
           <div className="mt-8">
             <SponsoredAd ad={sponsored} />
