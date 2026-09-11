@@ -183,13 +183,18 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
           const target = source.url.startsWith("http") ? source.url : `https://${source.url}`;
           let items: FeedItem[] = [];
           try {
-            const res = await fetch(target, {
-              headers: { "User-Agent": `${PUBLISHER} Editorial Bot`, Accept: "application/rss+xml, application/atom+xml, */*" },
-              redirect: "follow",
-            });
-            if (!res.ok) continue;
-            if (!sourceHost(res.url || target).endsWith(sourceHost(target))) continue;
-            items = parseFeed(await res.text());
+            const host = sourceHost(target);
+            if (host.endsWith("wikipedia.org")) {
+              items = await wikipediaItems(host);
+            } else {
+              const res = await fetch(target, {
+                headers: { "User-Agent": `${PUBLISHER} Editorial Bot`, Accept: "application/rss+xml, application/atom+xml, */*" },
+                redirect: "follow",
+              });
+              if (!res.ok) continue;
+              if (!sourceHost(res.url || target).endsWith(host)) continue;
+              items = parseFeed(await res.text());
+            }
           } catch (e) {
             console.error("feed fetch failed", source.name, e);
             continue;
