@@ -12,10 +12,23 @@ export type GazettePost = {
   is_featured: boolean;
   is_published: boolean;
   created_at: string;
+  source_name?: string | null;
 };
 
 export const GAZETTE_FIELDS =
-  "id,title,slug,excerpt,content,media_url,category,views,is_featured,is_published,created_at";
+  "id,title,slug,excerpt,content,media_url,category,views,is_featured,is_published,created_at,source_name";
+
+/** Formats a post date as an Arabic "الشهر السنة" archive key. */
+export function archiveKey(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+export function archiveLabel(key: string) {
+  const [y, m] = key.split("-");
+  const d = new Date(Number(y), Number(m) - 1, 1);
+  return d.toLocaleDateString("ar", { month: "long", year: "numeric" });
+}
 
 /** The publisher attributed on every Gazette article. */
 export const PUBLISHER = "مكتبة ترشيش";
