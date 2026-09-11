@@ -66,6 +66,25 @@ function Article() {
     if (post?.id) void bumpViews({ data: { id: post.id } }).catch(() => {});
   }, [post?.id, bumpViews]);
 
+  const category = post ? normalizeCategory(post.category) : null;
+  const { data: related } = useQuery({
+    enabled: Boolean(post?.id && category),
+    queryKey: ["gazette-related", post?.id, category],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(GAZETTE_FIELDS)
+        .eq("section", "gazette")
+        .eq("is_published", true)
+        .neq("id", post!.id)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return (data as GazettePost[]).filter((p) => normalizeCategory(p.category) === category).slice(0, 3);
+    },
+  });
+
+
   if (isLoading) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-14">
