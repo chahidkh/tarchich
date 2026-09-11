@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { bumpGazetteViews } from "@/lib/gazette.functions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GAZETTE_FIELDS, PUBLISHER, normalizeCategory, readingMinutes, type GazettePost } from "@/lib/gazette";
+import { GazetteShare, SourceBadge } from "@/components/gazette-share";
+import { GazetteCover } from "@/components/gazette-cover";
 import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
 export const Route = createFileRoute("/gazette/$slug")({
@@ -106,13 +108,19 @@ function Article() {
           </span>
           <h1 className="mt-3 text-4xl leading-[1.5] text-gold">{post.title}</h1>
           <div className="gold-rule mt-5 w-32" />
-          <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <time>{new Date(post.created_at).toLocaleDateString("ar")}</time>
             <span className="inline-flex items-center gap-1 text-gold-soft">
               <Clock className="size-3.5" /> {readingMinutes(post.content)} دقيقة قراءة
             </span>
             <span className="text-gold-soft">نشر: {PUBLISHER}</span>
+            <SourceBadge source={post.source_name} />
           </div>
+
+          <div className="mt-5">
+            <GazetteShare title={post.title} />
+          </div>
+
 
           {post.media_url && (
             <img src={post.media_url} alt={post.title} className="mt-6 w-full rounded-xl object-cover" />
