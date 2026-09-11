@@ -3,13 +3,13 @@ import { GAZETTE_CATEGORIES, PUBLISHER, slugify, type GazetteCategory } from "@/
 import { sourceHost } from "@/lib/content-sources";
 
 /**
- * النشر التلقائي المجدول للجريدة.
- * يقتصر حصراً على المصادر المفعّلة ذات التراخيص المفتوحة بالكامل
- * (المشاع الإبداعي أو الملك العام) المسجّلة في جدول content_sources.
+ * النشر التلقائي المجدول للجريدة، من المصادر المفعّلة في جدول content_sources.
+ * المصادر مفتوحة الترخيص تُصاغ بحرّية، أمّا المصادر الإخبارية ذات الحقوق
+ * المحفوظة فتخضع لقواعد صارمة: إعادة صياغة كاملة، واقتباس واحد قصير جداً
+ * (أقل من ١٥ كلمة) كحدٍّ أقصى، مع إسناد دائم لاسم المصدر ورابطه.
  */
 
-const OPEN_LICENSE = /(مشاع إبداعي|المشاع الإبداعي|CC BY|الملك العام|public domain)/i;
-const RESTRICTED = /(حقوق محفوظة|اقتباس مختصر|اقتباس محدود)/;
+const RESTRICTED = /(حقوق محفوظة|اقتباس مختصر|اقتباس محدود|اقتباس قصير)/;
 
 const MAX_PER_RUN = 2;
 
@@ -89,15 +89,40 @@ async function wikipediaItems(host: string): Promise<FeedItem[]> {
 }
 
 
-async function compose(apiKey: string, source: Source, item: FeedItem) {
+/** يكشف النسخ الحرفي: تطابق ستّ كلمات متتالية بين المادة الأصلية والمقال. */
+function sharesLongPhrase(original: string, article: string, n = 6) {
+  const norm = (s: string) =>
+    s.replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/[\u064B-\u0652]/g, "").replace(/\s+/g, " ").trim().split(" ");
+  const a = norm(original);
+  const b = norm(article);
+  if (a.length < n || b.length < n) return false;
+  const grams = new Set<string>();
+  for (let i = 0; i + n <= a.length; i++) grams.add(a.slice(i, i + n).join(" "));
+  for (let i = 0; i + n <= b.length; i++) if (grams.has(b.slice(i, i + n).join(" "))) return true;
+  return false;
+}
+
+async function compose(apiKey: string, source: Source, item: FeedItem, restricted: boolean) {
+  const restrictedRules = `
+قواعد إلزامية لأن هذا المصدر محفوظ الحقوق:
+- أعد كتابة المادة بالكامل بأسلوبك وبنيتك أنت (Paraphrase حقيقي): غيّر ترتيب الأفكار وبناء الجمل والمفردات، ولا تنقل أي جملة من الأصل كما هي ولا تكتفِ بتبديل كلمات قليلة أو إعادة ترتيب طفيف.
+- لا تتجاوز خمس كلمات متتالية مطابقة لنصّ المصدر في أي موضع.
+- يُسمح باقتباس حرفي واحد فقط في المقال كلّه، بشرط أن يكون أقل من ١٥ كلمة وبين علامتَي تنصيص، وفقط إن كانت الدقة تقتضيه (تصريح رسمي مثلاً). ويُمنع منعاً باتاً أي اقتباس ثانٍ من المصدر نفسه في المقال ذاته. والأفضل ألّا تقتبس أصلاً.
+- احتفظ بالوقائع والأرقام والأسماء كما هي دون اختلاق، فالحقائق لا تُعاد صياغتها بل تُصاغ عبارتها.
+- أنهِ المقال بسطر إسناد صريح بالصيغة: بحسب ${source.name} — ${item.link}`;
+
+  const openRules = `
+- اعتمد على المادة المرفقة وحدها دون اختلاق وقائع أو أرقام أو اقتباسات.
+- اختم المقال بسطر إسناد يذكر المصدر "${source.name}".`;
+
   const system = `أنت محرّرُ جريدة "${PUBLISHER}"، تكتب بعربية فصيحة رصينة عميقة الثقافة والتاريخ، بلا مبالغة ولا ركاكة.
-حوّل المادة الخام المرفقة إلى مقال جريدة متكامل بصوت المكتبة، واعتمد على المادة المرفقة وحدها دون اختلاق وقائع أو أرقام أو اقتباسات.
+حوّل المادة الخام المرفقة إلى مقال جريدة متكامل بصوت المكتبة.${restricted ? restrictedRules : openRules}
 صنّف المقال في واحد من هذه التصنيفات حصراً: ${GAZETTE_CATEGORIES.join("، ")}.
 أعد الجواب بصيغة JSON فقط بالمفاتيح: category, title, excerpt, content.
-- title: عنوان موجز أقل من ١٠٠ حرف.
+- title: عنوان موجز أقل من ١٠٠ حرف، بصياغتك أنت لا بعنوان المصدر.
 - excerpt: ملخّص أقل من ٣٠٠ حرف.
 - content: فقرات مفصولة بسطرين فارغين، بين ٣٥٠ و٦٥٠ كلمة، بلا رموز تنسيق.
-اختم المقال بسطر إسناد يذكر المصدر "${source.name}"، ثم سطر: "نشرته جريدة ${PUBLISHER}."`;
+ثم سطر أخير: "نشرته جريدة ${PUBLISHER}."`;
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -127,11 +152,27 @@ async function compose(apiKey: string, source: Source, item: FeedItem) {
     const category: GazetteCategory = (GAZETTE_CATEGORIES as readonly string[]).includes(p.category ?? "")
       ? (p.category as GazetteCategory)
       : "الثقافة";
+    let body = content;
+
+    if (restricted) {
+      // تحقّق فعلي من إعادة الصياغة: أي تطابق حرفي لستّ كلمات متتالية يُسقط المقال.
+      if (sharesLongPhrase(item.summary, body)) {
+        console.error("gazette auto: paraphrase check failed", source.name, item.title);
+        return null;
+      }
+      // اقتباس حرفي واحد كحدٍّ أقصى، وأقل من ١٥ كلمة.
+      const quotes = body.match(/[«"“]([^»"”]{1,400})[»"”]/g) ?? [];
+      if (quotes.length > 1) return null;
+      if (quotes[0] && quotes[0].split(/\s+/).length > 15) return null;
+      // إسناد دائم في نهاية المقال.
+      if (!body.includes(source.name)) body = `${body}\n\nبحسب ${source.name} — ${item.link}`;
+    }
+
     return {
       category,
       title: p.title.trim().slice(0, 160),
       excerpt: (p.excerpt ?? "").trim().slice(0, 300),
-      content: content.includes(PUBLISHER) ? content : `${content}\n\nنشرته جريدة ${PUBLISHER}.`,
+      content: body.includes(PUBLISHER) ? body : `${body}\n\nنشرته جريدة ${PUBLISHER}.`,
     };
   } catch {
     return null;
@@ -171,10 +212,9 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
           .eq("is_active", true);
         if (error) return Response.json({ error: error.message }, { status: 500 });
 
-        const sources = ((rows ?? []) as Source[]).filter(
-          (s) => OPEN_LICENSE.test(s.license_note ?? "") && !RESTRICTED.test(s.license_note ?? ""),
-        );
-        if (sources.length === 0) return Response.json({ published: 0, reason: "no open-licence sources" });
+        // ترتيب عشوائي كي تتنوّع المصادر بين تشغيلٍ وآخر بدل تكرار الأوائل دائماً.
+        const sources = ((rows ?? []) as Source[]).sort(() => Math.random() - 0.5);
+        if (sources.length === 0) return Response.json({ published: 0, reason: "no active sources" });
 
         const published: string[] = [];
 
@@ -200,8 +240,11 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
             continue;
           }
 
+          // مقال واحد كحدٍّ أقصى من كل مصدر في التشغيل الواحد، ليتنوّع المحتوى.
+          let fromThisSource = 0;
           for (const item of items.slice(0, 6)) {
-            if (published.length >= MAX_PER_RUN) break;
+            if (published.length >= MAX_PER_RUN || fromThisSource >= 1) break;
+
 
             const { data: existing } = await supabaseAdmin
               .from("posts")
@@ -211,7 +254,8 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
               .limit(1);
             if (existing && existing.length > 0) continue;
 
-            const article = await compose(apiKey, source, item);
+            const restricted = RESTRICTED.test(source.license_note ?? "");
+            const article = await compose(apiKey, source, item, restricted);
             if (!article) continue;
 
             const { data: dupe } = await supabaseAdmin
@@ -237,6 +281,7 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
               continue;
             }
             published.push(article.title);
+            fromThisSource += 1;
           }
         }
 
