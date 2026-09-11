@@ -82,3 +82,36 @@ export async function hmacSha256Hex(secret: string, payload: string): Promise<st
   const sig = await crypto.subtle.sign("HMAC", key, enc.encode(payload));
   return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+
+/**
+ * Verifies a Stripe `stripe-signature` header against the raw body.
+ * Extracted from the webhook route so it can be unit-tested.
+ */
+export async function verifyStripeSignature(
+  secret: string,
+  header: string,
+  body: string,
+  nowMs: number = Date.now(),
+  toleranceSec = 300,
+): Promise<{ ok: true } | { ok: false; status: number; reason: string }> {
+  const parts = Object.fromEntries(
+    header.split(",").map((p) => {
+      const [k, ...v] = p.trim().split("=");
+      return [k ?? "", v.join("=")];
+    }),
+  ) as Record<string, string>;
+
+  const timestamp = parts["t"];
+  const signature = parts["v1"];
+  if (!timestamp || !signature) return { ok: false, status: 400, reason: "Invalid signature header" };
+
+  const age = Math.abs(nowMs / 1000 - Number(timestamp));
+  if (!Number.isFinite(age) || age > toleranceSec) {
+    return { ok: false, status: 400, reason: "Timestamp out of tolerance" };
+  }
+
+  const expected = await hmacSha256Hex(secret, `${timestamp}.${body}`);
+  if (!timingSafeEqualHex(signature, expected)) return { ok: false, status: 401, reason: "Invalid signature" };
+
+  return { ok: true };
+}
