@@ -50,6 +50,45 @@ function parseFeed(xml: string): FeedItem[] {
     .filter((i) => i.title.length > 8);
 }
 
+/** ويكيبيديا العربية: تغذية اليوم (أحداث في مثل هذا اليوم + هل تعلم) بترخيص CC BY-SA. */
+async function wikipediaItems(host: string): Promise<FeedItem[]> {
+  const d = new Date();
+  const path = `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, "0")}/${String(d.getUTCDate()).padStart(2, "0")}`;
+  const res = await fetch(`https://${host}/api/rest_v1/feed/featured/${path}`, {
+    headers: { "User-Agent": `${PUBLISHER} Editorial Bot`, Accept: "application/json" },
+  });
+  if (!res.ok) return [];
+  const json = (await res.json()) as {
+    onthisday?: { text?: string; year?: number; pages?: { titles?: { normalized?: string }; extract?: string }[] }[];
+    tfa?: { titles?: { normalized?: string }; extract?: string; content_urls?: { desktop?: { page?: string } } };
+  };
+
+  const items: FeedItem[] = [];
+
+  for (const ev of (json.onthisday ?? []).slice(0, 4)) {
+    const page = ev.pages?.[0];
+    const title = page?.titles?.normalized ?? "";
+    if (!ev.text || !title) continue;
+    items.push({
+      title: `في مثل هذا اليوم: ${title}`,
+      summary: `${ev.year ? `سنة ${ev.year}: ` : ""}${ev.text}\n\n${page?.extract ?? ""}`,
+      link: `https://${host}/wiki/${encodeURIComponent(title)}`,
+    });
+  }
+
+  const tfa = json.tfa;
+  if (tfa?.titles?.normalized && tfa.extract) {
+    items.push({
+      title: tfa.titles.normalized,
+      summary: tfa.extract,
+      link: tfa.content_urls?.desktop?.page ?? `https://${host}`,
+    });
+  }
+
+  return items.filter((i) => i.summary.replace(/\s+/g, " ").trim().length > 200);
+}
+
+
 async function compose(apiKey: string, source: Source, item: FeedItem) {
   const system = `أنت محرّرُ جريدة "${PUBLISHER}"، تكتب بعربية فصيحة رصينة عميقة الثقافة والتاريخ، بلا مبالغة ولا ركاكة.
 حوّل المادة الخام المرفقة إلى مقال جريدة متكامل بصوت المكتبة، واعتمد على المادة المرفقة وحدها دون اختلاق وقائع أو أرقام أو اقتباسات.
