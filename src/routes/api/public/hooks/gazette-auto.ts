@@ -196,7 +196,7 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        const cooldown = new Date(Date.now() - 60 * 1000).toISOString();
+        const cooldown = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         const { data: recent } = await supabaseAdmin
           .from("posts")
           .select("id")
