@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { bumpGazetteViews } from "@/lib/gazette.functions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GAZETTE_FIELDS, PUBLISHER, normalizeCategory, readingMinutes, type GazettePost } from "@/lib/gazette";
+import { GazetteShare, SourceBadge } from "@/components/gazette-share";
+import { GazetteCover } from "@/components/gazette-cover";
 import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
 export const Route = createFileRoute("/gazette/$slug")({
@@ -64,6 +66,25 @@ function Article() {
     if (post?.id) void bumpViews({ data: { id: post.id } }).catch(() => {});
   }, [post?.id, bumpViews]);
 
+  const category = post ? normalizeCategory(post.category) : null;
+  const { data: related } = useQuery({
+    enabled: Boolean(post?.id && category),
+    queryKey: ["gazette-related", post?.id, category],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(GAZETTE_FIELDS)
+        .eq("section", "gazette")
+        .eq("is_published", true)
+        .neq("id", post!.id)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return (data as GazettePost[]).filter((p) => normalizeCategory(p.category) === category).slice(0, 3);
+    },
+  });
+
+
   if (isLoading) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-14">
@@ -106,13 +127,19 @@ function Article() {
           </span>
           <h1 className="mt-3 text-4xl leading-[1.5] text-gold">{post.title}</h1>
           <div className="gold-rule mt-5 w-32" />
-          <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <time>{new Date(post.created_at).toLocaleDateString("ar")}</time>
             <span className="inline-flex items-center gap-1 text-gold-soft">
               <Clock className="size-3.5" /> {readingMinutes(post.content)} دقيقة قراءة
             </span>
             <span className="text-gold-soft">نشر: {PUBLISHER}</span>
+            <SourceBadge source={post.source_name} />
           </div>
+
+          <div className="mt-5">
+            <GazetteShare title={post.title} />
+          </div>
+
 
           {post.media_url && (
             <img src={post.media_url} alt={post.title} className="mt-6 w-full rounded-xl object-cover" />
@@ -131,6 +158,37 @@ function Article() {
             ))}
           </div>
         </article>
+
+        {(related ?? []).length > 0 && (
+          <section className="mt-10">
+            <h2 className="flex items-center gap-2 text-xl text-gold">مقالات ذات صلة</h2>
+            <div className="gold-rule mt-3 w-24" />
+            <div className="mt-5 grid gap-5 sm:grid-cols-3">
+              {(related ?? []).map((r) => (
+                <Link
+                  key={r.id}
+                  to="/gazette/$slug"
+                  params={{ slug: r.slug ?? r.id }}
+                  className="glass group flex flex-col overflow-hidden rounded-xl border-gold/25 transition hover:border-gold/60"
+                >
+                  {r.media_url ? (
+                    <img src={r.media_url} alt={r.title} loading="lazy" className="h-28 w-full object-cover" />
+                  ) : (
+                    <GazetteCover title={r.title} className="h-28 w-full" />
+                  )}
+                  <div className="p-4">
+                    <h3 className="line-clamp-2 text-sm leading-relaxed transition group-hover:text-gold">
+                      {r.title}
+                    </h3>
+                    <span className="mt-2 inline-flex items-center gap-1 text-[11px] text-gold-soft">
+                      <Clock className="size-3" /> {readingMinutes(r.content)} دقيقة قراءة
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {sponsored && (
           <div className="mt-8">

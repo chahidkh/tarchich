@@ -324,6 +324,7 @@ export type Database = {
           media_url: string | null
           section: string
           slug: string | null
+          source_name: string | null
           title: string
           views: number
         }
@@ -340,6 +341,7 @@ export type Database = {
           media_url?: string | null
           section?: string
           slug?: string | null
+          source_name?: string | null
           title: string
           views?: number
         }
@@ -356,6 +358,7 @@ export type Database = {
           media_url?: string | null
           section?: string
           slug?: string | null
+          source_name?: string | null
           title?: string
           views?: number
         }
