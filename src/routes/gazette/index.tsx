@@ -52,7 +52,7 @@ function categoryStyle(category: string): React.CSSProperties {
   return { color: base, backgroundColor: `color-mix(in oklab, ${base} 14%, transparent)` };
 }
 
-function CategoryBadge({ category, plain = false }: { category: string; plain?: boolean }) {
+function CategoryBadge({ category, plain = false }: { category: string | null; plain?: boolean }) {
   const c = normalizeCategory(category);
   if (c === "عاجل") {
     return (
