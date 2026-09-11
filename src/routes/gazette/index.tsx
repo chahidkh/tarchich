@@ -35,34 +35,83 @@ export const Route = createFileRoute("/gazette/")({
   component: Gazette,
 });
 
-function Card({ post }: { post: GazettePost }) {
+/**
+ * تدرّجات من عائلة الذهب نفسها لتمييز التصنيفات، مشتقّة من متغيّر --gold
+ * بإزاحة طفيفة في الدرجة اللونية، فتبقى داخل هوية الموقع في الوضعين.
+ * "عاجل" وحده يحتفظ بلونه الأحمر المميّز.
+ */
+const CATEGORY_HUE: Record<string, number> = {
+  سياسة: -14,
+  التاريخ: 16,
+  الثقافة: 30,
+};
+
+function categoryStyle(category: string): React.CSSProperties {
+  const shift = CATEGORY_HUE[category] ?? 0;
+  const base = `oklch(from var(--gold) l c calc(h + ${shift}))`;
+  return { color: base, backgroundColor: `color-mix(in oklab, ${base} 14%, transparent)` };
+}
+
+function CategoryBadge({ category, plain = false }: { category: string; plain?: boolean }) {
+  const c = normalizeCategory(category);
+  if (c === "عاجل") {
+    return (
+      <span className="rounded-full bg-red-500/15 px-3 py-1 text-[11px] font-bold tracking-wider text-red-400">
+        {c}
+      </span>
+    );
+  }
+  return (
+    <span
+      className={`rounded-full px-3 py-1 text-[11px] tracking-wider ${plain ? "" : ""}`}
+      style={categoryStyle(c)}
+    >
+      {c}
+    </span>
+  );
+}
+
+function Card({ post, large = false }: { post: GazettePost; large?: boolean }) {
   return (
     <Link
       to="/gazette/$slug"
       params={{ slug: post.slug ?? post.id }}
-      className="glass group flex flex-col overflow-hidden rounded-xl border-gold/25 transition hover:border-gold/60"
+      className={`glass group flex flex-col overflow-hidden rounded-2xl border border-gold/15 transition hover:border-gold/45 ${
+        large ? "sm:col-span-2 sm:flex-row" : ""
+      }`}
     >
-      {post.media_url ? (
-        <img src={post.media_url} alt={post.title} loading="lazy" className="h-40 w-full object-cover" />
-      ) : (
-        <GazetteCover title={post.title} />
-      )}
-      <div className="flex flex-1 flex-col p-5">
+      <div className={large ? "sm:w-1/2" : ""}>
+        {post.media_url ? (
+          <img
+            src={post.media_url}
+            alt={post.title}
+            loading="lazy"
+            className={`w-full object-cover ${large ? "h-52 sm:h-full" : "h-28"}`}
+          />
+        ) : (
+          <GazetteCover title={post.title} className={large ? "h-52 w-full sm:h-full" : "h-28 w-full"} />
+        )}
+      </div>
+      <div className={`flex flex-1 flex-col ${large ? "p-7" : "p-6"}`}>
         <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={`text-[11px] tracking-widest ${
-              normalizeCategory(post.category) === "عاجل" ? "font-bold text-red-400" : "text-gold-soft"
-            }`}
-          >
-            {normalizeCategory(post.category)}
-          </span>
+          <CategoryBadge category={post.category} />
           <SourceBadge source={post.source_name} />
         </div>
-        <h3 className="mt-2 text-xl leading-relaxed transition group-hover:text-gold">{post.title}</h3>
-        <p className="mt-2 line-clamp-3 flex-1 text-sm leading-7 text-muted-foreground">
+        <h3
+          className={`mt-3 leading-relaxed transition group-hover:text-gold ${
+            large ? "text-2xl text-gold" : "text-lg"
+          }`}
+        >
+          {post.title}
+        </h3>
+        <p
+          className={`mt-3 flex-1 text-sm leading-7 text-muted-foreground ${
+            large ? "line-clamp-4" : "line-clamp-3"
+          }`}
+        >
           {post.excerpt ?? post.content}
         </p>
-        <span className="mt-4 inline-flex items-center gap-1 rounded-full border border-gold/30 px-2.5 py-1 text-[11px] text-gold-soft">
+        <span className="mt-5 inline-flex items-center gap-1 text-[11px] text-gold-soft">
           <Clock className="size-3" /> {readingMinutes(post.content)} دقيقة قراءة
         </span>
       </div>
