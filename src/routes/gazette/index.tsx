@@ -35,34 +35,83 @@ export const Route = createFileRoute("/gazette/")({
   component: Gazette,
 });
 
-function Card({ post }: { post: GazettePost }) {
+/**
+ * تدرّجات من عائلة الذهب نفسها لتمييز التصنيفات، مشتقّة من متغيّر --gold
+ * بإزاحة طفيفة في الدرجة اللونية، فتبقى داخل هوية الموقع في الوضعين.
+ * "عاجل" وحده يحتفظ بلونه الأحمر المميّز.
+ */
+const CATEGORY_HUE: Record<string, number> = {
+  سياسة: -14,
+  التاريخ: 16,
+  الثقافة: 30,
+};
+
+function categoryStyle(category: string): React.CSSProperties {
+  const shift = CATEGORY_HUE[category] ?? 0;
+  const base = `oklch(from var(--gold) l c calc(h + ${shift}))`;
+  return { color: base, backgroundColor: `color-mix(in oklab, ${base} 14%, transparent)` };
+}
+
+function CategoryBadge({ category, plain = false }: { category: string | null; plain?: boolean }) {
+  const c = normalizeCategory(category);
+  if (c === "عاجل") {
+    return (
+      <span className="rounded-full bg-red-500/15 px-3 py-1 text-[11px] font-bold tracking-wider text-red-400">
+        {c}
+      </span>
+    );
+  }
+  return (
+    <span
+      className={`rounded-full px-3 py-1 text-[11px] tracking-wider ${plain ? "" : ""}`}
+      style={categoryStyle(c)}
+    >
+      {c}
+    </span>
+  );
+}
+
+function Card({ post, large = false }: { post: GazettePost; large?: boolean }) {
   return (
     <Link
       to="/gazette/$slug"
       params={{ slug: post.slug ?? post.id }}
-      className="glass group flex flex-col overflow-hidden rounded-xl border-gold/25 transition hover:border-gold/60"
+      className={`glass group flex flex-col overflow-hidden rounded-2xl border border-gold/15 transition hover:border-gold/45 ${
+        large ? "sm:col-span-2 sm:flex-row" : ""
+      }`}
     >
-      {post.media_url ? (
-        <img src={post.media_url} alt={post.title} loading="lazy" className="h-40 w-full object-cover" />
-      ) : (
-        <GazetteCover title={post.title} />
-      )}
-      <div className="flex flex-1 flex-col p-5">
+      <div className={large ? "sm:w-1/2" : ""}>
+        {post.media_url ? (
+          <img
+            src={post.media_url}
+            alt={post.title}
+            loading="lazy"
+            className={`w-full object-cover ${large ? "h-52 sm:h-full" : "h-28"}`}
+          />
+        ) : (
+          <GazetteCover title={post.title} className={large ? "h-52 w-full sm:h-full" : "h-28 w-full"} />
+        )}
+      </div>
+      <div className={`flex flex-1 flex-col ${large ? "p-7" : "p-6"}`}>
         <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={`text-[11px] tracking-widest ${
-              normalizeCategory(post.category) === "عاجل" ? "font-bold text-red-400" : "text-gold-soft"
-            }`}
-          >
-            {normalizeCategory(post.category)}
-          </span>
+          <CategoryBadge category={post.category} />
           <SourceBadge source={post.source_name} />
         </div>
-        <h3 className="mt-2 text-xl leading-relaxed transition group-hover:text-gold">{post.title}</h3>
-        <p className="mt-2 line-clamp-3 flex-1 text-sm leading-7 text-muted-foreground">
+        <h3
+          className={`mt-3 leading-relaxed transition group-hover:text-gold ${
+            large ? "text-2xl text-gold" : "text-lg"
+          }`}
+        >
+          {post.title}
+        </h3>
+        <p
+          className={`mt-3 flex-1 text-sm leading-7 text-muted-foreground ${
+            large ? "line-clamp-4" : "line-clamp-3"
+          }`}
+        >
           {post.excerpt ?? post.content}
         </p>
-        <span className="mt-4 inline-flex items-center gap-1 rounded-full border border-gold/30 px-2.5 py-1 text-[11px] text-gold-soft">
+        <span className="mt-5 inline-flex items-center gap-1 text-[11px] text-gold-soft">
           <Clock className="size-3" /> {readingMinutes(post.content)} دقيقة قراءة
         </span>
       </div>
@@ -116,7 +165,7 @@ function Gazette() {
   const visible = rest.slice(0, limit);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-14">
+    <main className="mx-auto max-w-7xl px-4 py-14">
       <header className="mb-10 text-center">
         <h1 className="flex items-center justify-center gap-3 text-4xl text-gold">
           <Newspaper className="size-7" /> الجريدة
@@ -126,7 +175,7 @@ function Gazette() {
         <p className="mt-1 text-xs text-gold-soft">تصدر عن {PUBLISHER}</p>
       </header>
 
-      <div className="mx-auto mb-8 flex max-w-xl items-center gap-2 rounded-full border border-gold/30 bg-card/60 px-4 py-1.5">
+      <div className="mx-auto mb-10 flex max-w-xl items-center gap-2 rounded-full border border-gold/30 bg-card/60 px-4 py-1.5">
         <Search className="size-4 shrink-0 text-gold-soft" />
         <Input
           value={term}
@@ -137,16 +186,17 @@ function Gazette() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-72 rounded-xl bg-secondary/50" />
+            <Skeleton key={i} className="h-72 rounded-2xl bg-secondary/50" />
           ))}
         </div>
       ) : (
         <>
+          {/* بانر مقال الصدارة — كامل العرض وبمساحة بارزة */}
           {hero && (
-            <section className="mb-12">
-              <div className="mb-3 flex items-center justify-center gap-3">
+            <section className="mb-14">
+              <div className="mb-4 flex items-center justify-center gap-3">
                 <span className="gold-rule w-16" />
                 <span className="text-[11px] tracking-[0.3em] text-gold-soft">مقال الصدارة</span>
                 <span className="gold-rule w-16" />
@@ -154,76 +204,44 @@ function Gazette() {
               <Link
                 to="/gazette/$slug"
                 params={{ slug: hero.slug ?? hero.id }}
-                className="glass group grid gap-7 overflow-hidden rounded-2xl border-2 border-gold/50 p-6 shadow-[0_18px_60px_-25px_oklch(0.55_0.12_70_/_0.55)] transition hover:border-gold md:grid-cols-5 md:p-9"
+                className="group relative block overflow-hidden rounded-3xl border-2 border-gold/45 shadow-[0_26px_80px_-30px_oklch(0.55_0.12_70_/_0.6)] transition hover:border-gold"
               >
-                <div className="md:col-span-3">
-                  {hero.media_url ? (
-                    <img
-                      src={hero.media_url}
-                      alt={hero.title}
-                      className="h-72 w-full rounded-xl object-cover md:h-80"
-                    />
-                  ) : (
-                    <GazetteCover title={hero.title} className="h-72 w-full rounded-xl border md:h-80" />
-                  )}
-                </div>
-                <div className="self-center md:col-span-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`rounded-full px-3 py-1 text-[11px] ${
-                        normalizeCategory(hero.category) === "عاجل"
-                          ? "bg-red-500/15 font-bold text-red-400"
-                          : "bg-gold/15 text-gold"
-                      }`}
-                    >
-                      {normalizeCategory(hero.category)}
-                    </span>
-                    <SourceBadge source={hero.source_name} />
-                  </div>
-                  <h2 className="mt-4 font-display text-3xl leading-[1.45] text-gold transition group-hover:text-gold md:text-4xl">
-                    {hero.title}
-                  </h2>
-                  <div className="gold-rule mt-4 w-24" />
-                  <p className="mt-4 line-clamp-5 text-sm leading-8 text-muted-foreground">
-                    {hero.excerpt ?? hero.content}
-                  </p>
-                  <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-gold-soft">
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="size-3.5" /> {readingMinutes(hero.content)} دقيقة قراءة
-                    </span>
-                    <time className="text-muted-foreground">
-                      {new Date(hero.created_at).toLocaleDateString("ar")}
-                    </time>
+                {hero.media_url ? (
+                  <img
+                    src={hero.media_url}
+                    alt={hero.title}
+                    className="h-[320px] w-full object-cover transition duration-700 group-hover:scale-[1.03] md:h-[460px]"
+                  />
+                ) : (
+                  <GazetteCover title="" className="h-[320px] w-full md:h-[460px]" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-6 md:p-12">
+                  <div className="mx-auto max-w-4xl text-center">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      <CategoryBadge category={hero.category} />
+                      <SourceBadge source={hero.source_name} />
+                    </div>
+                    <h2 className="mt-4 font-display text-3xl leading-[1.4] text-gold md:text-5xl">{hero.title}</h2>
+                    <div className="gold-rule mx-auto mt-5 w-28" />
+                    <p className="mx-auto mt-4 line-clamp-3 max-w-3xl text-sm leading-8 text-muted-foreground md:text-base">
+                      {hero.excerpt ?? hero.content}
+                    </p>
+                    <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-xs text-gold-soft">
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="size-3.5" /> {readingMinutes(hero.content)} دقيقة قراءة
+                      </span>
+                      <time className="text-muted-foreground">
+                        {new Date(hero.created_at).toLocaleDateString("ar")}
+                      </time>
+                    </div>
                   </div>
                 </div>
               </Link>
             </section>
           )}
 
-          {weekly.length > 0 && (
-            <section className="glass mb-8 rounded-xl border-gold/25 p-5">
-              <h2 className="flex items-center gap-2 text-sm text-gold">
-                <Flame className="size-4" /> الأكثر قراءة هذا الأسبوع
-              </h2>
-              <ol className="mt-3 space-y-2">
-                {weekly.map((p, i) => (
-                  <li key={p.id} className="flex items-center gap-3 text-sm">
-                    <span className="text-gold-soft">{i + 1}.</span>
-                    <Link
-                      to="/gazette/$slug"
-                      params={{ slug: p.slug ?? p.id }}
-                      className="min-w-0 flex-1 truncate text-muted-foreground transition hover:text-gold"
-                    >
-                      {p.title}
-                    </Link>
-                    <span className="shrink-0 text-xs text-gold-soft">{p.views} مشاهدة</span>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          )}
-
-          <div className="mb-4 flex flex-wrap justify-center gap-2">
+          <div className="mb-5 flex flex-wrap justify-center gap-2">
             {categories.map((c) => (
               <button
                 key={c}
@@ -237,60 +255,92 @@ function Gazette() {
             ))}
           </div>
 
-          {months.length > 0 && (
-            <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
-              <span className="text-xs text-muted-foreground">الأرشيف:</span>
-              {["الكل", ...months].map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMonth(m)}
-                  className={`rounded-full border px-3 py-1 text-xs transition ${
-                    month === m
-                      ? "border-gold bg-gold/10 text-gold"
-                      : "border-border/70 text-muted-foreground hover:text-gold"
-                  }`}
-                >
-                  {m === "الكل" ? "كل الشهور" : archiveLabel(m)}
-                </button>
-              ))}
-            </div>
-          )}
-
           {sponsored.length > 0 && (
-            <div className="mb-8 space-y-4">
+            <div className="mb-10 space-y-4">
               {sponsored.map((ad) => (
                 <SponsoredAd key={ad.id} ad={ad} />
               ))}
             </div>
           )}
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {visible.map((p, i) => (
-              <Fragment key={p.id}>
-                <Card post={p} />
-                {inFeed.length > 0 && i > 0 && i % 3 === 2 && (
-                  <InFeedAd ad={inFeed[Math.floor(i / 3) % inFeed.length]!} />
-                )}
-              </Fragment>
-            ))}
-          </div>
+          {/* المحتوى الرئيسي + عمود جانبي لاصق على الشاشات الكبيرة */}
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div>
+              <div className="grid gap-8 sm:grid-cols-2">
+                {visible.map((p, i) => (
+                  <Fragment key={p.id}>
+                    <Card post={p} large={i === 0 || (i === 3 && Boolean(p.media_url))} />
+                    {inFeed.length > 0 && i > 0 && i % 3 === 2 && (
+                      <InFeedAd ad={inFeed[Math.floor(i / 3) % inFeed.length]!} />
+                    )}
+                  </Fragment>
+                ))}
+              </div>
 
-          {rest.length > visible.length && (
-            <div className="mt-10 text-center">
-              <button
-                onClick={() => setLimit((v) => v + PAGE_SIZE)}
-                className="rounded-full border border-gold/40 px-6 py-2 text-sm text-gold transition hover:bg-gold/10"
-              >
-                تحميل مقالات أقدم ({rest.length - visible.length})
-              </button>
+              {rest.length > visible.length && (
+                <div className="mt-12 text-center">
+                  <button
+                    onClick={() => setLimit((v) => v + PAGE_SIZE)}
+                    className="rounded-full border border-gold/40 px-6 py-2 text-sm text-gold transition hover:bg-gold/10"
+                  >
+                    تحميل مقالات أقدم ({rest.length - visible.length})
+                  </button>
+                </div>
+              )}
+
+              {list.length === 0 && (
+                <p className="text-center text-sm text-muted-foreground">
+                  {q ? "لا نتائج مطابقة لبحثك." : "لا مقالات في هذا التصنيف بعد."}
+                </p>
+              )}
             </div>
-          )}
 
-          {list.length === 0 && (
-            <p className="text-center text-sm text-muted-foreground">
-              {q ? "لا نتائج مطابقة لبحثك." : "لا مقالات في هذا التصنيف بعد."}
-            </p>
-          )}
+            <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+              {weekly.length > 0 && (
+                <section className="glass rounded-2xl border border-gold/15 p-6">
+                  <h2 className="flex items-center gap-2 text-sm text-gold">
+                    <Flame className="size-4" /> الأكثر قراءة هذا الأسبوع
+                  </h2>
+                  <ol className="mt-4 space-y-3">
+                    {weekly.map((p, i) => (
+                      <li key={p.id} className="flex items-start gap-3 text-sm">
+                        <span className="text-gold-soft">{i + 1}.</span>
+                        <Link
+                          to="/gazette/$slug"
+                          params={{ slug: p.slug ?? p.id }}
+                          className="min-w-0 flex-1 leading-6 text-muted-foreground transition hover:text-gold"
+                        >
+                          <span className="line-clamp-2">{p.title}</span>
+                          <span className="mt-0.5 block text-[11px] text-gold-soft">{p.views} مشاهدة</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              )}
+
+              {months.length > 0 && (
+                <section className="glass rounded-2xl border border-gold/15 p-6">
+                  <h2 className="text-sm text-gold">الأرشيف الشهري</h2>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {["الكل", ...months].map((m) => (
+                      <button
+                        key={m}
+                        onClick={() => setMonth(m)}
+                        className={`rounded-full border px-3 py-1 text-xs transition ${
+                          month === m
+                            ? "border-gold bg-gold/10 text-gold"
+                            : "border-border/70 text-muted-foreground hover:text-gold"
+                        }`}
+                      >
+                        {m === "الكل" ? "كل الشهور" : archiveLabel(m)}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </aside>
+          </div>
         </>
       )}
 
