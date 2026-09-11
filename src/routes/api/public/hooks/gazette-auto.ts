@@ -89,6 +89,19 @@ async function wikipediaItems(host: string): Promise<FeedItem[]> {
 }
 
 
+/** يكشف النسخ الحرفي: تطابق ستّ كلمات متتالية بين المادة الأصلية والمقال. */
+function sharesLongPhrase(original: string, article: string, n = 6) {
+  const norm = (s: string) =>
+    s.replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/[\u064B-\u0652]/g, "").replace(/\s+/g, " ").trim().split(" ");
+  const a = norm(original);
+  const b = norm(article);
+  if (a.length < n || b.length < n) return false;
+  const grams = new Set<string>();
+  for (let i = 0; i + n <= a.length; i++) grams.add(a.slice(i, i + n).join(" "));
+  for (let i = 0; i + n <= b.length; i++) if (grams.has(b.slice(i, i + n).join(" "))) return true;
+  return false;
+}
+
 async function compose(apiKey: string, source: Source, item: FeedItem, restricted: boolean) {
   const restrictedRules = `
 قواعد إلزامية لأن هذا المصدر محفوظ الحقوق:
