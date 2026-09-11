@@ -8,8 +8,7 @@ import { sourceHost } from "@/lib/content-sources";
  * (المشاع الإبداعي أو الملك العام) المسجّلة في جدول content_sources.
  */
 
-const OPEN_LICENSE = /(مشاع إبداعي|المشاع الإبداعي|CC BY|الملك العام|public domain)/i;
-const RESTRICTED = /(حقوق محفوظة|اقتباس مختصر|اقتباس محدود)/;
+const RESTRICTED = /(حقوق محفوظة|اقتباس مختصر|اقتباس محدود|اقتباس قصير)/;
 
 const MAX_PER_RUN = 2;
 
