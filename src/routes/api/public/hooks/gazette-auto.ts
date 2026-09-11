@@ -55,7 +55,7 @@ async function wikipediaItems(host: string): Promise<FeedItem[]> {
   const d = new Date();
   const path = `${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, "0")}/${String(d.getUTCDate()).padStart(2, "0")}`;
   const res = await fetch(`https://${host}/api/rest_v1/feed/featured/${path}`, {
-    headers: { "User-Agent": `${PUBLISHER} Editorial Bot`, Accept: "application/json" },
+    headers: { "User-Agent": "TarchishLibraryBot/1.0", Accept: "application/json" },
   });
   if (!res.ok) return [];
   const json = (await res.json()) as {
@@ -188,7 +188,7 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
               items = await wikipediaItems(host);
             } else {
               const res = await fetch(target, {
-                headers: { "User-Agent": `${PUBLISHER} Editorial Bot`, Accept: "application/rss+xml, application/atom+xml, */*" },
+                headers: { "User-Agent": "TarchishLibraryBot/1.0", Accept: "application/rss+xml, application/atom+xml, */*" },
                 redirect: "follow",
               });
               if (!res.ok) continue;
