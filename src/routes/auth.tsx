@@ -8,6 +8,7 @@ import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -36,6 +37,12 @@ function AuthPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    // Slow down repeated credential guessing from the same device.
+    const limit = checkRateLimit(mode === "signup" ? "signup" : "signin", mode === "signup" ? 3 : 5, 5 * 60_000);
+    if (!limit.allowed) {
+      toast.error(`محاولات كثيرة، انتظر ${limit.retryInSec} ثانية قبل المحاولة مجدداً.`);
+      return;
+    }
     setBusy(true);
     if (mode === "signup") {
       const { error } = await supabase.auth.signUp({
