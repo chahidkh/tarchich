@@ -139,11 +139,27 @@ async function compose(apiKey: string, source: Source, item: FeedItem, restricte
     const category: GazetteCategory = (GAZETTE_CATEGORIES as readonly string[]).includes(p.category ?? "")
       ? (p.category as GazetteCategory)
       : "الثقافة";
+    let body = content;
+
+    if (restricted) {
+      // تحقّق فعلي من إعادة الصياغة: أي تطابق حرفي لستّ كلمات متتالية يُسقط المقال.
+      if (sharesLongPhrase(item.summary, body)) {
+        console.error("gazette auto: paraphrase check failed", source.name, item.title);
+        return null;
+      }
+      // اقتباس حرفي واحد كحدٍّ أقصى، وأقل من ١٥ كلمة.
+      const quotes = body.match(/[«"“]([^»"”]{1,400})[»"”]/g) ?? [];
+      if (quotes.length > 1) return null;
+      if (quotes[0] && quotes[0].split(/\s+/).length > 15) return null;
+      // إسناد دائم في نهاية المقال.
+      if (!body.includes(source.name)) body = `${body}\n\nبحسب ${source.name} — ${item.link}`;
+    }
+
     return {
       category,
       title: p.title.trim().slice(0, 160),
       excerpt: (p.excerpt ?? "").trim().slice(0, 300),
-      content: content.includes(PUBLISHER) ? content : `${content}\n\nنشرته جريدة ${PUBLISHER}.`,
+      content: body.includes(PUBLISHER) ? body : `${body}\n\nنشرته جريدة ${PUBLISHER}.`,
     };
   } catch {
     return null;
