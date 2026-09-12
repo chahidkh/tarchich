@@ -63,35 +63,37 @@ function Admin() {
       </header>
 
       <Tabs defaultValue="books" dir="rtl">
-        <TabsList className="mx-auto mb-8 flex w-full max-w-2xl">
-          <TabsTrigger value="books" className="flex-1">
+        <div className="mx-auto mb-8 w-full max-w-2xl overflow-x-auto overscroll-x-contain scroll-smooth pb-1 sm:overflow-visible sm:pb-0">
+          <TabsList className="flex w-max min-w-full justify-start sm:w-full sm:justify-center">
+          <TabsTrigger value="books" className="shrink-0 sm:flex-1">
             الكتب والملفات
           </TabsTrigger>
-          <TabsTrigger value="gazette" className="flex-1">
+          <TabsTrigger value="gazette" className="shrink-0 sm:flex-1">
             الجريدة
           </TabsTrigger>
-          <TabsTrigger value="content" className="flex-1">
+          <TabsTrigger value="content" className="shrink-0 sm:flex-1">
             المحتوى والصور
           </TabsTrigger>
-          <TabsTrigger value="community" className="flex-1">
+          <TabsTrigger value="community" className="shrink-0 sm:flex-1">
             الإشراف على المجلس
           </TabsTrigger>
-          <TabsTrigger value="users" className="flex-1">
+          <TabsTrigger value="users" className="shrink-0 sm:flex-1">
             الأعضاء
           </TabsTrigger>
-          <TabsTrigger value="ads" className="flex-1">
+          <TabsTrigger value="ads" className="shrink-0 sm:flex-1">
             الإعلانات
           </TabsTrigger>
-        <TabsTrigger value="messages" className="flex-1">
+          <TabsTrigger value="messages" className="shrink-0 sm:flex-1">
             الرسائل
           </TabsTrigger>
-          <TabsTrigger value="design" className="flex-1">
+          <TabsTrigger value="design" className="shrink-0 sm:flex-1">
             التصميم
           </TabsTrigger>
-          <TabsTrigger value="errors" className="flex-1">
+          <TabsTrigger value="errors" className="shrink-0 sm:flex-1">
             سجل الأخطاء
           </TabsTrigger>
-        </TabsList>
+          </TabsList>
+        </div>
 
 
         <TabsContent value="books">
@@ -99,17 +101,19 @@ function Admin() {
         </TabsContent>
         <TabsContent value="gazette">
           <Tabs defaultValue="gazette-main" dir="rtl">
-            <TabsList className="mx-auto mb-6 flex w-full max-w-xl">
-              <TabsTrigger value="gazette-main" className="flex-1">
+            <div className="mx-auto mb-6 w-full max-w-xl overflow-x-auto overscroll-x-contain scroll-smooth pb-1 sm:overflow-visible sm:pb-0">
+              <TabsList className="flex w-max min-w-full justify-start sm:w-full sm:justify-center">
+              <TabsTrigger value="gazette-main" className="shrink-0 sm:flex-1">
                 المقالات
               </TabsTrigger>
-              <TabsTrigger value="gazette-sources" className="flex-1">
+              <TabsTrigger value="gazette-sources" className="shrink-0 sm:flex-1">
                 المصادر
               </TabsTrigger>
-              <TabsTrigger value="gazette-composer" className="flex-1">
+              <TabsTrigger value="gazette-composer" className="shrink-0 sm:flex-1">
                 المحرّر الذكي
               </TabsTrigger>
-            </TabsList>
+              </TabsList>
+            </div>
             <TabsContent value="gazette-main">
               <GazettePanel />
             </TabsContent>
