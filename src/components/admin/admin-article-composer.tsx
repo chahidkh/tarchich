@@ -67,6 +67,7 @@ export function AdminArticleComposer() {
         slug: slugify(draft.title),
         excerpt: draft.excerpt.trim() || null,
         content: draft.content.trim(),
+        media_url: draft.coverUrl ?? null,
         category: draft.category,
         section: "gazette",
         is_published: false,
