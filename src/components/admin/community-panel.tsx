@@ -83,10 +83,26 @@ export function CommunityPanel() {
                   <div className="flex-1">
                     <p className="font-display text-lg">{p.title}</p>
                     <p className="line-clamp-2 text-xs leading-6 text-muted-foreground">{p.content}</p>
-                    <p className="mt-1 text-[11px] text-muted-foreground">
+                    <p className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
                       {new Date(p.created_at).toLocaleDateString("ar")}
+                      {p.majlis_category && <span className="text-gold">{p.majlis_category}</span>}
+                      {p.is_pinned && (
+                        <span className="flex items-center gap-1 text-gold">
+                          <Pin className="size-3" /> مثبّت
+                        </span>
+                      )}
                     </p>
                   </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className={p.is_pinned ? "text-gold" : ""}
+                    title={p.is_pinned ? "إلغاء التثبيت" : "تثبيت في أعلى المجلس"}
+                    disabled={pin.isPending}
+                    onClick={() => pin.mutate({ id: p.id, next: !p.is_pinned })}
+                  >
+                    {p.is_pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
+                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"
