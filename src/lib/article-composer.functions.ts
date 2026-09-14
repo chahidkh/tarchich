@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { GAZETTE_CATEGORIES, PUBLISHER, type GazetteCategory } from "@/lib/gazette";
 import { sourceHost } from "@/lib/content-sources";
+import { generateGazetteCover } from "@/lib/gazette-cover.server";
 
 const schema = z.object({
   messages: z
@@ -21,6 +22,7 @@ export type ComposerDraft = {
   category: GazetteCategory;
   excerpt: string;
   content: string;
+  coverUrl: string | null;
 };
 
 export type ComposerReply = {
@@ -163,13 +165,17 @@ ${corpus}`;
 
     const d = parsed.draft;
     const content = (d?.content ?? "").trim();
+    const draftCategory: GazetteCategory = (GAZETTE_CATEGORIES as readonly string[]).includes(d?.category ?? "")
+      ? (d?.category as GazetteCategory)
+      : "الثقافة";
+    // غلاف مولّد بالذكاء الاصطناعي بهوية الجريدة؛ لا تُستعمل صور المصادر محفوظة الحقوق.
+    const coverUrl = d && d.title && content ? await generateGazetteCover(apiKey, d.title, draftCategory) : null;
     const draft: ComposerDraft | null =
       d && d.title && content
         ? {
             title: d.title.trim().slice(0, 160),
-            category: (GAZETTE_CATEGORIES as readonly string[]).includes(d.category ?? "")
-              ? (d.category as GazetteCategory)
-              : "الثقافة",
+            category: draftCategory,
+            coverUrl,
             excerpt: (d.excerpt ?? "").trim().slice(0, 300),
             content: content.includes(PUBLISHER) ? content : `${content}\n\nنشرته جريدة ${PUBLISHER}.`,
           }

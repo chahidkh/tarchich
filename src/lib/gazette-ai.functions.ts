@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { GAZETTE_CATEGORIES, PUBLISHER, type GazetteCategory } from "@/lib/gazette";
+import { generateGazetteCover } from "@/lib/gazette-cover.server";
 
 const schema = z.object({
   source: z.string().trim().min(10).max(6000),
@@ -24,6 +25,7 @@ export type ComposedArticle = {
   title: string;
   excerpt: string;
   content: string;
+  coverUrl: string | null;
 };
 
 export const composeGazetteArticle = createServerFn({ method: "POST" })
@@ -74,9 +76,13 @@ export const composeGazetteArticle = createServerFn({ method: "POST" })
     const content = (parsed.content ?? "").trim();
     if (!parsed.title || !content) throw new Error("جاء المقال ناقصاً، أعد المحاولة.");
 
+    const title = parsed.title.trim().slice(0, 160);
+    const coverUrl = await generateGazetteCover(apiKey, title, category);
+
     return {
       category,
-      title: parsed.title.trim().slice(0, 160),
+      title,
+      coverUrl,
       excerpt: (parsed.excerpt ?? "").trim().slice(0, 300),
       content: content.includes(PUBLISHER) ? content : `${content}\n\nنشرته جريدة ${PUBLISHER}.`,
     };
