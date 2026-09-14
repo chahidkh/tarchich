@@ -25,6 +25,10 @@ export function SiteFooter() {
           {t("nav.contact")}
         </Link>
         <span aria-hidden className="text-border">•</span>
+        <Link to="/diwan" className="text-gold hover:underline">
+          الديوان
+        </Link>
+        <span aria-hidden className="text-border">•</span>
         <Link to="/privacy" className="text-gold hover:underline">
           {t("nav.privacy")}
         </Link>

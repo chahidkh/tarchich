@@ -84,6 +84,21 @@ export function DesignPanel() {
     }
   }
 
+  async function uploadAuthorAsset(key: "author_photo_url" | "author_signature_url", file?: File | null) {
+    if (!file) return;
+    setBusy(key);
+    try {
+      const url = await uploadAsset("site-assets", file, "diwan");
+      await saveSetting(key, url);
+      await refresh();
+      toast.success(key === "author_photo_url" ? "تم رفع صورة المؤلف" : "تم رفع توقيع المؤلف");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function saveColors() {
     try {
       for (const f of COLOR_FIELDS) await saveSetting(f.key, colors[f.key] ?? "");
@@ -257,6 +272,39 @@ export function DesignPanel() {
         <p className="mt-2 text-[11px] text-muted-foreground">
           يبقى بإمكان كل زائر تعديل الخط لنفسه من قائمة الإعدادات.
         </p>
+      </section>
+
+      <section className="glass rounded-xl p-6">
+        <h3 className="font-display text-xl text-gold">٥) صور الديوان</h3>
+        <p className="mt-1 text-xs text-muted-foreground">صورة المؤلف وتوقيعه في صفحة الديوان.</p>
+        <div className="mt-5 grid gap-6 md:grid-cols-2">
+          {([
+            { key: "author_photo_url", label: "صورة المؤلف", preview: "صورة فريد خدومة" },
+            { key: "author_signature_url", label: "صورة التوقيع", preview: "توقيع فريد خدومة" },
+          ] as const).map((item) => (
+            <div key={item.key} className="space-y-3">
+              <Label className="text-sm text-foreground">{item.label}</Label>
+              {data?.[item.key] && (
+                <img
+                  src={data[item.key]}
+                  alt={item.preview}
+                  className="h-32 w-full rounded-lg border border-gold/20 object-contain"
+                />
+              )}
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-gold/40 px-3 py-1.5 text-xs text-gold-soft transition hover:border-gold">
+                <Upload className="size-4" />
+                {busy === item.key ? "جارٍ الرفع…" : `رفع ${item.label}`}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={busy === item.key}
+                  onChange={(e) => void uploadAuthorAsset(item.key, e.target.files?.[0] ?? null)}
+                />
+              </label>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );
