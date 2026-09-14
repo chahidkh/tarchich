@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Trash2, MessageSquare } from "lucide-react";
+import { Trash2, MessageSquare, Pin, PinOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +13,7 @@ export function CommunityPanel() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("posts")
-        .select("id,title,content,author_id,created_at")
+        .select("id,title,content,author_id,created_at,is_pinned,majlis_category")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
