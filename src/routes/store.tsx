@@ -26,8 +26,9 @@ export const Route = createFileRoute("/store")({
 const PAGE_SIZE = 24;
 
 function Store() {
-  const [q, setQ] = useState("");
-  const [term, setTerm] = useState("");
+  const { q: initialQ } = Route.useSearch();
+  const [q, setQ] = useState(initialQ ?? "");
+  const [term, setTerm] = useState(initialQ ?? "");
   const [page, setPage] = useState(0);
   const { data: settings } = useSiteSettings();
 
