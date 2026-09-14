@@ -26,7 +26,9 @@ export function MemberBadge({
           className={`${dim} rounded-full border border-gold/40 object-cover`}
         />
       ) : (
-        <span className={`${dim} grid place-items-center rounded-full border border-gold/40 bg-secondary/60 text-xs text-gold`}>
+        <span
+          className={`${dim} grid place-items-center rounded-full border border-gold/50 bg-[linear-gradient(140deg,var(--gold),var(--gold-soft))] text-xs font-semibold text-background`}
+        >
           {name.charAt(0)}
         </span>
       )}

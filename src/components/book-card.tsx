@@ -126,6 +126,11 @@ export function BookCard({ book }: { book: Book }) {
                 </a>
               </Button>
             )}
+            <Button asChild variant="outline">
+              <Link to="/majlis" search={{ book: book.id, bookTitle: book.title }}>
+                <MessagesSquare className="size-4" /> ناقش هذا الكتاب في المجلس
+              </Link>
+            </Button>
           </div>
           {preview && <BookReviews bookId={book.id} />}
 
