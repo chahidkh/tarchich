@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DiwanRouteImport } from './routes/diwan'
 import { Route as MajlisRouteImport } from './routes/majlis'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as StoreRouteImport } from './routes/store'
@@ -49,6 +50,11 @@ const AuthRoute = AuthRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiwanRoute = DiwanRouteImport.update({
+  id: '/diwan',
+  path: '/diwan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MajlisRoute = MajlisRouteImport.update({
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/diwan': typeof DiwanRoute
   '/majlis': typeof MajlisRoute
   '/privacy': typeof PrivacyRoute
   '/store': typeof StoreRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/diwan': typeof DiwanRoute
   '/majlis': typeof MajlisRoute
   '/privacy': typeof PrivacyRoute
   '/store': typeof StoreRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/diwan': typeof DiwanRoute
   '/majlis': typeof MajlisRoute
   '/privacy': typeof PrivacyRoute
   '/store': typeof StoreRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/diwan'
     | '/majlis'
     | '/privacy'
     | '/store'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/diwan'
     | '/majlis'
     | '/privacy'
     | '/store'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/diwan'
     | '/majlis'
     | '/privacy'
     | '/store'
@@ -233,6 +245,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  DiwanRoute: typeof DiwanRoute
   MajlisRoute: typeof MajlisRoute
   PrivacyRoute: typeof PrivacyRoute
   StoreRoute: typeof StoreRoute
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diwan': {
+      id: '/diwan'
+      path: '/diwan'
+      fullPath: '/diwan'
+      preLoaderRoute: typeof DiwanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/majlis': {
@@ -388,6 +408,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  DiwanRoute: DiwanRoute,
   MajlisRoute: MajlisRoute,
   PrivacyRoute: PrivacyRoute,
   StoreRoute: StoreRoute,
