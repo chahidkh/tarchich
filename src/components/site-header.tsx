@@ -13,6 +13,7 @@ const NAV: { to: string; key: TransKey }[] = [
   { to: "/store", key: "nav.store" },
   { to: "/gazette", key: "nav.gazette" },
   { to: "/majlis", key: "nav.majlis" },
+  { to: "/diwan", key: "nav.diwan" },
 ];
 
 export function SiteHeader() {
