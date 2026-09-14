@@ -254,6 +254,57 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          comment_id: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          post_id: string | null
+          preview: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          post_id?: string | null
+          preview?: string | null
+          type?: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          post_id?: string | null
+          preview?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string
@@ -313,13 +364,16 @@ export type Database = {
       posts: {
         Row: {
           author_id: string | null
+          book_id: string | null
           category: string | null
           content: string
           created_at: string
           excerpt: string | null
           id: string
           is_featured: boolean
+          is_pinned: boolean
           is_published: boolean
+          majlis_category: string | null
           media_type: string | null
           media_url: string | null
           section: string
@@ -330,13 +384,16 @@ export type Database = {
         }
         Insert: {
           author_id?: string | null
+          book_id?: string | null
           category?: string | null
           content: string
           created_at?: string
           excerpt?: string | null
           id?: string
           is_featured?: boolean
+          is_pinned?: boolean
           is_published?: boolean
+          majlis_category?: string | null
           media_type?: string | null
           media_url?: string | null
           section?: string
@@ -347,13 +404,16 @@ export type Database = {
         }
         Update: {
           author_id?: string | null
+          book_id?: string | null
           category?: string | null
           content?: string
           created_at?: string
           excerpt?: string | null
           id?: string
           is_featured?: boolean
+          is_pinned?: boolean
           is_published?: boolean
+          majlis_category?: string | null
           media_type?: string | null
           media_url?: string | null
           section?: string
@@ -362,7 +422,15 @@ export type Database = {
           title?: string
           views?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "books"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
