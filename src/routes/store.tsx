@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/lib/site-settings";
 
 export const Route = createFileRoute("/store")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search['q'] === "string" ? (search['q'] as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "متجر الكتب | مكتبة ترشيش" },
