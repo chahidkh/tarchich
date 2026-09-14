@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { BookCover } from "@/components/book-cover";
-import { SUPPORT_EMAIL } from "@/components/site-footer";
+import { SiteFooter, SUPPORT_EMAIL } from "@/components/site-footer";
 import { useCart } from "@/lib/cart";
 import { useSiteSettings } from "@/lib/site-settings";
 
@@ -105,7 +105,8 @@ function DiwanPage() {
   const latestWorks = filtered.filter((work) => work.latest);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
+    <main>
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
       <section className="glass overflow-hidden rounded-xl p-5 sm:p-8 lg:p-10">
         <div className="grid items-center gap-7 md:grid-cols-[240px_1fr] lg:gap-12">
           <div className="mx-auto aspect-[4/5] w-full max-w-[240px] overflow-hidden rounded-lg border border-gold/35">
@@ -205,6 +206,8 @@ function DiwanPage() {
           <Button asChild variant="outline"><a href={`mailto:${SUPPORT_EMAIL}`}><Mail className="size-4" /> تواصل عبر البريد الإلكتروني</a></Button>
         </div>
       </section>
+      </div>
+      <SiteFooter />
     </main>
   );
 }
