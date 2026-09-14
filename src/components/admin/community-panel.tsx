@@ -33,6 +33,27 @@ export function CommunityPanel() {
     },
   });
 
+  const pin = useMutation({
+    mutationFn: async ({ id, next }: { id: string; next: boolean }) => {
+      // منشور مثبّت واحد فقط: نزيل التثبيت السابق أولاً
+      const { error: clearError } = await supabase
+        .from("posts")
+        .update({ is_pinned: false })
+        .eq("is_pinned", true);
+      if (clearError) throw clearError;
+      if (next) {
+        const { error } = await supabase.from("posts").update({ is_pinned: true }).eq("id", id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("تم تحديث التثبيت");
+      void qc.invalidateQueries({ queryKey: ["admin-posts"] });
+      void qc.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const del = useMutation({
     mutationFn: async ({ table, id }: { table: "posts" | "comments"; id: string }) => {
       const { error } = await supabase.from(table).delete().eq("id", id);
