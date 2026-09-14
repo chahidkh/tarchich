@@ -50,7 +50,10 @@ export function GazettePanel() {
       setCategory(a.category);
       setExcerpt(a.excerpt);
       setContent(a.content);
-      toast.success(`صيغ المقال وصُنّف في «${a.category}»`);
+      if (a.coverUrl) setMedia(a.coverUrl);
+      toast.success(
+        `صيغ المقال وصُنّف في «${a.category}»${a.coverUrl ? " مع غلاف مولّد" : ""}`,
+      );
     },
     onError: (e: Error) => toast.error(e.message),
   });

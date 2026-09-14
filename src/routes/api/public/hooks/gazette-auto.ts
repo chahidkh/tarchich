@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { GAZETTE_CATEGORIES, PUBLISHER, slugify, type GazetteCategory } from "@/lib/gazette";
 import { sourceHost } from "@/lib/content-sources";
+import { generateGazetteCover } from "@/lib/gazette-cover.server";
 
 /**
  * النشر التلقائي المجدول للجريدة، من المصادر المفعّلة في جدول content_sources.
@@ -14,7 +15,7 @@ const RESTRICTED = /(حقوق محفوظة|اقتباس مختصر|اقتباس 
 const MAX_PER_RUN = 2;
 
 type Source = { name: string; url: string; license_note: string | null };
-type FeedItem = { title: string; summary: string; link: string };
+type FeedItem = { title: string; summary: string; link: string; image?: string };
 
 function decode(s: string) {
   return s
@@ -59,8 +60,17 @@ async function wikipediaItems(host: string): Promise<FeedItem[]> {
   });
   if (!res.ok) return [];
   const json = (await res.json()) as {
-    onthisday?: { text?: string; year?: number; pages?: { titles?: { normalized?: string }; extract?: string }[] }[];
-    tfa?: { titles?: { normalized?: string }; extract?: string; content_urls?: { desktop?: { page?: string } } };
+    onthisday?: {
+      text?: string;
+      year?: number;
+      pages?: { titles?: { normalized?: string }; extract?: string; thumbnail?: { source?: string } }[];
+    }[];
+    tfa?: {
+      titles?: { normalized?: string };
+      extract?: string;
+      thumbnail?: { source?: string };
+      content_urls?: { desktop?: { page?: string } };
+    };
   };
 
   const items: FeedItem[] = [];
@@ -73,6 +83,7 @@ async function wikipediaItems(host: string): Promise<FeedItem[]> {
       title: `في مثل هذا اليوم: ${title}`,
       summary: `${ev.year ? `سنة ${ev.year}: ` : ""}${ev.text}\n\n${page?.extract ?? ""}`,
       link: `https://${host}/wiki/${encodeURIComponent(title)}`,
+      ...(page?.thumbnail?.source ? { image: page.thumbnail.source } : {}),
     });
   }
 
@@ -82,6 +93,7 @@ async function wikipediaItems(host: string): Promise<FeedItem[]> {
       title: tfa.titles.normalized,
       summary: tfa.extract,
       link: tfa.content_urls?.desktop?.page ?? `https://${host}`,
+      ...(tfa.thumbnail?.source ? { image: tfa.thumbnail.source } : {}),
     });
   }
 
@@ -266,7 +278,14 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
               .limit(1);
             if (dupe && dupe.length > 0) continue;
 
+            // الغلاف: صورة من مصدر مفتوح الترخيص فعلياً (ويكيميديا/أرشيف) إن توفّرت،
+            // وإلّا غلاف مولّد بالذكاء الاصطناعي. ويُمنع منعاً باتاً استعمال صور
+            // المصادر الإخبارية محفوظة الحقوق مهما كانت متاحة تقنياً.
+            const openImage = restricted ? null : (item.image ?? null);
+            const cover = openImage ?? (await generateGazetteCover(apiKey, article.title, article.category));
+
             const { error: insertError } = await supabaseAdmin.from("posts").insert({
+              media_url: cover,
               title: article.title,
               slug: slugify(article.title),
               excerpt: article.excerpt || null,

@@ -18,6 +18,7 @@ export type TransKey =
   | "nav.store"
   | "nav.gazette"
   | "nav.majlis"
+  | "nav.diwan"
   | "nav.contact"
   | "nav.about"
   | "nav.privacy"
@@ -57,6 +58,7 @@ const ar: Dict = {
   "nav.store": "متجر الكتب",
   "nav.gazette": "الجريدة",
   "nav.majlis": "المجلس الثقافي",
+  "nav.diwan": "الديوان",
   "nav.contact": "تواصل معنا",
   "nav.about": "من نحن",
   "nav.privacy": "سياسة الخصوصية",
@@ -95,6 +97,7 @@ const en: Dict = {
   "nav.store": "Bookstore",
   "nav.gazette": "The Gazette",
   "nav.majlis": "Cultural Forum",
+  "nav.diwan": "The Diwan",
   "nav.contact": "Contact",
   "nav.about": "About",
   "nav.privacy": "Privacy Policy",
@@ -137,6 +140,7 @@ const fr = make({
   "nav.store": "Librairie",
   "nav.gazette": "La Gazette",
   "nav.majlis": "Forum culturel",
+  "nav.diwan": "Le Diwan",
   "nav.contact": "Contact",
   "nav.about": "À propos",
   "nav.privacy": "Politique de confidentialité",
@@ -170,6 +174,7 @@ const it = make({
   "nav.store": "Libreria",
   "nav.gazette": "La Gazzetta",
   "nav.majlis": "Forum culturale",
+  "nav.diwan": "Il Diwan",
   "nav.contact": "Contatti",
   "nav.about": "Chi siamo",
   "nav.privacy": "Informativa sulla privacy",
@@ -203,6 +208,7 @@ const pt = make({
   "nav.store": "Livraria",
   "nav.gazette": "A Gazeta",
   "nav.majlis": "Fórum cultural",
+  "nav.diwan": "O Diwan",
   "nav.contact": "Contato",
   "nav.about": "Sobre nós",
   "nav.privacy": "Política de privacidade",
@@ -236,6 +242,7 @@ const ja = make({
   "nav.store": "書店",
   "nav.gazette": "ガゼット",
   "nav.majlis": "文化フォーラム",
+  "nav.diwan": "ディーワーン",
   "nav.contact": "お問い合わせ",
   "nav.about": "私たちについて",
   "nav.privacy": "プライバシーポリシー",
@@ -269,6 +276,7 @@ const zh = make({
   "nav.store": "书店",
   "nav.gazette": "报刊",
   "nav.majlis": "文化论坛",
+  "nav.diwan": "诗集",
   "nav.contact": "联系我们",
   "nav.about": "关于我们",
   "nav.privacy": "隐私政策",
@@ -302,6 +310,7 @@ const ru = make({
   "nav.store": "Книжный магазин",
   "nav.gazette": "Газета",
   "nav.majlis": "Культурный форум",
+  "nav.diwan": "Диван",
   "nav.contact": "Контакты",
   "nav.about": "О нас",
   "nav.privacy": "Политика конфиденциальности",
