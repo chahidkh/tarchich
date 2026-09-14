@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Trash2, MessageSquare } from "lucide-react";
+import { Trash2, MessageSquare, Pin, PinOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +13,7 @@ export function CommunityPanel() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("posts")
-        .select("id,title,content,author_id,created_at")
+        .select("id,title,content,author_id,created_at,is_pinned,majlis_category")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -31,6 +31,27 @@ export function CommunityPanel() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const pin = useMutation({
+    mutationFn: async ({ id, next }: { id: string; next: boolean }) => {
+      // منشور مثبّت واحد فقط: نزيل التثبيت السابق أولاً
+      const { error: clearError } = await supabase
+        .from("posts")
+        .update({ is_pinned: false })
+        .eq("is_pinned", true);
+      if (clearError) throw clearError;
+      if (next) {
+        const { error } = await supabase.from("posts").update({ is_pinned: true }).eq("id", id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("تم تحديث التثبيت");
+      void qc.invalidateQueries({ queryKey: ["admin-posts"] });
+      void qc.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const del = useMutation({
@@ -62,10 +83,26 @@ export function CommunityPanel() {
                   <div className="flex-1">
                     <p className="font-display text-lg">{p.title}</p>
                     <p className="line-clamp-2 text-xs leading-6 text-muted-foreground">{p.content}</p>
-                    <p className="mt-1 text-[11px] text-muted-foreground">
+                    <p className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
                       {new Date(p.created_at).toLocaleDateString("ar")}
+                      {p.majlis_category && <span className="text-gold">{p.majlis_category}</span>}
+                      {p.is_pinned && (
+                        <span className="flex items-center gap-1 text-gold">
+                          <Pin className="size-3" /> مثبّت
+                        </span>
+                      )}
                     </p>
                   </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className={p.is_pinned ? "text-gold" : ""}
+                    title={p.is_pinned ? "إلغاء التثبيت" : "تثبيت في أعلى المجلس"}
+                    disabled={pin.isPending}
+                    onClick={() => pin.mutate({ id: p.id, next: !p.is_pinned })}
+                  >
+                    {p.is_pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
+                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"

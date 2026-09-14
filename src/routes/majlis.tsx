@@ -14,9 +14,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MAJLIS_CATEGORIES, MAJLIS_SORTS, type MajlisSort } from "@/lib/majlis";
 
 export const Route = createFileRoute("/majlis")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    book: typeof search['book'] === "string" ? (search['book'] as string) : undefined,
-    bookTitle: typeof search['bookTitle'] === "string" ? (search['bookTitle'] as string) : undefined,
+  validateSearch: (search: Record<string, unknown>): { book?: string; bookTitle?: string } => ({
+    ...(typeof search['book'] === "string" && search['book'] ? { book: search['book'] as string } : {}),
+    ...(typeof search['bookTitle'] === "string" && search['bookTitle']
+      ? { bookTitle: search['bookTitle'] as string }
+      : {}),
   }),
   head: () => ({
     meta: [

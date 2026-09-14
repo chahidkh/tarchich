@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, CreditCard, ExternalLink, FileText, Loader2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { BookOpen, CreditCard, ExternalLink, FileText, Loader2, MessagesSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useCart } from "@/lib/cart";
