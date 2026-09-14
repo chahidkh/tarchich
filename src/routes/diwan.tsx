@@ -109,8 +109,8 @@ function DiwanPage() {
       <section className="glass overflow-hidden rounded-xl p-5 sm:p-8 lg:p-10">
         <div className="grid items-center gap-7 md:grid-cols-[240px_1fr] lg:gap-12">
           <div className="mx-auto aspect-[4/5] w-full max-w-[240px] overflow-hidden rounded-lg border border-gold/35">
-            {settings?.author_photo_url ? (
-              <img src={settings.author_photo_url} alt="فريد خدومة" className="size-full object-cover" />
+            {settings?.["author_photo_url"] ? (
+              <img src={settings["author_photo_url"]} alt="فريد خدومة" className="size-full object-cover" />
             ) : (
               <div className="flex size-full flex-col items-center justify-center gap-4 text-gold">
                 <UserRound className="size-16 stroke-1" />
@@ -197,8 +197,8 @@ function DiwanPage() {
       </section>
 
       <section className="pb-16 pt-4 text-center">
-        {settings?.author_signature_url && (
-          <img src={settings.author_signature_url} alt="توقيع فريد خدومة" className="mx-auto mb-8 h-28 max-w-full object-contain" />
+        {settings?.["author_signature_url"] && (
+          <img src={settings["author_signature_url"]} alt="توقيع فريد خدومة" className="mx-auto mb-8 h-28 max-w-full object-contain" />
         )}
         <div className="flex flex-wrap justify-center gap-3">
           <Button asChild><Link to="/majlis"><MessagesSquare className="size-4" /> ناقشني في المجلس الثقافي</Link></Button>
@@ -209,7 +209,7 @@ function DiwanPage() {
   );
 }
 
-function WorkCard({ work, book }: { work: Work; book?: MatchedBook }) {
+function WorkCard({ work, book }: { work: Work; book: MatchedBook | undefined }) {
   const { add, setOpen } = useCart();
   function addRealBook() {
     if (!book) return;
