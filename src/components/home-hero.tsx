@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,20 @@ import { usePrefs } from "@/lib/prefs";
 const HomeLibraryScene = lazy(() => import("@/components/home-library-scene"));
 
 type RenderMode = "checking" | "static" | "three";
+
+// أي فشل حقيقي أثناء إنشاء السياق أو العرض يحوّل فوراً إلى البديل المسطح.
+class SceneErrorBoundary extends Component<{ onFailure: () => void; children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override componentDidCatch() {
+    this.props.onFailure();
+  }
+  override render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
 
 function hasSuitable3DPerformance(lowData: boolean) {
   if (lowData || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
@@ -18,11 +32,11 @@ function hasSuitable3DPerformance(lowData: boolean) {
 
   const canvas = document.createElement("canvas");
   try {
-    const gl = canvas.getContext("webgl2", {
-      antialias: false,
-      failIfMajorPerformanceCaveat: true,
-      powerPreference: "high-performance",
-    });
+    // فحص متساهل: نتحقق فقط من وجود دعم WebGL2 أساسي وقدرة على إنشاء نسيج بحجم معقول.
+    // لا نستخدم failIfMajorPerformanceCaveat هنا لأنه يرفض خطأً أجهزة قوية فعلياً
+    // (بطاقات رسومات مزدوجة، أوضاع توفير الطاقة، بعض تركيبات المتصفح/النظام).
+    // خط الدفاع الحقيقي هو مستمع webglcontextlost وonFailure أثناء التشغيل الفعلي.
+    const gl = canvas.getContext("webgl2", { antialias: false });
     if (!gl) return false;
     const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
     gl.getExtension("WEBGL_lose_context")?.loseContext();
@@ -82,13 +96,15 @@ export function HomeHero() {
     >
       {mode === "three" && (
         <div className={`absolute inset-0 transition-opacity duration-500 ${painted ? "opacity-100" : "opacity-0"}`}>
-          <Suspense fallback={null}>
-            <HomeLibraryScene
-              theme={theme}
-              onFirstFrame={() => setPainted(true)}
-              onFailure={() => { setPainted(false); setMode("static"); }}
-            />
-          </Suspense>
+          <SceneErrorBoundary onFailure={() => { setPainted(false); setMode("static"); }}>
+            <Suspense fallback={null}>
+              <HomeLibraryScene
+                theme={theme}
+                onFirstFrame={() => setPainted(true)}
+                onFailure={() => { setPainted(false); setMode("static"); }}
+              />
+            </Suspense>
+          </SceneErrorBoundary>
         </div>
       )}
       {painted && <div aria-hidden className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-background/0 via-background/15 to-background/65" />}

@@ -334,7 +334,7 @@ export default function HomeLibraryScene({ theme, onFirstFrame, onFailure }: Pro
         dpr={[1, 1.35]}
         frameloop={active ? "always" : "never"}
         camera={{ position: [0, 3.3, 10.8], fov: 47, near: 0.1, far: 40 }}
-        gl={{ antialias: true, alpha: false, powerPreference: "high-performance", failIfMajorPerformanceCaveat: true }}
+        gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
         onCreated={({ gl }) => {
           const canvas = gl.domElement;
           canvas.addEventListener("webglcontextlost", (event) => {
