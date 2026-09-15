@@ -10,14 +10,14 @@ type RenderMode = "checking" | "static" | "three";
 
 // أي فشل حقيقي أثناء إنشاء السياق أو العرض يحوّل فوراً إلى البديل المسطح.
 class SceneErrorBoundary extends Component<{ onFailure: () => void; children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
+  override state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
   }
-  componentDidCatch() {
+  override componentDidCatch() {
     this.props.onFailure();
   }
-  render() {
+  override render() {
     return this.state.failed ? null : this.props.children;
   }
 }
