@@ -18,11 +18,11 @@ function hasSuitable3DPerformance(lowData: boolean) {
 
   const canvas = document.createElement("canvas");
   try {
-    const gl = canvas.getContext("webgl2", {
-      antialias: false,
-      failIfMajorPerformanceCaveat: true,
-      powerPreference: "high-performance",
-    });
+    // فحص متساهل: نتحقق فقط من وجود دعم WebGL2 أساسي وقدرة على إنشاء نسيج بحجم معقول.
+    // لا نستخدم failIfMajorPerformanceCaveat هنا لأنه يرفض خطأً أجهزة قوية فعلياً
+    // (بطاقات رسومات مزدوجة، أوضاع توفير الطاقة، بعض تركيبات المتصفح/النظام).
+    // خط الدفاع الحقيقي هو مستمع webglcontextlost وonFailure أثناء التشغيل الفعلي.
+    const gl = canvas.getContext("webgl2", { antialias: false });
     if (!gl) return false;
     const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
     gl.getExtension("WEBGL_lose_context")?.loseContext();
