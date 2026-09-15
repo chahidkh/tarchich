@@ -114,10 +114,6 @@ export function SiteHeader() {
                 {t(n.key)}
               </Link>
             ))}
-            <div className="flex items-center justify-between gap-3 border-t border-border/50 py-3">
-              <span className="text-sm text-muted-foreground">{t("settings.title")}</span>
-              <SettingsMenu />
-            </div>
             {user ? (
               <div className="grid gap-2 border-t border-border/50 py-3">
                 {isAdmin && (
