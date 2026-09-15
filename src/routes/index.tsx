@@ -3,11 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Crown,
-  Feather,
   Quote,
-  Sparkles,
   Star,
-  Users,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -123,37 +120,12 @@ function Home() {
 
       <BookOfTheDay />
 
-      <FeatureHighlights />
-
       <ReaderVoices />
 
       <MembershipPanel />
 
       <SiteFooter />
     </main>
-  );
-}
-
-/** مزايا المكتبة الأصلية غير المكررة مع روابط التنقل. */
-function FeatureHighlights() {
-  const features = [
-    { icon: Sparkles, title: "حكيم ترشيش", text: "مستشار معرفي يجيبك بعربية أصيلة ويرشّح لك بحسب حالك." },
-    { icon: Users, title: "المجلس الثقافي", text: "مقالات يومية ونقاشات متشعّبة بين القرّاء والمؤلفين." },
-    { icon: Feather, title: "برنامج الإحالة", text: "عمولة ١٠٪ على كل كتاب يُباع عبر رابطك الخاص." },
-  ];
-
-  return (
-    <section className="islamic-corners mx-auto max-w-6xl px-4 pb-20">
-      <div className="grid gap-4 sm:grid-cols-3">
-        {features.map(({ icon: Icon, title, text }) => (
-          <div key={title} className="glass rounded-xl p-6">
-            <Icon className="size-5 text-gold" />
-            <h3 className="mt-4 text-xl">{title}</h3>
-            <p className="mt-2 text-sm leading-7 text-muted-foreground">{text}</p>
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }
 

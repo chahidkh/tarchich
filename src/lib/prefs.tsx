@@ -93,7 +93,8 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
         setStored((s) => ({ ...s, [key]: val }));
       },
       reset: () => {
-        setPrefs(DEFAULTS);
+        const hour = new Date().getHours();
+        setPrefs({ ...DEFAULTS, theme: hour >= 19 || hour < 6 ? "gold" : "parchment" });
         setStored({});
       },
       hasStored,
