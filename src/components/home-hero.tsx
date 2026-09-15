@@ -96,13 +96,15 @@ export function HomeHero() {
     >
       {mode === "three" && (
         <div className={`absolute inset-0 transition-opacity duration-500 ${painted ? "opacity-100" : "opacity-0"}`}>
-          <Suspense fallback={null}>
-            <HomeLibraryScene
-              theme={theme}
-              onFirstFrame={() => setPainted(true)}
-              onFailure={() => { setPainted(false); setMode("static"); }}
-            />
-          </Suspense>
+          <SceneErrorBoundary onFailure={() => { setPainted(false); setMode("static"); }}>
+            <Suspense fallback={null}>
+              <HomeLibraryScene
+                theme={theme}
+                onFirstFrame={() => setPainted(true)}
+                onFailure={() => { setPainted(false); setMode("static"); }}
+              />
+            </Suspense>
+          </SceneErrorBoundary>
         </div>
       )}
       {painted && <div aria-hidden className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-background/0 via-background/15 to-background/65" />}
