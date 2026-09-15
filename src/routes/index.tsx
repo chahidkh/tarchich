@@ -2,26 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Sparkles,
   Crown,
-  Users,
-  Feather,
-  Library,
-  Newspaper,
-  MessagesSquare,
   Quote,
   Star,
-  Mail,
-  Loader2,
-  Scroll,
 } from "lucide-react";
-import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { BookCard, type Book } from "@/components/book-card";
 import { BookCover } from "@/components/book-cover";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PriceTag } from "@/components/price-tag";
 import { SiteFooter } from "@/components/site-footer";
@@ -37,33 +26,20 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:title", content: "مكتبة ترشيش | مجلس المعرفة العربي" },
       { property: "og:description", content: "كتب مختارة، مجلس ثقافي، وحكيمٌ يرشدك إلى قراءتك القادمة." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
 });
 
 const QUOTES: { text: string; author: string }[] = [
-  { text: "من لم يذق ذلّ التعلّم ساعة، تجرّع ذلّ الجهل أبداً.", author: "الإمام الشافعي" },
   { text: "الكتاب هو الجليس الذي لا يُطريك، والصديق الذي لا يُغريك.", author: "الجاحظ" },
   { text: "قيمة كل امرئٍ ما يُحسنه.", author: "الإمام علي بن أبي طالب" },
-  { text: "العلم يحرس صاحبه، والمال يحرسه صاحبه.", author: "الإمام علي بن أبي طالب" },
-  { text: "الإنسان ابن عوائده ومألوفه، لا ابن طبيعته ومزاجه.", author: "ابن خلدون" },
-  { text: "من طلب العُلا سهر الليالي.", author: "المتنبي" },
   { text: "أعزُّ مكانٍ في الدنى سرجُ سابحٍ، وخير جليسٍ في الزمان كتابُ.", author: "المتنبي" },
-  { text: "العلم ما نفع، ليس العلم ما حُفظ.", author: "الإمام الشافعي" },
-  { text: "لو كان الكلام من فضة، لكان الصمت من ذهب.", author: "مثل عربي مأثور" },
-  { text: "من عرف نفسه فقد عرف ربّه.", author: "أبو حامد الغزالي" },
 ];
 
-const ERAS = [
-  "التراث الإسلامي",
-  "التاريخ",
-  "الأدب",
-  "الفلسفة والعلوم",
-  "التصوف",
-  "اللغة والمعاجم",
-  "الرحلات والجغرافيا",
-];
+
 
 function dayOfYear(d: Date) {
   const start = Date.UTC(d.getUTCFullYear(), 0, 0);
@@ -118,94 +94,35 @@ function Home() {
 
       <QuoteBar />
 
-      <section className="mx-auto max-w-6xl px-4 py-20">
-        <header className="mb-10 text-center">
-          <h2 className="text-3xl text-gold sm:text-4xl">مختاراتُ الرفّ الذهبي</h2>
+      <section className="islamic-corners mx-auto max-w-6xl px-4 py-14 sm:py-20">
+        <header className="mb-7 text-center sm:mb-10">
+          <h2 className="ink-reveal text-3xl text-gold sm:text-4xl">مختاراتُ الرفّ الذهبي</h2>
           <p className="mt-3 text-sm text-muted-foreground">نفائس اخترناها لك من أعمدة التراث والفكر</p>
         </header>
 
-        <div className="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(165px,1fr))]">
+        <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 md:hidden">
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-60 w-28 shrink-0 rounded-md bg-secondary/50" />)
+            : books?.map((book) => <BookCard key={book.id} book={book} compact />)}
+        </div>
+        <div className="hidden gap-5 [grid-template-columns:repeat(auto-fill,minmax(165px,1fr))] md:grid">
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-xl bg-secondary/50" />)
-            : books?.map((b) => <BookCard key={b.id} book={b} />)}
+            : books?.map((book) => <BookCard key={book.id} book={book} />)}
         </div>
 
-        <div className="mt-10 text-center">
+        <div className="mt-7 text-center sm:mt-10">
           <Button asChild variant="outline">
             <Link to="/store">كل الكتب</Link>
           </Button>
         </div>
       </section>
 
-      <EraStrip />
-
       <BookOfTheDay />
-
-      <section className="mx-auto max-w-6xl px-4 pb-20">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              icon: Library,
-              title: "متجر الكتب التراثية",
-              text: "مكتبة تضمّ نفائس التراث والتاريخ والأدب، جاهزة للقراءة والاقتناء.",
-              to: "/store" as const,
-            },
-            {
-              icon: Newspaper,
-              title: "جريدة ترشيش",
-              text: "مقالات ثقافية يومية في التاريخ والسياسة والفكر بلغةٍ رصينة.",
-              to: "/gazette" as const,
-            },
-            {
-              icon: MessagesSquare,
-              title: "المجلس الثقافي",
-              text: "نقاشات حيّة بين القرّاء والمؤلفين حول ما يُقرأ ويُكتب اليوم.",
-              to: "/majlis" as const,
-            },
-          ].map(({ icon: Icon, title, text, to }) => (
-            <Link key={title} to={to} className="glass block rounded-xl p-6 transition hover:border-gold/50">
-              <Icon className="size-5 text-gold" />
-              <h3 className="mt-4 text-xl">{title}</h3>
-              <p className="mt-2 text-sm leading-7 text-muted-foreground">{text}</p>
-            </Link>
-          ))}
-
-          {[
-            { icon: Sparkles, title: "حكيم ترشيش", text: "مستشار معرفي يجيبك بعربية أصيلة ويرشّح لك بحسب حالك." },
-            { icon: Users, title: "المجلس الثقافي", text: "مقالات يومية ونقاشات متشعّبة بين القرّاء والمؤلفين." },
-            { icon: Feather, title: "برنامج الإحالة", text: "عمولة ١٠٪ على كل كتاب يُباع عبر رابطك الخاص." },
-          ].map(({ icon: Icon, title, text }) => (
-            <div key={title} className="glass rounded-xl p-6">
-              <Icon className="size-5 text-gold" />
-              <h3 className="mt-4 text-xl">{title}</h3>
-              <p className="mt-2 text-sm leading-7 text-muted-foreground">{text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
       <ReaderVoices />
 
-      <LibraryPulse />
-
-      <section className="mx-auto max-w-4xl px-4 pb-24">
-        <div className="glass relative overflow-hidden rounded-2xl p-10 text-center">
-          <Crown className="mx-auto size-6 text-gold" />
-          <h2 className="mt-4 text-3xl text-gold">عضوية مجلس ترشيش</h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground">
-            مقالات يومية حصرية، كتبٌ صوتية نادرة، واستشارات غير محدودة مع حكيم المكتبة.
-          </p>
-          <p className="mt-6 flex items-center justify-center gap-2 font-display text-3xl text-parchment">
-            <PriceTag amount={49} className="text-3xl" />
-            <span className="text-base text-muted-foreground">/ شهرياً</span>
-          </p>
-          <Button asChild className="mt-6" size="lg">
-            <Link to="/auth">انضم إلى المجلس</Link>
-          </Button>
-        </div>
-      </section>
-
-      <NewsletterBox />
+      <MembershipPanel />
 
       <SiteFooter />
     </main>
@@ -229,26 +146,6 @@ function QuoteBar() {
         </p>
       </div>
     </div>
-  );
-}
-
-/** شريط العصور/التصنيفات، يوجّه إلى صفحة المتجر. */
-function EraStrip() {
-  return (
-    <section className="mx-auto max-w-6xl px-4 pb-6">
-      <h2 className="mb-4 text-center text-2xl text-gold">تصفّح بحسب العصور والفنون</h2>
-      <div className="flex flex-wrap justify-center gap-2">
-        {ERAS.map((e) => (
-          <Link
-            key={e}
-            to="/store"
-            className="glass rounded-full border-gold/30 px-4 py-2 text-xs text-muted-foreground transition hover:border-gold/60 hover:text-gold"
-          >
-            {e}
-          </Link>
-        ))}
-      </div>
-    </section>
   );
 }
 
@@ -279,9 +176,9 @@ function BookOfTheDay() {
   if (!data) return null;
 
   return (
-    <section className="mx-auto max-w-5xl px-4 pb-20">
+    <section className="islamic-corners mx-auto max-w-5xl px-4 pb-20">
       <header className="mb-6 text-center">
-        <h2 className="text-3xl text-gold">كتاب اليوم</h2>
+        <h2 className="ink-reveal text-3xl text-gold">كتاب اليوم</h2>
         <p className="mt-2 text-sm text-muted-foreground">اختيارٌ يتجدّد كل يوم من رفوف المكتبة</p>
       </header>
       <div className="glass grid gap-6 rounded-2xl p-6 sm:grid-cols-[220px_1fr]">
@@ -324,9 +221,9 @@ function ReaderVoices() {
   });
 
   return (
-    <section className="mx-auto max-w-6xl px-4 pb-20">
+    <section className="islamic-corners mx-auto max-w-6xl px-4 pb-20">
       <header className="mb-6 text-center">
-        <h2 className="text-3xl text-gold">آراء القرّاء</h2>
+        <h2 className="ink-reveal text-3xl text-gold">آراء القرّاء</h2>
       </header>
       {data && data.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -360,106 +257,54 @@ function ReaderVoices() {
   );
 }
 
-/** مؤشر نشاط صادق: أرقام حقيقية فقط من قاعدة البيانات. */
-function LibraryPulse() {
+/** عضوية المجلس مع أرقام المكتبة الحقيقية مدمجة في الشريط نفسه. */
+function MembershipPanel() {
   const { data } = useQuery({
     queryKey: ["library-pulse"],
     queryFn: async () => {
       const [booksRes, reviewsRes, postsRes] = await Promise.all([
         supabase.from("books").select("id", { count: "exact", head: true }).eq("is_visible", true),
-        supabase.from("reviews").select("id", { count: "exact", head: true }),
+        supabase.from("reviews").select("id", { count: "exact", head: true),
         supabase.from("posts").select("id", { count: "exact", head: true }).eq("is_published", true),
       ]);
-      return {
-        books: booksRes.count ?? 0,
-        reviews: reviewsRes.count ?? 0,
-        posts: postsRes.count ?? 0,
-      };
+      return { books: booksRes.count ?? 0, reviews: reviewsRes.count ?? 0, posts: postsRes.count ?? 0 };
     },
   });
 
   const items = useMemo(
     () => [
-      { label: "كتاب متاح الآن", value: data?.books ?? 0 },
-      { label: "مقال ومشاركة منشورة", value: data?.posts ?? 0 },
+      { label: "كتاب متاح", value: data?.books ?? 0 },
+      { label: "مقال ومشاركة", value: data?.posts ?? 0 },
       { label: "مراجعة قارئ", value: data?.reviews ?? 0 },
     ],
     [data],
   );
 
-  const empty = !data || (data.books === 0 && data.posts === 0 && data.reviews === 0);
-
   return (
-    <section className="mx-auto max-w-4xl px-4 pb-20">
-      <div className="glass rounded-2xl p-6 text-center">
-        <Scroll className="mx-auto size-5 text-gold" />
-        {empty ? (
-          <p className="mt-3 text-sm text-muted-foreground">المكتبة في طور الإثراء، وستُعرض هنا أرقامها الحقيقية فور توفّرها.</p>
-        ) : (
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            {items.map((it) => (
-              <div key={it.label}>
-                <p className="font-display text-3xl text-gold">{it.value}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{it.label}</p>
+    <section className="islamic-corners mx-auto max-w-4xl px-4 pb-24">
+      <div className="glass relative overflow-hidden rounded-2xl p-7 text-center sm:p-10">
+        <Crown className="mx-auto size-6 text-gold" />
+        <h2 className="ink-reveal mt-4 text-3xl text-gold">عضوية مجلس ترشيش</h2>
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground">
+          مقالات يومية حصرية، كتبٌ صوتية نادرة، واستشارات غير محدودة مع حكيم المكتبة.
+        </p>
+        {data && (data.books > 0 || data.posts > 0 || data.reviews > 0) && (
+          <div className="mx-auto mt-6 grid max-w-xl grid-cols-3 border-y border-border py-4">
+            {items.map((item) => (
+              <div key={item.label} className="border-e border-border px-2 last:border-0">
+                <p className="font-display text-xl text-gold sm:text-2xl">{item.value}</p>
+                <p className="mt-1 text-[10px] leading-4 text-muted-foreground sm:text-xs">{item.label}</p>
               </div>
             ))}
           </div>
         )}
-      </div>
-    </section>
-  );
-}
-
-/** اشتراك بريدي بسيط يُخزَّن في قاعدة البيانات فقط. */
-function NewsletterBox() {
-  const [email, setEmail] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [done, setDone] = useState(false);
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const value = email.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      toast.error("أدخل بريداً إلكترونياً صحيحاً");
-      return;
-    }
-    setSaving(true);
-    const { error } = await supabase.from("newsletter_subscribers").insert({ email: value });
-    setSaving(false);
-    if (error && !error.message.includes("duplicate")) {
-      toast.error("تعذّر حفظ الاشتراك، حاول لاحقاً");
-      return;
-    }
-    setDone(true);
-    setEmail("");
-    toast.success("شكراً لك، تم تسجيل بريدك بنجاح");
-  }
-
-  return (
-    <section className="mx-auto max-w-3xl px-4 pb-24">
-      <div className="glass rounded-2xl p-8 text-center">
-        <Mail className="mx-auto size-5 text-gold" />
-        <h2 className="mt-4 text-2xl text-gold">اشترك بإشعارات الجديد</h2>
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-muted-foreground">
-          سجّل بريدك لنُعلمك بالكتب والمقالات الجديدة فور صدورها.
+        <p className="mt-6 flex items-center justify-center gap-2 font-display text-3xl text-parchment">
+          <PriceTag amount={49} className="text-3xl" />
+          <span className="text-base text-muted-foreground">/ شهرياً</span>
         </p>
-        {done ? (
-          <p className="mt-6 text-sm text-gold">شكراً لك، تم تسجيل بريدك بنجاح وسنوافيك بكل جديد.</p>
-        ) : (
-          <form onSubmit={(e) => void submit(e)} className="mx-auto mt-6 flex max-w-md flex-col gap-2 sm:flex-row">
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="بريدك الإلكتروني"
-              className="bg-background text-right"
-            />
-            <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="size-4 animate-spin" />}
-              اشترك
-            </Button>
-          </form>
-        )}
+        <Button asChild className="mt-6" size="lg">
+          <Link to="/auth">انضم إلى المجلس</Link>
+        </Button>
       </div>
     </section>
   );
