@@ -18,7 +18,7 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="التنقل الرئيسي للجوال"
-      className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-50 border-t border-gold/25 bg-background/95 px-[max(0.5rem,env(safe-area-inset-left))] pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_oklch(0.08_0.02_55/0.28)] backdrop-blur-xl md:hidden"
+      className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-50 border-t border-gold/25 bg-background/95 px-[max(0.5rem,env(safe-area-inset-left))] pb-[env(safe-area-inset-bottom)] shadow-[var(--shadow-deep)] backdrop-blur-xl md:hidden"
     >
       <div className="mx-auto grid h-16 max-w-md grid-cols-5 items-stretch">
         {ITEMS.map(({ to, label, icon: Icon }) => {
