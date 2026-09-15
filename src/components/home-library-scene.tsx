@@ -185,20 +185,21 @@ function GoldenDust({ count = 85 }: { count?: number }) {
 function Hotspot({ label, to, position }: (typeof DESTINATIONS)[number]) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
-  const group = useRef<THREE.Group>(null);
+  const marker = useRef<THREE.Mesh>(null);
   const scaleTarget = useMemo(() => new THREE.Vector3(1, 1, 1), []);
   useFrame(({ clock }, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05);
     const pulse = 1 + Math.sin(clock.elapsedTime * 2.1 + position[0]) * 0.045;
     const target = (hovered ? 1.18 : 1) * pulse;
     scaleTarget.setScalar(target);
-    if (group.current) group.current.scale.lerp(scaleTarget, 1 - Math.exp(-8 * dt));
+    if (marker.current) marker.current.scale.lerp(scaleTarget, 1 - Math.exp(-8 * dt));
   });
 
   const go = () => void navigate({ to });
   return (
-    <group ref={group} position={position}>
+    <group position={position}>
       <mesh
+        ref={marker}
         onClick={(event) => { event.stopPropagation(); go(); }}
         onPointerOver={(event) => { event.stopPropagation(); setHovered(true); document.body.style.cursor = "pointer"; }}
         onPointerOut={() => { setHovered(false); document.body.style.cursor = "default"; }}
