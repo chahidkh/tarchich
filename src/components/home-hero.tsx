@@ -1,50 +1,16 @@
-import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from "react";
+import { useRef, type PointerEvent as ReactPointerEvent } from "react";
 import { Link } from "@tanstack/react-router";
+import { BookOpenText, Landmark, Library, Newspaper } from "lucide-react";
 
+import { LibraryBackdrop } from "@/components/library-backdrop";
 import { Button } from "@/components/ui/button";
-import { usePrefs } from "@/lib/prefs";
 
-const HomeLibraryScene = lazy(() => import("@/components/home-library-scene"));
-
-type RenderMode = "checking" | "static" | "three";
-
-// أي فشل حقيقي أثناء إنشاء السياق أو العرض يحوّل فوراً إلى البديل المسطح.
-class SceneErrorBoundary extends Component<{ onFailure: () => void; children: ReactNode }, { failed: boolean }> {
-  override state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  override componentDidCatch() {
-    this.props.onFailure();
-  }
-  override render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
-
-function hasSuitable3DPerformance(lowData: boolean) {
-  if (lowData || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-  const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
-  if (nav.connection?.saveData) return false;
-  const mobile = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
-  if ((nav.deviceMemory ?? 8) < (mobile ? 6 : 4)) return false;
-  if ((nav.hardwareConcurrency ?? 8) < (mobile ? 6 : 4)) return false;
-
-  const canvas = document.createElement("canvas");
-  try {
-    // فحص متساهل: نتحقق فقط من وجود دعم WebGL2 أساسي وقدرة على إنشاء نسيج بحجم معقول.
-    // لا نستخدم failIfMajorPerformanceCaveat هنا لأنه يرفض خطأً أجهزة قوية فعلياً
-    // (بطاقات رسومات مزدوجة، أوضاع توفير الطاقة، بعض تركيبات المتصفح/النظام).
-    // خط الدفاع الحقيقي هو مستمع webglcontextlost وonFailure أثناء التشغيل الفعلي.
-    const gl = canvas.getContext("webgl2", { antialias: false });
-    if (!gl) return false;
-    const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
-    gl.getExtension("WEBGL_lose_context")?.loseContext();
-    return maxTextureSize >= 4096;
-  } catch {
-    return false;
-  }
-}
+const DESTINATIONS = [
+  { label: "المتجر", to: "/store" as const, icon: Library, position: "start-[7%] top-[43%] sm:start-[12%]" },
+  { label: "الجريدة", to: "/gazette" as const, icon: Newspaper, position: "end-[7%] top-[43%] sm:end-[12%]" },
+  { label: "المجلس الثقافي", to: "/majlis" as const, icon: Landmark, position: "start-[8%] bottom-[15%] sm:start-[22%]" },
+  { label: "الديوان", to: "/diwan" as const, icon: BookOpenText, position: "end-[8%] bottom-[15%] sm:end-[22%]" },
+];
 
 function HeroCopy() {
   return (
@@ -70,50 +36,74 @@ function HeroCopy() {
 }
 
 export function HomeHero() {
-  const { lowData, theme } = usePrefs();
-  const [mode, setMode] = useState<RenderMode>("checking");
-  const [painted, setPainted] = useState(false);
+  const imageLayer = useRef<HTMLDivElement>(null);
+  const dragStart = useRef<{ x: number; y: number } | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    const decide = () => {
-      if (!cancelled) setMode(hasSuitable3DPerformance(lowData) ? "three" : "static");
-    };
-    const idle = window.requestIdleCallback?.(decide, { timeout: 650 });
-    const timer = idle === undefined ? window.setTimeout(decide, 80) : undefined;
-    return () => {
-      cancelled = true;
-      if (idle !== undefined) window.cancelIdleCallback?.(idle);
-      if (timer !== undefined) window.clearTimeout(timer);
-    };
-  }, [lowData]);
+  const setPerspective = (x: number, y: number) => {
+    const layer = imageLayer.current;
+    if (!layer) return;
+    const rotateY = Math.max(-1.6, Math.min(1.6, x * 0.008));
+    const rotateX = Math.max(-1.1, Math.min(1.1, -y * 0.006));
+    layer.style.transform = `perspective(1200px) scale(1.045) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  };
+
+  const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
+    if ((event.target as HTMLElement).closest("a")) return;
+    dragStart.current = { x: event.clientX, y: event.clientY };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const onPointerMove = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!dragStart.current || !event.currentTarget.hasPointerCapture(event.pointerId)) return;
+    setPerspective(event.clientX - dragStart.current.x, event.clientY - dragStart.current.y);
+  };
+
+  const releasePointer = (event: ReactPointerEvent<HTMLElement>) => {
+    dragStart.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
 
   return (
     <section
-      className="relative isolate flex min-h-[88vh] items-center justify-center overflow-hidden"
-      data-hero-render-mode={mode}
-      data-hero-scene-painted={String(painted)}
+      className="relative isolate flex min-h-[88vh] touch-pan-y items-center justify-center overflow-hidden"
+      aria-label="واجهة مكتبة ترشيش"
+      data-hero-render-mode="original-image"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={releasePointer}
+      onPointerCancel={releasePointer}
     >
-      {mode === "three" && (
-        <div className={`absolute inset-0 transition-opacity duration-500 ${painted ? "opacity-100" : "opacity-0"}`}>
-          <SceneErrorBoundary onFailure={() => { setPainted(false); setMode("static"); }}>
-            <Suspense fallback={null}>
-              <HomeLibraryScene
-                theme={theme}
-                onFirstFrame={() => setPainted(true)}
-                onFailure={() => { setPainted(false); setMode("static"); }}
-              />
-            </Suspense>
-          </SceneErrorBoundary>
-        </div>
-      )}
-      {painted && <div aria-hidden className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-background/0 via-background/15 to-background/65" />}
+      <div
+        ref={imageLayer}
+        aria-hidden
+        className="absolute inset-[-3%] z-0 origin-center transition-transform duration-300 ease-out motion-reduce:transform-none"
+      >
+        <LibraryBackdrop className="size-full object-cover" eager />
+      </div>
+
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-background/5 via-background/10 to-background/45" />
+
+      <div className="absolute inset-0 z-20">
+        {DESTINATIONS.map(({ label, to, icon: Icon, position }) => (
+          <Button
+            key={to}
+            asChild
+            size="sm"
+            variant="outline"
+            className={`absolute ${position} h-8 border-gold/40 bg-background/75 px-2.5 font-kufi text-[10px] text-gold shadow-md backdrop-blur-sm hover:border-gold hover:bg-background/90 sm:h-9 sm:px-3 sm:text-xs`}
+          >
+            <Link to={to} aria-label={`الانتقال إلى ${label}`}>
+              <Icon aria-hidden />
+              {label}
+            </Link>
+          </Button>
+        ))}
+      </div>
+
       <HeroCopy />
-      {mode === "three" && painted && (
-        <p className="pointer-events-none absolute bottom-5 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap font-kufi text-[11px] text-parchment/70 hero-text">
-          اسحب لاستكشاف المكتبة · اختر الضوء للانتقال
-        </p>
-      )}
+      <p className="pointer-events-none absolute bottom-4 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap font-kufi text-[10px] text-parchment/70 hero-text sm:text-[11px]">
+        اسحب برفق لاستكشاف الصورة · اختر وجهتك
+      </p>
     </section>
   );
 }
