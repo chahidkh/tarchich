@@ -75,7 +75,11 @@ export function HomeHero() {
   }, [lowData]);
 
   return (
-    <section className="relative isolate flex min-h-[88vh] items-center justify-center overflow-hidden">
+    <section
+      className="relative isolate flex min-h-[88vh] items-center justify-center overflow-hidden"
+      data-hero-render-mode={mode}
+      data-hero-scene-painted={String(painted)}
+    >
       {mode === "three" && (
         <div className={`absolute inset-0 transition-opacity duration-500 ${painted ? "opacity-100" : "opacity-0"}`}>
           <Suspense fallback={null}>
