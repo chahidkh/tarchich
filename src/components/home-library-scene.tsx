@@ -249,18 +249,18 @@ function LibraryWorld({ theme, onReady }: { theme: SceneTheme; onReady: () => vo
 
       <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
         <planeGeometry args={[20, 25]} />
-        <meshStandardMaterial map={stoneTexture ?? undefined} color={floor} roughness={0.95} />
+        <meshStandardMaterial map={stoneTexture} color={floor} roughness={0.95} />
       </mesh>
       <mesh position={[0, 4, -10]} receiveShadow>
         <boxGeometry args={[16, 8, 0.45]} />
-        <meshStandardMaterial map={stoneTexture ?? undefined} color={floor} roughness={0.98} />
+        <meshStandardMaterial map={stoneTexture} color={floor} roughness={0.98} />
       </mesh>
 
       {[-6.7, 6.7].map((x) => (
         <group key={x} position={[x, 0, -2]}>
           <mesh position-y={3.1} castShadow>
             <cylinderGeometry args={[0.48, 0.62, 6.2, 12]} />
-            <meshStandardMaterial map={stoneTexture ?? undefined} color={floor} roughness={0.94} />
+            <meshStandardMaterial map={stoneTexture} color={floor} roughness={0.94} />
           </mesh>
           <mesh position-y={6.22} castShadow>
             <cylinderGeometry args={[0.72, 0.72, 0.24, 12]} />
