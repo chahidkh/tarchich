@@ -49,6 +49,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ms-auto flex shrink-0 items-center gap-2">
+          <SettingsMenu />
           <button
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={t("settings.title")}
@@ -57,9 +58,6 @@ export function SiteHeader() {
           >
             {menuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
-          <div className="hidden md:block">
-            <SettingsMenu />
-          </div>
           <button
             onClick={() => setOpen(true)}
             aria-label={t("cart.title")}
