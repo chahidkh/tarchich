@@ -1,5 +1,5 @@
 import { Environment, Html, Lightformer, OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
@@ -186,11 +186,13 @@ function Hotspot({ label, to, position }: (typeof DESTINATIONS)[number]) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   const group = useRef<THREE.Group>(null);
+  const scaleTarget = useMemo(() => new THREE.Vector3(1, 1, 1), []);
   useFrame(({ clock }, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05);
     const pulse = 1 + Math.sin(clock.elapsedTime * 2.1 + position[0]) * 0.045;
     const target = (hovered ? 1.18 : 1) * pulse;
-    if (group.current) group.current.scale.lerp(new THREE.Vector3(target, target, target), 1 - Math.exp(-8 * dt));
+    scaleTarget.setScalar(target);
+    if (group.current) group.current.scale.lerp(scaleTarget, 1 - Math.exp(-8 * dt));
   });
 
   const go = () => void navigate({ to });
@@ -230,6 +232,18 @@ function FirstFrame({ onReady }: { onReady: () => void }) {
   return null;
 }
 
+function ResponsiveCamera() {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    const perspective = camera as THREE.PerspectiveCamera;
+    const narrow = size.width / Math.max(size.height, 1) < 0.72;
+    perspective.position.set(0, narrow ? 3.5 : 3.3, narrow ? 15.2 : 10.8);
+    perspective.fov = narrow ? 52 : 47;
+    perspective.updateProjectionMatrix();
+  }, [camera, size]);
+  return null;
+}
+
 function LibraryWorld({ theme, onReady }: { theme: SceneTheme; onReady: () => void }) {
   const stoneTexture = useMemo(() => createStoneTexture(theme), [theme]);
   useEffect(() => () => stoneTexture?.dispose(), [stoneTexture]);
@@ -240,11 +254,11 @@ function LibraryWorld({ theme, onReady }: { theme: SceneTheme; onReady: () => vo
     <>
       <color attach="background" args={[background]} />
       <fog attach="fog" args={[background, 10, 25]} />
-      <ambientLight intensity={theme === "gold" ? 0.58 : 0.88} color={theme === "gold" ? "#b88a63" : "#f0dec2"} />
-      <directionalLight position={[1, 9, 4]} intensity={1.1} color="#efc77c" castShadow shadow-mapSize={[768, 768]} />
+      <ambientLight intensity={theme === "gold" ? 1.25 : 1.55} color={theme === "gold" ? "#cf9d72" : "#f0dec2"} />
+      <directionalLight position={[1, 9, 4]} intensity={2.6} color="#efc77c" />
       <Environment resolution={64}>
-        <Lightformer intensity={2.2} color="#d8a552" position={[0, 6, 3]} scale={[7, 2, 1]} />
-        <Lightformer intensity={0.8} color="#789088" position={[-6, 2, -2]} rotation-y={Math.PI / 2} scale={[8, 2, 1]} />
+        <Lightformer intensity={3.4} color="#d8a552" position={[0, 6, 3]} scale={[7, 2, 1]} />
+        <Lightformer intensity={1.35} color="#8ea59a" position={[-6, 2, -2]} rotation-y={Math.PI / 2} scale={[8, 2, 1]} />
       </Environment>
 
       <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
@@ -276,6 +290,7 @@ function LibraryWorld({ theme, onReady }: { theme: SceneTheme; onReady: () => vo
       <Candle position={[0, 0.2, -6.7]} />
       <GoldenDust />
       {DESTINATIONS.map((destination) => <Hotspot key={destination.to} {...destination} />)}
+      <ResponsiveCamera />
       <OrbitControls
         makeDefault
         enablePan={false}
@@ -315,7 +330,6 @@ export default function HomeLibraryScene({ theme, onFirstFrame, onFailure }: Pro
   return (
     <div ref={wrapper} className="absolute inset-0 touch-pan-y" aria-label="مشهد تفاعلي لمكتبة تراثية">
       <Canvas
-        shadows
         dpr={[1, 1.35]}
         frameloop={active ? "always" : "never"}
         camera={{ position: [0, 3.3, 10.8], fov: 47, near: 0.1, far: 40 }}

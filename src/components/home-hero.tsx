@@ -35,7 +35,7 @@ function hasSuitable3DPerformance(lowData: boolean) {
 function HeroCopy() {
   return (
     <div className="pointer-events-none relative z-20 mx-auto max-w-3xl px-6 text-center">
-      <div className="rise-in rounded-2xl border border-gold/20 bg-background/40 px-5 py-8 shadow-2xl backdrop-blur-[3px] sm:px-10">
+      <div className="rise-in">
         <p className="font-kufi text-sm tracking-[0.3em] text-gold-soft hero-text">منصة المعرفة العربية</p>
         <h1 className="mt-6 text-5xl leading-[1.35] text-parchment hero-text sm:text-7xl">مكتبة ترشيش</h1>
         <div className="gold-rule mx-auto mt-6 w-40" />
@@ -91,7 +91,7 @@ export function HomeHero() {
           </Suspense>
         </div>
       )}
-      {painted && <div aria-hidden className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-background/5 via-background/10 to-background/60" />}
+      {painted && <div aria-hidden className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-background/0 via-background/15 to-background/65" />}
       <HeroCopy />
       {mode === "three" && painted && (
         <p className="pointer-events-none absolute bottom-5 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap font-kufi text-[11px] text-parchment/70 hero-text">
