@@ -5,6 +5,8 @@ import {
   DESIGN_KEYS,
   resolveBackground,
 } from "@/lib/backgrounds";
+import goldMobile from "@/assets/hero-gold-mobile.webp.asset.json";
+import parchmentMobile from "@/assets/hero-parchment-mobile.webp.asset.json";
 
 
 type Props = {
@@ -22,27 +24,19 @@ export function LibraryBackdrop({ className = "", alt = "", eager = false }: Pro
   const { data } = useSiteSettings();
   const goldImage = resolveBackground(data?.[DESIGN_KEYS.bgGold], DEFAULT_GOLD_BG);
   const parchmentImage = resolveBackground(data?.[DESIGN_KEYS.bgParchment], DEFAULT_PARCHMENT_BG);
-
+  const goldMobileImage = goldImage === DEFAULT_GOLD_BG ? goldMobile.url : goldImage;
+  const parchmentMobileImage = parchmentImage === DEFAULT_PARCHMENT_BG ? parchmentMobile.url : parchmentImage;
 
   return (
     <>
-      <img
-        src={goldImage}
-        alt={alt}
-        width={1920}
-        height={1088}
-        loading={eager ? "eager" : "lazy"}
-        className={`theme-bg-gold ${className}`}
-      />
-      <img
-        src={parchmentImage}
-        alt=""
-        aria-hidden
-        width={1920}
-        height={1088}
-        loading="lazy"
-        className={`theme-bg-parchment ${className}`}
-      />
+      <picture className="theme-bg-gold contents">
+        <source media="(max-width: 767px)" srcSet={goldMobileImage} type="image/webp" />
+        <img src={goldImage} alt={alt} width={1920} height={1088} loading={eager ? "eager" : "lazy"} className={className} />
+      </picture>
+      <picture className="theme-bg-parchment contents">
+        <source media="(max-width: 767px)" srcSet={parchmentMobileImage} type="image/webp" />
+        <img src={parchmentImage} alt="" aria-hidden width={1920} height={1088} loading="lazy" className={className} />
+      </picture>
     </>
   );
 }

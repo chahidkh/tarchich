@@ -47,6 +47,9 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
         const parsed = JSON.parse(raw) as Partial<Prefs>;
         setStored(parsed);
         setPrefs({ ...DEFAULTS, ...parsed });
+      } else {
+        const hour = new Date().getHours();
+        setPrefs((current) => ({ ...current, theme: hour >= 19 || hour < 6 ? "gold" : "parchment" }));
       }
     } catch {
       /* ignore */

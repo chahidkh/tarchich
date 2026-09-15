@@ -51,7 +51,7 @@ export function HakeemDrawer() {
         size="icon"
         title="استشر حكيم المكتبة"
         aria-label="استشر حكيم المكتبة"
-        className="glow-pulse fixed bottom-4 left-4 z-40 size-12 rounded-full border-gold/40 bg-card/90 text-gold shadow-lg backdrop-blur hover:bg-card sm:bottom-6 sm:left-6 sm:h-auto sm:w-auto sm:gap-2 sm:px-5 sm:py-3"
+        className="glow-pulse fixed bottom-20 left-4 z-40 size-12 rounded-full border-gold/40 bg-card/90 text-gold shadow-lg backdrop-blur hover:bg-card sm:bottom-6 sm:left-6 sm:h-auto sm:w-auto sm:gap-2 sm:px-5 sm:py-3"
       >
         <Sparkles className="size-4" />
         <span className="hidden sm:inline">استشر حكيم المكتبة</span>

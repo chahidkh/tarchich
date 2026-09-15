@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { BookOpen, CreditCard, ExternalLink, FileText, Loader2, MessagesSquare } from "lucide-react";
+import { BookOpen, CreditCard, ExternalLink, FileText, Loader2, MessagesSquare, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useCart } from "@/lib/cart";
@@ -11,6 +11,7 @@ import { createBookCheckout } from "@/lib/checkout.functions";
 import { useSession } from "@/hooks/use-session";
 import { BookCover } from "@/components/book-cover";
 import { BookReviews } from "@/components/book-reviews";
+import { cn } from "@/lib/utils";
 
 export type Book = {
   id: string;
@@ -27,7 +28,7 @@ export type Book = {
   sample_pdf_url?: string | null;
 };
 
-export function BookCard({ book }: { book: Book }) {
+export function BookCard({ book, compact = false }: { book: Book; compact?: boolean }) {
   const { add, setOpen } = useCart();
   const { user } = useSession();
   const [preview, setPreview] = useState(false);
@@ -60,27 +61,32 @@ export function BookCard({ book }: { book: Book }) {
 
   return (
     <>
-      <article className="glass group flex flex-col overflow-hidden rounded-xl transition duration-300 ease-out hover:-rotate-1 hover:scale-[1.03] hover:border-gold/50 hover:shadow-[var(--shadow-glow),var(--shadow-deep)]">
+      <article
+        className={cn(
+          "glass group flex flex-col overflow-hidden rounded-xl transition duration-300 ease-out hover:-rotate-1 hover:scale-[1.03] hover:border-gold/50 hover:shadow-[var(--shadow-glow),var(--shadow-deep)]",
+          compact && "w-28 shrink-0 snap-start rounded-md sm:w-32",
+        )}
+      >
         <button
           onClick={() => setPreview(true)}
           className="relative flex aspect-3/4 w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_20%,oklch(0.3_0.05_60),oklch(0.19_0.03_55))]"
         >
           <BookCover src={book.cover_image_url} title={book.title} />
           {book.badge && (
-            <span className="absolute top-3 end-3 rounded-full border border-gold/50 bg-background/80 px-3 py-1 text-[11px] text-gold">
+            <span className={cn("absolute end-3 top-3 rounded-full border border-gold/50 bg-background/80 px-3 py-1 text-[11px] text-gold", compact && "end-1.5 top-1.5 px-1.5 py-0.5 text-[8px]")}>
               {book.badge}
             </span>
           )}
         </button>
 
-        <div className="flex flex-1 flex-col gap-1.5 p-3">
-          <h3 className="font-display text-base leading-snug">{book.title}</h3>
-          <p className="text-[11px] text-muted-foreground">{book.author}</p>
-          <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">{book.description}</p>
-          <div className="mt-auto flex items-center justify-between pt-2">
-            <PriceTag amount={Number(book.price)} />
-            <Button size="sm" onClick={addToCart}>
-              أضف للسلة
+        <div className={cn("flex flex-1 flex-col gap-1.5 p-3", compact && "gap-1 p-2")}>
+          <h3 className={cn("font-display text-base leading-snug", compact && "line-clamp-2 min-h-9 text-xs leading-[1.45]")}>{book.title}</h3>
+          <p className={cn("text-[11px] text-muted-foreground", compact && "truncate text-[9px]")}>{book.author}</p>
+          {!compact && <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">{book.description}</p>}
+          <div className={cn("mt-auto flex items-center justify-between pt-2", compact && "gap-1 pt-1")}>
+            <PriceTag amount={Number(book.price)} className={compact ? "text-[11px]" : undefined} />
+            <Button size="sm" onClick={addToCart} className={compact ? "size-7 p-0" : undefined} aria-label={`أضف ${book.title} إلى السلة`}>
+              {compact ? <ShoppingBag className="size-3" /> : "أضف للسلة"}
             </Button>
           </div>
         </div>

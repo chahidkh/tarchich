@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteFooter, SUPPORT_EMAIL } from "@/components/site-footer";
 
 export const Route = createFileRoute("/about")({
@@ -43,6 +43,8 @@ const VALUES: { title: string; body: string }[] = [
   },
 ];
 
+const ERAS = ["التراث الإسلامي", "التاريخ", "الأدب", "الفلسفة والعلوم", "التصوف", "اللغة والمعاجم", "الرحلات والجغرافيا"];
+
 function About() {
   return (
     <main>
@@ -80,6 +82,17 @@ function About() {
             </article>
           ))}
         </div>
+
+        <section className="mt-10 border-y border-border py-8 text-center">
+          <h2 className="text-2xl text-gold">تصفّح بحسب العصور والفنون</h2>
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            {ERAS.map((era) => (
+              <Link key={era} to="/store" search={{ q: era }} className="glass rounded-full border-gold/30 px-4 py-2 text-xs text-muted-foreground transition hover:border-gold/60 hover:text-gold">
+                {era}
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           للتواصل معنا أو اقتراح كتاب:{" "}
