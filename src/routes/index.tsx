@@ -38,6 +38,8 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:title", content: "مكتبة ترشيش | مجلس المعرفة العربي" },
       { property: "og:description", content: "كتب مختارة، مجلس ثقافي، وحكيمٌ يرشدك إلى قراءتك القادمة." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
