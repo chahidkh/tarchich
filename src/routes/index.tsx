@@ -96,19 +96,20 @@ function Home() {
 
   return (
     <main>
-      <section className="relative isolate flex min-h-[88vh] items-center justify-center overflow-hidden">
-        <div className="rise-in mx-auto max-w-3xl px-6 text-center">
-          <p className="font-kufi text-sm tracking-[0.3em] text-gold-soft hero-text">منصة المعرفة العربية</p>
-          <h1 className="mt-6 text-5xl leading-[1.35] text-parchment hero-text sm:text-7xl">مكتبة ترشيش</h1>
-          <div className="gold-rule mx-auto mt-6 w-40" />
-          <p className="mt-6 text-lg leading-9 text-parchment/85 hero-text">
+      <section className="relative isolate flex min-h-[34rem] items-center justify-center overflow-hidden sm:min-h-[88vh]">
+        <div aria-hidden className="absolute inset-0 bg-background/35 sm:hidden" />
+        <div className="rise-in relative mx-auto max-w-3xl px-6 py-8 text-center sm:py-0">
+          <p className="font-kufi text-xs tracking-[0.3em] text-gold-soft hero-text sm:text-sm">منصة المعرفة العربية</p>
+          <h1 className="mt-4 text-4xl leading-[1.35] text-parchment hero-text sm:mt-6 sm:text-7xl">مكتبة ترشيش</h1>
+          <div className="gold-rule mx-auto mt-4 w-32 sm:mt-6 sm:w-40" />
+          <p className="mt-4 text-base leading-8 text-parchment/85 hero-text sm:mt-6 sm:text-lg sm:leading-9">
             حيث يلتقي عبقُ المخطوط بذكاء العصر. كتبٌ منتقاة، مجلسٌ ثقافي يومي، وحكيمٌ يصحبك في اختيار قراءتك.
           </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg">
+          <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-10 sm:flex sm:flex-wrap sm:justify-center sm:gap-3">
+            <Button asChild size="lg" className="px-4 sm:px-8">
               <Link to="/store">تصفّح المتجر</Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" variant="outline" className="px-4 sm:px-8">
               <Link to="/majlis">ادخل المجلس</Link>
             </Button>
           </div>

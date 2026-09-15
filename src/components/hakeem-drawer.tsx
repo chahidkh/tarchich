@@ -45,13 +45,17 @@ export function HakeemDrawer() {
 
   return (
     <>
-      <button
+      <Button
         onClick={() => setOpen(true)}
-        className="glow-pulse fixed bottom-6 left-6 z-40 flex items-center gap-2 rounded-full border border-gold/40 bg-card/90 px-5 py-3 text-sm font-medium text-gold shadow-[0_10px_40px_-12px_rgba(0,0,0,.8)] backdrop-blur transition hover:bg-card"
+        variant="outline"
+        size="icon"
+        title="استشر حكيم المكتبة"
+        aria-label="استشر حكيم المكتبة"
+        className="glow-pulse fixed bottom-4 left-4 z-40 size-12 rounded-full border-gold/40 bg-card/90 text-gold shadow-lg backdrop-blur hover:bg-card sm:bottom-6 sm:left-6 sm:h-auto sm:w-auto sm:gap-2 sm:px-5 sm:py-3"
       >
         <Sparkles className="size-4" />
-        استشر حكيم المكتبة
-      </button>
+        <span className="hidden sm:inline">استشر حكيم المكتبة</span>
+      </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="flex w-full flex-col bg-card sm:max-w-md">

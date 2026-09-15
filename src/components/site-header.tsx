@@ -30,10 +30,10 @@ export function SiteHeader() {
 
   return (
     <header className="site-header sticky top-0 z-40 border-b border-border bg-background/60 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
-        <Link to="/" className="flex items-center gap-2">
+      <div className="mx-auto grid h-16 max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 md:flex md:gap-4">
+        <Link to="/" className="flex min-w-0 items-center gap-2">
           <BookOpen className="size-5 text-gold" />
-          <span className="font-display text-xl text-gold">مكتبة ترشيش</span>
+          <span className="truncate font-display text-lg text-gold sm:text-xl">مكتبة ترشيش</span>
         </Link>
 
         <nav className="hidden flex-1 items-center gap-6 md:flex">
@@ -48,7 +48,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="ms-auto flex items-center gap-2">
+        <div className="ms-auto flex shrink-0 items-center gap-2">
           <button
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={t("settings.title")}
@@ -57,7 +57,9 @@ export function SiteHeader() {
           >
             {menuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
-          <SettingsMenu />
+          <div className="hidden md:block">
+            <SettingsMenu />
+          </div>
           <button
             onClick={() => setOpen(true)}
             aria-label={t("cart.title")}
@@ -74,13 +76,13 @@ export function SiteHeader() {
           {user ? (
             <>
               {isAdmin && (
-                <Button asChild variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
                   <Link to="/admin">
                     <ShieldCheck className="size-4" /> {t("nav.admin")}
                   </Link>
                 </Button>
               )}
-              <Button asChild variant="outline" size="sm">
+              <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
                 <Link to="/dashboard">
                   <User className="size-4" /> {t("nav.account")}
                 </Link>
@@ -88,13 +90,13 @@ export function SiteHeader() {
               <button
                 onClick={() => void signOut()}
                 aria-label="خروج"
-                className="rounded-md border border-border p-2 text-muted-foreground transition hover:text-destructive"
+                className="hidden rounded-md border border-border p-2 text-muted-foreground transition hover:text-destructive md:inline-flex"
               >
                 <LogOut className="size-4" />
               </button>
             </>
           ) : (
-            <Button asChild size="sm">
+            <Button asChild size="sm" className="hidden md:inline-flex">
               <Link to="/auth">{t("nav.join")}</Link>
             </Button>
           )}
@@ -114,6 +116,33 @@ export function SiteHeader() {
                 {t(n.key)}
               </Link>
             ))}
+            <div className="flex items-center justify-between gap-3 border-t border-border/50 py-3">
+              <span className="text-sm text-muted-foreground">{t("settings.title")}</span>
+              <SettingsMenu />
+            </div>
+            {user ? (
+              <div className="grid gap-2 border-t border-border/50 py-3">
+                {isAdmin && (
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/admin" onClick={() => setMenuOpen(false)}>
+                      <ShieldCheck className="size-4" /> {t("nav.admin")}
+                    </Link>
+                  </Button>
+                )}
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/dashboard" onClick={() => setMenuOpen(false)}>
+                    <User className="size-4" /> {t("nav.account")}
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => void signOut()}>
+                  <LogOut className="size-4" /> خروج
+                </Button>
+              </div>
+            ) : (
+              <Button asChild size="sm" className="my-3 w-full">
+                <Link to="/auth" onClick={() => setMenuOpen(false)}>{t("nav.join")}</Link>
+              </Button>
+            )}
           </div>
         </nav>
       )}
