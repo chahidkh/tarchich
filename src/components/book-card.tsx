@@ -84,7 +84,7 @@ export function BookCard({ book, compact = false }: { book: Book; compact?: bool
           <p className={cn("text-[11px] text-muted-foreground", compact && "truncate text-[9px]")}>{book.author}</p>
           {!compact && <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">{book.description}</p>}
           <div className={cn("mt-auto flex items-center justify-between pt-2", compact && "gap-1 pt-1")}>
-            <PriceTag amount={Number(book.price)} className={compact ? "text-[11px]" : undefined} />
+            <PriceTag amount={Number(book.price)} {...(compact ? { className: "text-[11px]" } : {})} />
             <Button size="sm" onClick={addToCart} className={compact ? "size-7 p-0" : undefined} aria-label={`أضف ${book.title} إلى السلة`}>
               {compact ? <ShoppingBag className="size-3" /> : "أضف للسلة"}
             </Button>

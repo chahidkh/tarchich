@@ -264,7 +264,7 @@ function MembershipPanel() {
     queryFn: async () => {
       const [booksRes, reviewsRes, postsRes] = await Promise.all([
         supabase.from("books").select("id", { count: "exact", head: true }).eq("is_visible", true),
-        supabase.from("reviews").select("id", { count: "exact", head: true),
+        supabase.from("reviews").select("id", { count: "exact", head: true }),
         supabase.from("posts").select("id", { count: "exact", head: true }).eq("is_published", true),
       ]);
       return { books: booksRes.count ?? 0, reviews: reviewsRes.count ?? 0, posts: postsRes.count ?? 0 };
