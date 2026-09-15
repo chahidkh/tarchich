@@ -20,6 +20,7 @@ import { CartDrawer } from "../components/cart-drawer";
 import { HakeemDrawer } from "../components/hakeem-drawer";
 import { Toaster } from "../components/ui/sonner";
 import { SiteThemeOverrides } from "@/components/site-theme-overrides";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 
 
 function NotFoundComponent() {
@@ -138,7 +139,7 @@ function RootComponent() {
       <PrefsProvider>
       <CartProvider>
         <SiteThemeOverrides />
-        <div aria-hidden className="app-bg pointer-events-none fixed inset-0 z-0">
+        <div aria-hidden className={`app-bg pointer-events-none fixed inset-0 z-0 ${isHome ? "home-bg" : ""}`}>
           <LibraryBackdrop
             className={
               isHome
@@ -164,6 +165,7 @@ function RootComponent() {
         </div>
         <CartDrawer />
         <HakeemDrawer />
+        <MobileBottomNav />
         <Toaster position="top-center" richColors />
       </CartProvider>
       </PrefsProvider>

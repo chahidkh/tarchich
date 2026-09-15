@@ -1,13 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { Mail } from "lucide-react";
 import { useT } from "@/lib/i18n";
+import { NewsletterSignup } from "@/components/newsletter-signup";
 
 export const SUPPORT_EMAIL = "tarchich@gmail.com";
 
 export function SiteFooter() {
   const { t } = useT();
   return (
-    <footer className="border-t border-border py-10 text-center text-sm text-muted-foreground">
+    <footer className="border-t border-border px-4 py-10 text-center text-sm text-muted-foreground">
+      <NewsletterSignup />
       <p className="font-display text-base text-gold">مكتبة ترشيش — حيث تُصان المعرفة وتُروى.</p>
       <p className="mt-3 flex flex-wrap items-center justify-center gap-2">
         <Mail className="size-4 text-gold" />

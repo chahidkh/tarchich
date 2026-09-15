@@ -61,7 +61,7 @@ export function SiteHeader() {
           <button
             onClick={() => setOpen(true)}
             aria-label={t("cart.title")}
-            className="relative rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold"
+            className="relative hidden rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold md:inline-flex"
           >
             <ShoppingBag className="size-4" />
             {count > 0 && (

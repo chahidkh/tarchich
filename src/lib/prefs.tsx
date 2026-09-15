@@ -46,7 +46,12 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<Prefs>;
         setStored(parsed);
-        setPrefs({ ...DEFAULTS, ...parsed });
+        const hour = new Date().getHours();
+        const automaticTheme: ThemeMode = hour >= 19 || hour < 6 ? "gold" : "parchment";
+        setPrefs({ ...DEFAULTS, theme: parsed.theme ?? automaticTheme, ...parsed });
+      } else {
+        const hour = new Date().getHours();
+        setPrefs((current) => ({ ...current, theme: hour >= 19 || hour < 6 ? "gold" : "parchment" }));
       }
     } catch {
       /* ignore */
@@ -88,7 +93,8 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
         setStored((s) => ({ ...s, [key]: val }));
       },
       reset: () => {
-        setPrefs(DEFAULTS);
+        const hour = new Date().getHours();
+        setPrefs({ ...DEFAULTS, theme: hour >= 19 || hour < 6 ? "gold" : "parchment" });
         setStored({});
       },
       hasStored,
