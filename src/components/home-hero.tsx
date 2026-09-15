@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,20 @@ import { usePrefs } from "@/lib/prefs";
 const HomeLibraryScene = lazy(() => import("@/components/home-library-scene"));
 
 type RenderMode = "checking" | "static" | "three";
+
+// أي فشل حقيقي أثناء إنشاء السياق أو العرض يحوّل فوراً إلى البديل المسطح.
+class SceneErrorBoundary extends Component<{ onFailure: () => void; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch() {
+    this.props.onFailure();
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
 
 function hasSuitable3DPerformance(lowData: boolean) {
   if (lowData || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
