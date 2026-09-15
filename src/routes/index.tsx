@@ -26,7 +26,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PriceTag } from "@/components/price-tag";
 import { SiteFooter } from "@/components/site-footer";
 import { useProfiles, AvatarInitial } from "@/hooks/use-profiles";
-import { HomeHero } from "@/components/home-hero";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,8 +37,6 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:title", content: "مكتبة ترشيش | مجلس المعرفة العربي" },
       { property: "og:description", content: "كتب مختارة، مجلس ثقافي، وحكيمٌ يرشدك إلى قراءتك القادمة." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -99,7 +96,24 @@ function Home() {
 
   return (
     <main>
-      <HomeHero />
+      <section className="relative isolate flex min-h-[88vh] items-center justify-center overflow-hidden">
+        <div className="rise-in mx-auto max-w-3xl px-6 text-center">
+          <p className="font-kufi text-sm tracking-[0.3em] text-gold-soft hero-text">منصة المعرفة العربية</p>
+          <h1 className="mt-6 text-5xl leading-[1.35] text-parchment hero-text sm:text-7xl">مكتبة ترشيش</h1>
+          <div className="gold-rule mx-auto mt-6 w-40" />
+          <p className="mt-6 text-lg leading-9 text-parchment/85 hero-text">
+            حيث يلتقي عبقُ المخطوط بذكاء العصر. كتبٌ منتقاة، مجلسٌ ثقافي يومي، وحكيمٌ يصحبك في اختيار قراءتك.
+          </p>
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Button asChild size="lg">
+              <Link to="/store">تصفّح المتجر</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/majlis">ادخل المجلس</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       <QuoteBar />
 
