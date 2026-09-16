@@ -17,6 +17,8 @@ export const Route = createFileRoute("/store")({
       { name: "description", content: "كتب رقمية وورقية منتقاة في التراث والأدب والفلسفة، مع معاينة فورية وشراء سريع." },
       { property: "og:title", content: "متجر الكتب | مكتبة ترشيش" },
       { property: "og:description", content: "نفائس الكتب العربية بين يديك، رقمية وورقية." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Store,
@@ -80,41 +82,42 @@ function Store() {
     const map = new Map<string, Book[]>();
     for (const b of books) {
       const cat = b.category?.trim() || "متنوعات";
-      if (!map.has(cat)) map.set(cat, []);
-      map.get(cat)!.push(b);
+      const group = map.get(cat);
+      if (group) group.push(b);
+      else map.set(cat, [b]);
     }
     return [...map.entries()];
   })();
 
-  const gridCls = "grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(165px,1fr))]";
+  const gridCls = "grid grid-cols-2 gap-3 sm:gap-5 sm:[grid-template-columns:repeat(auto-fill,minmax(165px,1fr))]";
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-14">
+    <main className="mx-auto max-w-7xl overflow-x-clip px-3 py-8 sm:px-4 sm:py-14">
       {settings?.["store_banner_url"] && (
         <img
           src={settings["store_banner_url"]}
           alt="بانر متجر مكتبة ترشيش"
-          className="mb-10 h-56 w-full rounded-2xl border border-gold/20 object-cover"
+          className="mb-7 h-36 w-full rounded-xl border border-gold/20 object-cover sm:mb-10 sm:h-56 sm:rounded-2xl"
         />
       )}
-      <header className="mb-10 text-center">
-        <h1 className="text-4xl text-gold">قسم متجر الكتب</h1>
-        <div className="gold-rule mx-auto mt-5 w-32" />
-        <p className="mt-4 text-sm text-muted-foreground">
+      <header className="mb-8 text-center sm:mb-10">
+        <h1 className="text-3xl text-gold sm:text-4xl">قسم متجر الكتب</h1>
+        <div className="gold-rule mx-auto mt-4 w-24 sm:mt-5 sm:w-32" />
+        <p className="mx-auto mt-3 max-w-xl text-xs leading-6 text-muted-foreground sm:mt-4 sm:text-sm">
           {settings?.["store_description"] || "اقتنِ نسختك الرقمية فوراً، أو اطلب النسخة الورقية إلى بابك."}
         </p>
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="ابحث بعنوان الكتاب أو المؤلف…"
-          className="mx-auto mt-6 max-w-md bg-card"
+          className="mx-auto mt-5 h-10 max-w-md bg-card text-sm sm:mt-6"
         />
       </header>
 
       {isLoading ? (
         <div className={gridCls}>
           {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="h-80 rounded-xl bg-secondary/50" />
+            <Skeleton key={i} className="h-72 rounded-lg bg-secondary/50 sm:h-80 sm:rounded-xl" />
           ))}
         </div>
       ) : live ? (
@@ -126,12 +129,14 @@ function Store() {
         </div>
       ) : (
         // بدون بحث: أقسام حسب التصنيف
-        <div className="space-y-12">
+        <div className="space-y-9 sm:space-y-12">
           {grouped.map(([cat, catBooks]) => (
             <section key={cat}>
-              <header className="mb-5 flex items-center gap-4">
-                <h2 className="shrink-0 text-2xl text-gold">{cat}</h2>
-                <div className="gold-rule flex-1" />
+              <header className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:mb-5 sm:flex sm:gap-4">
+                <div className="flex min-w-0 items-center gap-3 sm:contents">
+                  <h2 className="min-w-0 truncate text-xl text-gold sm:shrink-0 sm:text-2xl">{cat}</h2>
+                  <div className="gold-rule min-w-4 flex-1" />
+                </div>
                 <span className="shrink-0 text-xs text-muted-foreground">{catBooks.length} كتاب</span>
               </header>
               <div className={gridCls}>
@@ -149,14 +154,14 @@ function Store() {
       )}
 
       {total > PAGE_SIZE && (
-        <nav className="mt-12 flex items-center justify-center gap-4 text-sm">
-          <Button variant="outline" disabled={page === 0 || isFetching} onClick={() => setPage((p) => p - 1)}>
+        <nav className="mt-10 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 text-xs sm:mt-12 sm:flex sm:justify-center sm:gap-4 sm:text-sm">
+          <Button size="sm" variant="outline" disabled={page === 0 || isFetching} onClick={() => setPage((p) => p - 1)}>
             السابق
           </Button>
-          <span className="text-muted-foreground">
+          <span className="min-w-0 text-center text-muted-foreground">
             صفحة {page + 1} من {pages} — {total} كتاب
           </span>
-          <Button variant="outline" disabled={page + 1 >= pages || isFetching} onClick={() => setPage((p) => p + 1)}>
+          <Button size="sm" variant="outline" disabled={page + 1 >= pages || isFetching} onClick={() => setPage((p) => p + 1)}>
             التالي
           </Button>
         </nav>
