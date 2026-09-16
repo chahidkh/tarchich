@@ -73,33 +73,34 @@ export function BookCard({ book, compact = false }: { book: Book; compact?: bool
         >
           <BookCover src={book.cover_image_url} title={book.title} />
           {book.badge && (
-            <span className={cn("absolute end-3 top-3 rounded-full border border-gold/50 bg-background/80 px-3 py-1 text-[11px] text-gold", compact && "end-1.5 top-1.5 px-1.5 py-0.5 text-[8px]")}>
+            <span className={cn("absolute end-1.5 top-1.5 max-w-[calc(100%-0.75rem)] truncate rounded-full border border-gold/50 bg-background/80 px-1.5 py-0.5 text-[8px] text-gold sm:end-3 sm:top-3 sm:px-3 sm:py-1 sm:text-[11px]", compact && "sm:end-1.5 sm:top-1.5 sm:px-1.5 sm:py-0.5 sm:text-[8px]")}>
               {book.badge}
             </span>
           )}
         </button>
 
-        <div className={cn("flex flex-1 flex-col gap-1.5 p-3", compact && "gap-1 p-2")}>
-          <h3 className={cn("font-display text-base leading-snug", compact && "line-clamp-2 min-h-9 text-xs leading-[1.45]")}>{book.title}</h3>
-          <p className={cn("text-[11px] text-muted-foreground", compact && "truncate text-[9px]")}>{book.author}</p>
-          {!compact && <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">{book.description}</p>}
+        <div className={cn("flex flex-1 flex-col gap-1 p-2 sm:gap-1.5 sm:p-3", compact && "gap-1 p-2")}>
+          <h3 className={cn("line-clamp-2 min-h-9 font-display text-[13px] leading-[1.45] sm:min-h-0 sm:text-base sm:leading-snug", compact && "min-h-9 text-xs leading-[1.45] sm:min-h-9 sm:text-xs sm:leading-[1.45]")}>{book.title}</h3>
+          <p className={cn("truncate text-[10px] text-muted-foreground sm:text-[11px]", compact && "text-[9px] sm:text-[9px]")}>{book.author}</p>
+          {!compact && <p className="hidden line-clamp-2 text-xs leading-5 text-muted-foreground sm:block">{book.description}</p>}
           <div className={cn("mt-auto flex items-center justify-between pt-2", compact && "gap-1 pt-1")}>
-            <PriceTag amount={Number(book.price)} {...(compact ? { className: "text-[11px]" } : {})} />
-            <Button size="sm" onClick={addToCart} className={compact ? "size-7 p-0" : undefined} aria-label={`أضف ${book.title} إلى السلة`}>
-              {compact ? <ShoppingBag className="size-3" /> : "أضف للسلة"}
+            <PriceTag amount={Number(book.price)} className={compact ? "text-[11px]" : "text-[11px] sm:text-sm"} />
+            <Button size="sm" onClick={addToCart} className={compact ? "size-7 p-0" : "size-8 p-0 sm:h-8 sm:w-auto sm:px-3"} aria-label={`أضف ${book.title} إلى السلة`}>
+              <ShoppingBag className={compact ? "size-3" : "size-3.5 sm:hidden"} />
+              {!compact && <span className="hidden sm:inline">أضف للسلة</span>}
             </Button>
           </div>
         </div>
       </article>
 
       <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent className="glass max-h-[90vh] overflow-y-auto border-gold/20">
+        <DialogContent className="glass max-h-[calc(100dvh-5.5rem)] w-[calc(100%-1.5rem)] overflow-y-auto border-gold/20 p-4 sm:max-h-[90vh] sm:w-full sm:p-6">
           <DialogHeader className="text-right">
-            <DialogTitle className="font-display text-2xl text-gold">{book.title}</DialogTitle>
+            <DialogTitle className="font-display text-xl leading-relaxed text-gold sm:text-2xl">{book.title}</DialogTitle>
             <DialogDescription>{book.author}</DialogDescription>
           </DialogHeader>
           <p className="text-sm leading-8 text-muted-foreground">{book.description}</p>
-          <div className="flex items-center justify-between text-sm">
+          <div className="grid grid-cols-2 gap-2 text-xs sm:flex sm:items-center sm:justify-between sm:text-sm">
             <span className="text-muted-foreground">{book.category}</span>
             <span className="text-muted-foreground">المتوفر: {book.stock} نسخة</span>
           </div>
