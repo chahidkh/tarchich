@@ -1,7 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Library, Newspaper, MessagesSquare, ShoppingBag } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/lib/cart";
+import { Home, Library, Newspaper, MessagesSquare, ScrollText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -9,11 +7,11 @@ const ITEMS = [
   { to: "/store" as const, label: "المتجر", icon: Library },
   { to: "/gazette" as const, label: "الجريدة", icon: Newspaper },
   { to: "/majlis" as const, label: "المجلس", icon: MessagesSquare },
+  { to: "/diwan" as const, label: "الديوان", icon: ScrollText },
 ];
 
 export function MobileBottomNav() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const { count, setOpen } = useCart();
 
   return (
     <nav
@@ -38,23 +36,6 @@ export function MobileBottomNav() {
             </Link>
           );
         })}
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => setOpen(true)}
-          aria-label={`السلة، ${count} عناصر`}
-          className="relative h-auto min-w-0 flex-col gap-1 rounded-none px-1 text-[10px] font-normal text-muted-foreground hover:text-gold"
-        >
-          <span className="relative">
-            <ShoppingBag className="size-4" />
-            {count > 0 && (
-              <span className="absolute -end-2.5 -top-2 grid size-4 place-items-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-                {count > 99 ? "99+" : count}
-              </span>
-            )}
-          </span>
-          <span>السلة</span>
-        </Button>
       </div>
     </nav>
   );
