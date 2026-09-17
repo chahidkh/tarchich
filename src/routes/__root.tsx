@@ -139,7 +139,7 @@ function RootComponent() {
       <PrefsProvider>
       <CartProvider>
         <SiteThemeOverrides />
-        <div aria-hidden className={`app-bg pointer-events-none fixed inset-0 z-0 ${isHome ? "home-bg" : ""}`}>
+        <div aria-hidden className={`app-bg pointer-events-none fixed inset-x-0 top-0 z-0 h-[100dvh] min-h-[100dvh] ${isHome ? "home-bg" : ""}`}>
           <LibraryBackdrop
             className={
               isHome

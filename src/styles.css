@@ -225,8 +225,8 @@ html.zen .site-header {
 }
 
 /* توفير البيانات — drop heavy decorative imagery */
-html[data-lowdata="true"] .app-bg img {
-  display: none;
+html[data-lowdata="true"] .library-backdrop-layer {
+  background-image: none;
 }
 
 html[data-lowdata="true"] img {
@@ -237,6 +237,14 @@ html[data-lowdata="true"] img {
 /* تبديل خلفية المكتبة حسب نمط القراءة */
 .theme-bg-parchment {
   display: none;
+}
+
+.library-backdrop-layer {
+  min-height: 100dvh;
+  background-image: var(--backdrop-image);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 html[data-theme="parchment"] .theme-bg-gold {
@@ -274,8 +282,11 @@ html[data-theme="parchment"] .hero-text {
     display: none;
   }
 
-  .home-bg img {
-    transform: scale(1.035);
+  .library-backdrop-layer {
+    background-image: var(--backdrop-mobile-image);
+  }
+
+  .home-bg .library-backdrop-layer {
     animation: home-parallax linear both;
     animation-timeline: scroll(root block);
     animation-range: 0 42rem;
@@ -321,8 +332,8 @@ html[data-theme="parchment"] .hero-text {
 }
 
 @keyframes home-parallax {
-  from { transform: scale(1.035) translateY(0); }
-  to { transform: scale(1.075) translateY(-1.25rem); }
+  from { background-position: center 50%; }
+  to { background-position: center 44%; }
 }
 
 @keyframes ink-reveal {
@@ -339,9 +350,8 @@ html[data-theme="parchment"] .hero-text {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-bg img,
+  .home-bg .library-backdrop-layer,
   .ink-reveal {
     animation: none;
-    transform: none;
   }
 }
