@@ -51,17 +51,9 @@ export function SiteHeader() {
         <div className="ms-auto flex shrink-0 items-center gap-2">
           <SettingsMenu />
           <button
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={t("settings.title")}
-            aria-expanded={menuOpen}
-            className="rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold md:hidden"
-          >
-            {menuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
-          </button>
-          <button
             onClick={() => setOpen(true)}
             aria-label={t("cart.title")}
-            className="relative hidden rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold md:inline-flex"
+            className="relative inline-flex rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold"
           >
             <ShoppingBag className="size-4" />
             {count > 0 && (
@@ -69,6 +61,14 @@ export function SiteHeader() {
                 {count}
               </span>
             )}
+          </button>
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={t("settings.title")}
+            aria-expanded={menuOpen}
+            className="rounded-md border border-border p-2 text-foreground transition hover:border-gold/60 hover:text-gold md:hidden"
+          >
+            {menuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
 
           {user ? (
