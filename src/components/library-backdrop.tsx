@@ -1,4 +1,5 @@
 import { useSiteSettings } from "@/lib/site-settings";
+import type { CSSProperties } from "react";
 import {
   DEFAULT_GOLD_BG,
   DEFAULT_PARCHMENT_BG,
@@ -20,7 +21,16 @@ type Props = {
  * gold => الصورة الداكنة، parchment => الصورة الفاتحة.
  * يمكن لصاحب الموقع تغيير الصورتين من لوحة التصميم (site_settings).
  */
-export function LibraryBackdrop({ className = "", alt = "", eager = false }: Props) {
+type BackdropStyle = CSSProperties & {
+  "--backdrop-image": string;
+  "--backdrop-mobile-image": string;
+};
+
+function backgroundUrl(value: string) {
+  return `url(${JSON.stringify(value)})`;
+}
+
+export function LibraryBackdrop({ className = "" }: Props) {
   const { data } = useSiteSettings();
   const goldImage = resolveBackground(data?.[DESIGN_KEYS.bgGold], DEFAULT_GOLD_BG);
   const parchmentImage = resolveBackground(data?.[DESIGN_KEYS.bgParchment], DEFAULT_PARCHMENT_BG);
@@ -29,14 +39,20 @@ export function LibraryBackdrop({ className = "", alt = "", eager = false }: Pro
 
   return (
     <>
-      <picture className="theme-bg-gold contents">
-        <source media="(max-width: 767px)" srcSet={goldMobileImage} type="image/webp" />
-        <img src={goldImage} alt={alt} width={1920} height={1088} loading={eager ? "eager" : "lazy"} className={className} />
-      </picture>
-      <picture className="theme-bg-parchment contents">
-        <source media="(max-width: 767px)" srcSet={parchmentMobileImage} type="image/webp" />
-        <img src={parchmentImage} alt="" aria-hidden width={1920} height={1088} loading="lazy" className={className} />
-      </picture>
+      <div
+        className={`library-backdrop-layer theme-bg-gold ${className}`}
+        style={{
+          "--backdrop-image": backgroundUrl(goldImage),
+          "--backdrop-mobile-image": backgroundUrl(goldMobileImage),
+        } as BackdropStyle}
+      />
+      <div
+        className={`library-backdrop-layer theme-bg-parchment ${className}`}
+        style={{
+          "--backdrop-image": backgroundUrl(parchmentImage),
+          "--backdrop-mobile-image": backgroundUrl(parchmentMobileImage),
+        } as BackdropStyle}
+      />
     </>
   );
 }
