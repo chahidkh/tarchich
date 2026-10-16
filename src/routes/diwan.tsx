@@ -123,7 +123,7 @@ function DiwanPage() {
             </div>
             <figcaption className="mt-4 flex items-center justify-center gap-3">
               <span className="gold-rule w-8 shrink-0" aria-hidden="true" />
-              <span className="font-body text-base text-foreground">فريد خدومة</span>
+              <span className="font-body text-base text-gold">فريد خدومة</span>
               <span className="gold-rule w-8 shrink-0" aria-hidden="true" />
             </figcaption>
           </figure>
