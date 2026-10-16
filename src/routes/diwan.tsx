@@ -9,7 +9,7 @@ import { BookCover } from "@/components/book-cover";
 import { SiteFooter, SUPPORT_EMAIL } from "@/components/site-footer";
 import { useCart } from "@/lib/cart";
 import { useSiteSettings } from "@/lib/site-settings";
-import faridKhadoumaPhoto from "@/assets/farid-khadouma.jpg.asset.json";
+import faridKhadoumaPhoto from "@/assets/farid-khadouma-2026.jpg.asset.json";
 
 export const Route = createFileRoute("/diwan")({
   head: () => ({
@@ -109,16 +109,23 @@ function DiwanPage() {
     <main>
       <div className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
       <section className="glass overflow-hidden rounded-xl p-5 sm:p-8 lg:p-10">
-        <div className="grid items-center gap-7 md:grid-cols-[240px_1fr] lg:gap-12">
-          <figure className="mx-auto w-full max-w-[240px]">
-            <div className="aspect-[3/4] overflow-hidden rounded-lg border border-gold/60">
-              <img
-                src={settings?.["author_photo_url"] || faridKhadoumaPhoto.url}
-                alt="الكاتب فريد خدومة"
-                className="size-full object-cover"
-              />
+        <div className="grid items-center gap-7 md:grid-cols-[260px_1fr] lg:grid-cols-[280px_1fr] lg:gap-12">
+          <figure className="group mx-auto w-full max-w-[260px] lg:max-w-[280px]">
+            <div className="relative rounded-xl border border-gold/50 bg-card/50 p-2 shadow-[var(--shadow-deep)] backdrop-blur-sm transition duration-500 ease-out group-hover:-translate-y-0.5 group-hover:border-gold/70">
+              <span className="pointer-events-none absolute inset-[6px] rounded-lg border border-gold/25" aria-hidden="true" />
+              <div className="aspect-[3/4] overflow-hidden rounded-md border border-gold/40">
+                <img
+                  src={settings?.["author_photo_url"] || faridKhadoumaPhoto.url}
+                  alt="الكاتب فريد خدومة"
+                  className="size-full object-cover object-top"
+                />
+              </div>
             </div>
-            <figcaption className="mt-3 text-center font-body text-base text-foreground">فريد خدومة</figcaption>
+            <figcaption className="mt-4 flex items-center justify-center gap-3">
+              <span className="gold-rule w-8 shrink-0" aria-hidden="true" />
+              <span className="font-body text-base text-foreground">فريد خدومة</span>
+              <span className="gold-rule w-8 shrink-0" aria-hidden="true" />
+            </figcaption>
           </figure>
           <div className="text-center md:text-right">
             <p className="font-kufi text-xs text-gold-soft">الديوان</p>
