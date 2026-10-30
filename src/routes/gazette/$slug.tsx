@@ -4,22 +4,45 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Clock } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { bumpGazetteViews } from "@/lib/gazette.functions";
+import { bumpGazetteViews, getGazetteMeta } from "@/lib/gazette.functions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GAZETTE_FIELDS, PUBLISHER, normalizeCategory, readingMinutes, type GazettePost } from "@/lib/gazette";
 import { GazetteShare, SourceBadge } from "@/components/gazette-share";
-import { GazetteCover } from "@/components/gazette-cover";
+import { CategoryBadge, SourceImage, SourceLine } from "@/components/gazette-ui";
 import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
 export const Route = createFileRoute("/gazette/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `مقال الجريدة | مكتبة ترشيش` },
-      { name: "description", content: `اقرأ مقال ${params.slug} في جريدة مكتبة ترشيش الثقافية والتاريخية.` },
-      { property: "og:title", content: "مقال الجريدة | مكتبة ترشيش" },
-      { property: "og:description", content: "مقال ثقافي وتاريخي من جريدة مكتبة ترشيش." },
-    ],
-  }),
+  loader: ({ params }) => getGazetteMeta({ data: { slug: params.slug } }),
+  head: ({ params, loaderData }) => {
+    const title = loaderData?.title ? `${loaderData.title} | جريدة مكتبة ترشيش` : "مقال الجريدة | مكتبة ترشيش";
+    const description = (loaderData?.excerpt ?? "خبر ومقال من جريدة مكتبة ترشيش.").slice(0, 160);
+    const image = loaderData?.media_url && /^https:\/\//.test(loaderData.media_url) ? loaderData.media_url : null;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: `/gazette/${params.slug}` },
+        ...(loaderData?.created_at ? [{ property: "article:published_time", content: loaderData.created_at }] : []),
+        { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
+        ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
+      ],
+      links: [{ rel: "canonical", href: `/gazette/${params.slug}` }],
+    };
+  },
+  errorComponent: () => (
+    <main className="mx-auto max-w-2xl px-4 py-24 text-center" role="alert">
+      <h1 className="text-2xl text-gold">تعذّر تحميل المقال</h1>
+      <p className="mt-3 text-sm text-muted-foreground">حدث خطأ أثناء التحميل، أعد المحاولة بعد قليل.</p>
+    </main>
+  ),
+  notFoundComponent: () => (
+    <main className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <h1 className="text-2xl text-gold">لم نعثر على هذا المقال</h1>
+    </main>
+  ),
   component: Article,
 });
 
@@ -47,7 +70,7 @@ function Article() {
   const sponsored = (ads ?? []).find((a) => a.type === "sponsored_article");
   const sticky = (ads ?? []).find((a) => a.type === "sticky_bottom");
 
-  const { data: post, isLoading } = useQuery({
+  const { data: post, isLoading, isError, refetch } = useQuery({
     queryKey: ["gazette-post", slug],
     queryFn: async () => {
       const isUuid = /^[0-9a-f-]{36}$/i.test(slug);
@@ -66,6 +89,7 @@ function Article() {
     if (post?.id) void bumpViews({ data: { id: post.id } }).catch(() => {});
   }, [post?.id, bumpViews]);
 
+  const [imgFailed, setImgFailed] = useState(false);
   const category = post ? normalizeCategory(post.category) : null;
   const { data: related } = useQuery({
     enabled: Boolean(post?.id && category),
@@ -76,11 +100,12 @@ function Article() {
         .select(GAZETTE_FIELDS)
         .eq("section", "gazette")
         .eq("is_published", true)
+        .eq("category", category!)
         .neq("id", post!.id)
         .order("created_at", { ascending: false })
-        .limit(30);
+        .limit(3);
       if (error) throw error;
-      return (data as GazettePost[]).filter((p) => normalizeCategory(p.category) === category).slice(0, 3);
+      return data as GazettePost[];
     },
   });
 
@@ -89,6 +114,17 @@ function Article() {
     return (
       <main className="mx-auto max-w-3xl px-4 py-14">
         <Skeleton className="h-96 rounded-xl bg-secondary/50" />
+      </main>
+    );
+  }
+
+  if (isError) {
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-24 text-center" role="alert">
+        <h1 className="text-2xl text-gold">تعذّر تحميل المقال</h1>
+        <button onClick={() => void refetch()} className="mt-6 rounded-full border border-gold/40 px-5 py-1.5 text-sm text-gold">
+          إعادة المحاولة
+        </button>
       </main>
     );
   }
@@ -118,17 +154,13 @@ function Article() {
         </Link>
 
         <article className="glass rounded-2xl border-gold/30 p-6 sm:p-10">
-          <span
-            className={`text-[11px] tracking-widest ${
-              normalizeCategory(post.category) === "عاجل" ? "font-bold text-red-400" : "text-gold-soft"
-            }`}
-          >
-            {normalizeCategory(post.category)}
-          </span>
-          <h1 className="mt-3 text-4xl leading-[1.5] text-gold">{post.title}</h1>
+          <Link to="/gazette" search={{ section: normalizeCategory(post.category) }}>
+            <CategoryBadge category={post.category} />
+          </Link>
+          <h1 className="mt-3 text-2xl leading-[1.5] text-gold sm:text-4xl">{post.title}</h1>
           <div className="gold-rule mt-5 w-32" />
           <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            <time>{new Date(post.created_at).toLocaleDateString("ar")}</time>
+            <time dateTime={post.created_at}>{new Date(post.created_at).toLocaleDateString("ar")}</time>
             <span className="inline-flex items-center gap-1 text-gold-soft">
               <Clock className="size-3.5" /> {readingMinutes(post.content)} دقيقة قراءة
             </span>
@@ -141,9 +173,21 @@ function Article() {
           </div>
 
 
-          {post.media_url && (
-            <img src={post.media_url} alt={post.title} className="mt-6 w-full rounded-xl object-cover" />
+          {post.media_url && !imgFailed && (
+            <figure className="mt-6">
+              <SourceImage
+                src={post.media_url}
+                alt={post.title}
+                eager
+                className="rounded-xl"
+                onFail={() => setImgFailed(true)}
+              />
+              <figcaption>
+                <SourceLine post={post} className="mt-2" />
+              </figcaption>
+            </figure>
           )}
+          {(!post.media_url || imgFailed) && post.source_url && <SourceLine post={post} className="mt-4" />}
 
           <div className="mt-6 space-y-5">
             {paragraphs.map((para, i) => (
@@ -171,11 +215,6 @@ function Article() {
                   params={{ slug: r.slug ?? r.id }}
                   className="glass group flex flex-col overflow-hidden rounded-xl border-gold/25 transition hover:border-gold/60"
                 >
-                  {r.media_url ? (
-                    <img src={r.media_url} alt={r.title} loading="lazy" className="h-28 w-full object-cover" />
-                  ) : (
-                    <GazetteCover title={r.title} className="h-28 w-full" />
-                  )}
                   <div className="p-4">
                     <h3 className="line-clamp-2 text-sm leading-relaxed transition group-hover:text-gold">
                       {r.title}

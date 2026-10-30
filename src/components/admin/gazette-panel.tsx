@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function GazettePanel() {
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<GazetteCategory>("الثقافة");
+  const [category, setCategory] = useState<GazetteCategory>("ثقافة وكتب");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [media, setMedia] = useState("");
@@ -50,9 +50,8 @@ export function GazettePanel() {
       setCategory(a.category);
       setExcerpt(a.excerpt);
       setContent(a.content);
-      if (a.coverUrl) setMedia(a.coverUrl);
       toast.success(
-        `صيغ المقال وصُنّف في «${a.category}»${a.coverUrl ? " مع غلاف مولّد" : ""}`,
+        `صيغ المقال وصُنّف في «${a.category}» — الصورة اختيارية`,
       );
     },
     onError: (e: Error) => toast.error(e.message),
@@ -163,7 +162,7 @@ export function GazettePanel() {
         <Textarea value={excerpt} maxLength={300} onChange={(e) => setExcerpt(e.target.value)} placeholder="مقتطف قصير" className="bg-background" />
         <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="نص المقال…" className="min-h-40 bg-background" />
         <div className="flex flex-wrap items-center gap-2">
-          <Input value={media} onChange={(e) => setMedia(e.target.value)} placeholder="رابط صورة المقال" className="bg-background" />
+          <Input value={media} onChange={(e) => setMedia(e.target.value)} placeholder="رابط صورة المقال (اختياري)" className="bg-background" />
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-border px-3 py-2 text-sm hover:border-gold/60">
             <Upload className="size-4" /> {uploading ? "جارٍ الرفع…" : "رفع صورة"}
             <input
