@@ -379,6 +379,7 @@ export type Database = {
           section: string
           slug: string | null
           source_name: string | null
+          source_url: string | null
           title: string
           views: number
         }
@@ -399,6 +400,7 @@ export type Database = {
           section?: string
           slug?: string | null
           source_name?: string | null
+          source_url?: string | null
           title: string
           views?: number
         }
@@ -419,6 +421,7 @@ export type Database = {
           section?: string
           slug?: string | null
           source_name?: string | null
+          source_url?: string | null
           title?: string
           views?: number
         }
