@@ -119,7 +119,7 @@ export function NewsCard({ post, size = "sm" }: { post: GazettePost; size?: "lg"
         <SourceImage
           src={post.media_url!}
           alt={post.title}
-          ratio={lg ? "aspect-[16/9]" : "aspect-[16/10]"}
+          ratio={lg ? "aspect-[16/9] lg:aspect-[21/9]" : "aspect-[16/10]"}
           onFail={() => setFailed(true)}
         />
       )}
