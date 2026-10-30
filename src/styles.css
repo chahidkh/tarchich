@@ -355,3 +355,22 @@ html[data-theme="parchment"] .hero-text {
     animation: none;
   }
 }
+
+/* شريط «عاجل» في الجريدة — RTL، يتوقف عند المرور ويحترم تقليل الحركة */
+.gazette-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: gazette-ticker 45s linear infinite;
+}
+.gazette-ticker:hover .gazette-ticker-track,
+.gazette-ticker:focus-within .gazette-ticker-track {
+  animation-play-state: paused;
+}
+@keyframes gazette-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gazette-ticker { overflow-x: auto; }
+  .gazette-ticker-track { animation: none; }
+}
