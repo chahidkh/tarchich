@@ -1,317 +1,309 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { Clock, Flame, Newspaper, Search } from "lucide-react";
+import { Fragment, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { AlertTriangle, Flame, Newspaper, Search, Zap } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import {
   GAZETTE_CATEGORIES,
+  GAZETTE_PAGE_SIZE,
   PUBLISHER,
-  archiveKey,
   archiveLabel,
-  fetchGazettePosts,
-  normalizeCategory,
-  readingMinutes,
+  fetchGazetteBreaking,
+  fetchGazetteLead,
+  fetchGazetteMonths,
+  fetchGazetteMostRead,
+  fetchGazettePage,
+  isGazetteCategory,
   type GazettePost,
 } from "@/lib/gazette";
-import { GazetteCover } from "@/components/gazette-cover";
-import { SourceBadge } from "@/components/gazette-share";
+import { CategoryBadge, MetaRow, NewsCard, SourceImage, SourceLine } from "@/components/gazette-ui";
 import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
-const PAGE_SIZE = 9;
+type GazetteSearch = { section?: string; month?: string; q?: string };
 
 export const Route = createFileRoute("/gazette/")({
+  validateSearch: (s: Record<string, unknown>): GazetteSearch => ({
+    ...(isGazetteCategory(s["section"]) ? { section: s["section"] } : {}),
+    ...(typeof s["month"] === "string" && /^\d{4}-\d{2}$/.test(s["month"]) ? { month: s["month"] } : {}),
+    ...(typeof s["q"] === "string" && s["q"].trim() ? { q: s["q"].slice(0, 80) } : {}),
+  }),
   head: () => ({
     meta: [
-      { title: "الجريدة | مكتبة ترشيش" },
+      { title: "الجريدة — أخبار سياسة واقتصاد ورياضة وثقافة | مكتبة ترشيش" },
       {
         name: "description",
-        content: "جريدة ترشيش: أخبار ومقالات تاريخية وثقافية مختارة، بقراءة أنيقة ومهلة قراءة مقدّرة.",
+        content: "جريدة ترشيش: آخر الأخبار في السياسة والاقتصاد والرياضة والتقنية والعلوم والثقافة والتاريخ، مع إسناد واضح لكل مصدر.",
       },
       { property: "og:title", content: "الجريدة | مكتبة ترشيش" },
-      { property: "og:description", content: "أخبار ومقالات تاريخية وثقافية في جريدة مكتبة ترشيش." },
+      { property: "og:description", content: "أخبار ومقالات مصنّفة في أقسام جريدة مكتبة ترشيش." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "/gazette" }],
   }),
   component: Gazette,
 });
 
-/**
- * تدرّجات من عائلة الذهب نفسها لتمييز التصنيفات، مشتقّة من متغيّر --gold
- * بإزاحة طفيفة في الدرجة اللونية، فتبقى داخل هوية الموقع في الوضعين.
- * "عاجل" وحده يحتفظ بلونه الأحمر المميّز.
- */
-const CATEGORY_HUE: Record<string, number> = {
-  سياسة: -14,
-  التاريخ: 16,
-  الثقافة: 30,
-};
-
-function categoryStyle(category: string): React.CSSProperties {
-  const shift = CATEGORY_HUE[category] ?? 0;
-  const base = `oklch(from var(--gold) l c calc(h + ${shift}))`;
-  return { color: base, backgroundColor: `color-mix(in oklab, ${base} 14%, transparent)` };
-}
-
-function CategoryBadge({ category, plain = false }: { category: string | null; plain?: boolean }) {
-  const c = normalizeCategory(category);
-  if (c === "عاجل") {
-    return (
-      <span className="rounded-full bg-red-500/15 px-3 py-1 text-[11px] font-bold tracking-wider text-red-400">
-        {c}
-      </span>
-    );
-  }
+function ErrorBox({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <span
-      className={`rounded-full px-3 py-1 text-[11px] tracking-wider ${plain ? "" : ""}`}
-      style={categoryStyle(c)}
-    >
-      {c}
-    </span>
+    <div role="alert" className="glass flex flex-col items-center gap-3 rounded-xl border border-destructive/40 p-8 text-center">
+      <AlertTriangle className="size-6 text-destructive" />
+      <p className="text-sm text-muted-foreground">{message}</p>
+      <button onClick={onRetry} className="rounded-full border border-gold/40 px-5 py-1.5 text-sm text-gold hover:bg-gold/10">
+        إعادة المحاولة
+      </button>
+    </div>
   );
 }
 
-function Card({ post, large = false }: { post: GazettePost; large?: boolean }) {
+function BreakingTicker() {
+  const { data } = useQuery({ queryKey: ["gazette", "breaking"], queryFn: fetchGazetteBreaking });
+  if (!data || data.length === 0) return null;
+  const items = [...data, ...data];
   return (
-    <Link
-      to="/gazette/$slug"
-      params={{ slug: post.slug ?? post.id }}
-      className={`glass group flex flex-col overflow-hidden rounded-2xl border border-gold/15 transition hover:border-gold/45 ${
-        large ? "sm:col-span-2 sm:flex-row" : ""
-      }`}
-    >
-      <div className={large ? "sm:w-1/2" : ""}>
-        {post.media_url ? (
-          <img
-            src={post.media_url}
-            alt={post.title}
-            loading="lazy"
-            className={`w-full object-cover ${large ? "h-52 sm:h-full" : "h-28"}`}
-          />
-        ) : (
-          <GazetteCover title={post.title} className={large ? "h-52 w-full sm:h-full" : "h-28 w-full"} />
+    <div className="mb-6 flex items-stretch overflow-hidden rounded-lg border border-red-500/30 bg-card/70" aria-label="شريط الأخبار العاجلة">
+      <span className="z-10 inline-flex shrink-0 items-center gap-1 bg-red-500/15 px-3 text-xs font-bold text-red-400">
+        <Zap className="size-3.5" /> عاجل
+      </span>
+      <div className="gazette-ticker min-w-0 flex-1 overflow-hidden py-2" role="marquee">
+        <ul className="gazette-ticker-track">
+          {items.map((p, i) => (
+            <li key={`${p.id}-${i}`} className="shrink-0 px-5 text-sm" aria-hidden={i >= data.length || undefined}>
+              <Link
+                to="/gazette/$slug"
+                params={{ slug: p.slug ?? p.id }}
+                tabIndex={i >= data.length ? -1 : undefined}
+                className="whitespace-nowrap text-foreground/90 hover:text-gold"
+              >
+                <span className="me-2 text-red-400">●</span>
+                {p.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function LeadStory({ post }: { post: GazettePost }) {
+  const [failed, setFailed] = useState(false);
+  const hasImage = Boolean(post.media_url) && !failed;
+  return (
+    <article className="glass group relative mb-8 overflow-hidden rounded-2xl border-2 border-gold/35 transition hover:border-gold/70">
+      <div className={hasImage ? "grid lg:grid-cols-[1.35fr_1fr]" : ""}>
+        {hasImage && (
+          <SourceImage src={post.media_url!} alt={post.title} eager ratio="aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[380px]" onFail={() => setFailed(true)} />
         )}
-      </div>
-      <div className={`flex flex-1 flex-col ${large ? "p-7" : "p-6"}`}>
-        <div className="flex flex-wrap items-center gap-2">
-          <CategoryBadge category={post.category} />
-          <SourceBadge source={post.source_name} />
+        <div className={`flex flex-col justify-center gap-3 p-5 sm:p-8 ${hasImage ? "" : "mx-auto max-w-3xl py-10 text-center"}`}>
+          <div className={hasImage ? "" : "flex justify-center"}>
+            <CategoryBadge category={post.category} />
+          </div>
+          <h2 className="font-display text-2xl leading-[1.45] text-gold sm:text-4xl">
+            <Link to="/gazette/$slug" params={{ slug: post.slug ?? post.id }} className="after:absolute after:inset-0">
+              {post.title}
+            </Link>
+          </h2>
+          <p className="line-clamp-4 text-sm leading-8 text-muted-foreground sm:text-base">{post.excerpt ?? post.content}</p>
+          <div className={hasImage ? "" : "flex justify-center"}>
+            <MetaRow post={post} />
+          </div>
+          {hasImage && <SourceLine post={post} className="relative z-10" />}
         </div>
-        <h3
-          className={`mt-3 leading-relaxed transition group-hover:text-gold ${
-            large ? "text-2xl text-gold" : "text-lg"
-          }`}
-        >
-          {post.title}
-        </h3>
-        <p
-          className={`mt-3 flex-1 text-sm leading-7 text-muted-foreground ${
-            large ? "line-clamp-4" : "line-clamp-3"
-          }`}
-        >
-          {post.excerpt ?? post.content}
-        </p>
-        <span className="mt-5 inline-flex items-center gap-1 text-[11px] text-gold-soft">
-          <Clock className="size-3" /> {readingMinutes(post.content)} دقيقة قراءة
-        </span>
       </div>
-    </Link>
+    </article>
   );
 }
 
 function Gazette() {
-  const [cat, setCat] = useState("الكل");
-  const [term, setTerm] = useState("");
-  const [month, setMonth] = useState("الكل");
-  const [limit, setLimit] = useState(PAGE_SIZE);
-  const { data: posts, isLoading } = useQuery({ queryKey: ["gazette"], queryFn: () => fetchGazettePosts() });
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/gazette/" });
+  const [term, setTerm] = useState(search.q ?? "");
   const { data: ads } = useAds();
   const sponsored = (ads ?? []).filter((a) => a.type === "sponsored_article");
   const inFeed = (ads ?? []).filter((a) => a.type === "in_feed");
   const sticky = (ads ?? []).find((a) => a.type === "sticky_bottom");
 
-  const categories = useMemo(() => ["الكل", ...GAZETTE_CATEGORIES], []);
+  const filtered = Boolean(search.month || search.q);
 
-  const all = posts ?? [];
-
-  const months = useMemo(() => {
-    const keys = Array.from(new Set(all.map((p) => archiveKey(p.created_at))));
-    return keys.sort().reverse();
-  }, [all]);
-
-  // الأكثر قراءة هذا الأسبوع — من بيانات المشاهدات الحقيقية فقط.
-  const weekly = useMemo(() => {
-    const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    return all
-      .filter((p) => new Date(p.created_at).getTime() >= since && p.views > 0)
-      .sort((a, b) => b.views - a.views)
-      .slice(0, 5);
-  }, [all]);
-
-  const q = term.trim().toLowerCase();
-  const list = all.filter((p) => {
-    if (cat !== "الكل" && normalizeCategory(p.category) !== cat) return false;
-    if (month !== "الكل" && archiveKey(p.created_at) !== month) return false;
-    if (q && !(`${p.title} ${p.excerpt ?? ""} ${p.content}`.toLowerCase().includes(q))) return false;
-    return true;
+  const lead = useQuery({
+    queryKey: ["gazette", "lead", search.section ?? ""],
+    queryFn: () => fetchGazetteLead(search.section),
+    enabled: !filtered,
   });
+  const leadId = filtered ? undefined : lead.data?.id;
 
-  useEffect(() => {
-    setLimit(PAGE_SIZE);
-  }, [cat, term, month]);
+  const feed = useInfiniteQuery({
+    queryKey: ["gazette", "feed", search.section ?? "", search.month ?? "", search.q ?? "", leadId ?? ""],
+    enabled: filtered || !lead.isLoading,
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) =>
+      fetchGazettePage({ category: search.section, month: search.month, term: search.q, offset: pageParam, excludeId: leadId }),
+    getNextPageParam: (last, pages) => {
+      const loaded = pages.length * GAZETTE_PAGE_SIZE;
+      return loaded < last.count ? loaded : undefined;
+    },
+  });
+  const mostRead = useQuery({ queryKey: ["gazette", "most-read"], queryFn: fetchGazetteMostRead });
+  const months = useQuery({ queryKey: ["gazette", "months"], queryFn: fetchGazetteMonths });
 
-  const hero = list.find((p) => p.is_featured) ?? list[0];
-  const rest = list.filter((p) => p.id !== hero?.id);
-  const visible = rest.slice(0, limit);
+  const rows = feed.data?.pages.flatMap((p) => p.rows) ?? [];
+  const total = feed.data?.pages[0]?.count ?? 0;
+  const loading = (!filtered && lead.isLoading) || feed.isLoading;
+
+  const setSection = (section?: string) =>
+    void navigate({ search: (prev) => ({ ...prev, section, month: undefined }) });
+
+  const today = new Date().toLocaleDateString("ar", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-14">
-      <header className="mb-10 text-center">
-        <h1 className="flex items-center justify-center gap-3 text-4xl text-gold">
-          <Newspaper className="size-7" /> الجريدة
+    <main className="mx-auto max-w-7xl px-3 py-8 sm:px-4 sm:py-12">
+      <header className="mb-6 border-b-2 border-gold/40 pb-4 text-center">
+        <p className="text-[11px] text-muted-foreground">{today}</p>
+        <h1 className="mt-1 flex items-center justify-center gap-3 font-display text-4xl text-gold sm:text-6xl">
+          <Newspaper className="size-7 sm:size-9" /> الجريدة
         </h1>
-        <div className="gold-rule mx-auto mt-5 w-32" />
-        <p className="mt-4 text-sm text-muted-foreground">أخبارٌ ومقالاتٌ من ذاكرة التاريخ وحاضر الثقافة.</p>
         <p className="mt-1 text-xs text-gold-soft">تصدر عن {PUBLISHER}</p>
       </header>
 
-      <div className="mx-auto mb-10 flex max-w-xl items-center gap-2 rounded-full border border-gold/30 bg-card/60 px-4 py-1.5">
-        <Search className="size-4 shrink-0 text-gold-soft" />
+      <BreakingTicker />
+
+      <nav aria-label="أقسام الجريدة" className="sticky top-14 z-30 -mx-3 mb-6 border-y border-gold/20 bg-background/85 px-3 backdrop-blur-md sm:top-16 sm:mx-0 sm:rounded-lg sm:border">
+        <ul className="flex gap-1 overflow-x-auto py-2 [scrollbar-width:none]">
+          {[undefined, ...GAZETTE_CATEGORIES].map((c) => {
+            const active = (search.section ?? undefined) === c;
+            return (
+              <li key={c ?? "all"} className="shrink-0">
+                <button
+                  onClick={() => setSection(c)}
+                  aria-current={active ? "page" : undefined}
+                  className={`rounded-full px-3.5 py-1.5 text-sm transition ${
+                    active ? "bg-gold/15 font-bold text-gold" : "text-muted-foreground hover:text-gold"
+                  } ${c === "عاجل" && !active ? "text-red-400" : ""}`}
+                >
+                  {c ?? "الرئيسية"}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <form
+        role="search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void navigate({ search: (prev) => ({ ...prev, q: term.trim() || undefined }) });
+        }}
+        className="mx-auto mb-8 flex max-w-xl items-center gap-2 rounded-full border border-gold/30 bg-card/60 px-4 py-1"
+      >
+        <Search className="size-4 shrink-0 text-gold-soft" aria-hidden />
         <Input
           value={term}
           onChange={(e) => setTerm(e.target.value)}
-          placeholder="ابحث في عناوين المقالات ونصوصها…"
+          placeholder="ابحث في عناوين الأخبار…"
+          aria-label="البحث في الجريدة"
           className="border-0 bg-transparent shadow-none focus-visible:ring-0"
         />
-      </div>
+      </form>
 
-      {isLoading ? (
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-72 rounded-2xl bg-secondary/50" />
-          ))}
+      {(search.section || filtered) && (
+        <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">
+          <h2 className="font-display text-2xl text-gold">{search.section ?? "نتائج"}</h2>
+          {search.month && <span className="text-muted-foreground">· {archiveLabel(search.month)}</span>}
+          {search.q && <span className="text-muted-foreground">· «{search.q}»</span>}
+          {!loading && <span className="text-xs text-muted-foreground">({total + (leadId ? 1 : 0)} خبر)</span>}
+          {filtered && (
+            <button
+              onClick={() => {
+                setTerm("");
+                void navigate({ search: (prev) => ({ section: prev.section }) });
+              }}
+              className="ms-auto text-xs text-gold-soft underline"
+            >
+              إلغاء الترشيح
+            </button>
+          )}
+        </div>
+      )}
+
+      {lead.isError || feed.isError ? (
+        <ErrorBox
+          message="تعذّر تحميل أخبار الجريدة. تحقّق من اتصالك ثم أعد المحاولة."
+          onRetry={() => {
+            void lead.refetch();
+            void feed.refetch();
+          }}
+        />
+      ) : loading ? (
+        <div aria-busy="true" aria-label="جارٍ تحميل الأخبار">
+          <Skeleton className="mb-8 h-[320px] rounded-2xl bg-secondary/50 sm:h-[400px]" />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-60 rounded-xl bg-secondary/50" />
+            ))}
+          </div>
         </div>
       ) : (
         <>
-          {/* بانر مقال الصدارة — كامل العرض وبمساحة بارزة */}
-          {hero && (
-            <section className="mb-14">
-              <div className="mb-4 flex items-center justify-center gap-3">
-                <span className="gold-rule w-16" />
-                <span className="text-[11px] tracking-[0.3em] text-gold-soft">مقال الصدارة</span>
-                <span className="gold-rule w-16" />
-              </div>
-              <Link
-                to="/gazette/$slug"
-                params={{ slug: hero.slug ?? hero.id }}
-                className="group relative block overflow-hidden rounded-3xl border-2 border-gold/45 shadow-[0_26px_80px_-30px_oklch(0.55_0.12_70_/_0.6)] transition hover:border-gold"
-              >
-                {hero.media_url ? (
-                  <img
-                    src={hero.media_url}
-                    alt={hero.title}
-                    className="h-[320px] w-full object-cover transition duration-700 group-hover:scale-[1.03] md:h-[460px]"
-                  />
-                ) : (
-                  <GazetteCover title="" className="h-[320px] w-full md:h-[460px]" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/75 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 md:p-12">
-                  <div className="mx-auto max-w-4xl text-center">
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      <CategoryBadge category={hero.category} />
-                      <SourceBadge source={hero.source_name} />
-                    </div>
-                    <h2 className="mt-4 font-display text-3xl leading-[1.4] text-gold md:text-5xl">{hero.title}</h2>
-                    <div className="gold-rule mx-auto mt-5 w-28" />
-                    <p className="mx-auto mt-4 line-clamp-3 max-w-3xl text-sm leading-8 text-muted-foreground md:text-base">
-                      {hero.excerpt ?? hero.content}
-                    </p>
-                    <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-xs text-gold-soft">
-                      <span className="inline-flex items-center gap-1">
-                        <Clock className="size-3.5" /> {readingMinutes(hero.content)} دقيقة قراءة
-                      </span>
-                      <time className="text-muted-foreground">
-                        {new Date(hero.created_at).toLocaleDateString("ar")}
-                      </time>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </section>
-          )}
-
-          <div className="mb-5 flex flex-wrap justify-center gap-2">
-            {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setCat(c)}
-                className={`rounded-full border px-4 py-1.5 text-sm transition ${
-                  cat === c ? "border-gold bg-gold/15 text-gold" : "border-border text-muted-foreground hover:text-gold"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
+          {!filtered && lead.data && <LeadStory post={lead.data} />}
 
           {sponsored.length > 0 && (
-            <div className="mb-10 space-y-4">
+            <div className="mb-8 space-y-4">
               {sponsored.map((ad) => (
                 <SponsoredAd key={ad.id} ad={ad} />
               ))}
             </div>
           )}
 
-          {/* المحتوى الرئيسي + عمود جانبي لاصق على الشاشات الكبيرة */}
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
-            <div>
-              <div className="grid gap-8 sm:grid-cols-2">
-                {visible.map((p, i) => (
-                  <Fragment key={p.id}>
-                    <Card post={p} large={i === 0 || (i === 3 && Boolean(p.media_url))} />
-                    {inFeed.length > 0 && i > 0 && i % 3 === 2 && (
-                      <InFeedAd ad={inFeed[Math.floor(i / 3) % inFeed.length]!} />
-                    )}
-                  </Fragment>
-                ))}
-              </div>
-
-              {rest.length > visible.length && (
-                <div className="mt-12 text-center">
-                  <button
-                    onClick={() => setLimit((v) => v + PAGE_SIZE)}
-                    className="rounded-full border border-gold/40 px-6 py-2 text-sm text-gold transition hover:bg-gold/10"
-                  >
-                    تحميل مقالات أقدم ({rest.length - visible.length})
-                  </button>
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <section aria-label="آخر الأخبار">
+              {rows.length === 0 && !lead.data ? (
+                <p className="glass rounded-xl p-8 text-center text-sm text-muted-foreground">
+                  {search.q ? "لا نتائج مطابقة لبحثك." : "لا أخبار في هذا القسم بعد."}
+                </p>
+              ) : (
+                <div className="grid grid-flow-row-dense gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {rows.map((p, i) => (
+                    <Fragment key={p.id}>
+                      <NewsCard post={p} size={i % GAZETTE_PAGE_SIZE === 0 || i % GAZETTE_PAGE_SIZE === 7 ? "lg" : "sm"} />
+                      {inFeed.length > 0 && i % 6 === 5 && <InFeedAd ad={inFeed[Math.floor(i / 6) % inFeed.length]!} />}
+                    </Fragment>
+                  ))}
                 </div>
               )}
 
-              {list.length === 0 && (
-                <p className="text-center text-sm text-muted-foreground">
-                  {q ? "لا نتائج مطابقة لبحثك." : "لا مقالات في هذا التصنيف بعد."}
-                </p>
+              {feed.hasNextPage && (
+                <div className="mt-10 text-center">
+                  <button
+                    onClick={() => void feed.fetchNextPage()}
+                    disabled={feed.isFetchingNextPage}
+                    className="rounded-full border border-gold/40 px-6 py-2 text-sm text-gold transition hover:bg-gold/10 disabled:opacity-60"
+                  >
+                    {feed.isFetchingNextPage ? "جارٍ التحميل…" : `عرض المزيد (${total - rows.length})`}
+                  </button>
+                </div>
               )}
-            </div>
+            </section>
 
-            <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-              {weekly.length > 0 && (
-                <section className="glass rounded-2xl border border-gold/15 p-6">
-                  <h2 className="flex items-center gap-2 text-sm text-gold">
-                    <Flame className="size-4" /> الأكثر قراءة هذا الأسبوع
+            <aside className="space-y-6 lg:sticky lg:top-32 lg:self-start">
+              {(mostRead.data ?? []).length > 0 && (
+                <section className="glass rounded-xl border border-gold/15 p-5" aria-labelledby="most-read">
+                  <h2 id="most-read" className="flex items-center gap-2 text-sm text-gold">
+                    <Flame className="size-4" /> الأكثر قراءة
                   </h2>
                   <ol className="mt-4 space-y-3">
-                    {weekly.map((p, i) => (
-                      <li key={p.id} className="flex items-start gap-3 text-sm">
-                        <span className="text-gold-soft">{i + 1}.</span>
+                    {mostRead.data!.map((p, i) => (
+                      <li key={p.id} className="flex items-start gap-3 border-b border-border/40 pb-3 text-sm last:border-0 last:pb-0">
+                        <span className="font-display text-2xl leading-none text-gold/60">{i + 1}</span>
                         <Link
                           to="/gazette/$slug"
                           params={{ slug: p.slug ?? p.id }}
-                          className="min-w-0 flex-1 leading-6 text-muted-foreground transition hover:text-gold"
+                          className="min-w-0 flex-1 leading-6 text-foreground/85 transition hover:text-gold"
                         >
                           <span className="line-clamp-2">{p.title}</span>
-                          <span className="mt-0.5 block text-[11px] text-gold-soft">{p.views} مشاهدة</span>
+                          <span className="mt-0.5 block text-[11px] text-muted-foreground">{p.views} مشاهدة</span>
                         </Link>
                       </li>
                     ))}
@@ -319,21 +311,19 @@ function Gazette() {
                 </section>
               )}
 
-              {months.length > 0 && (
-                <section className="glass rounded-2xl border border-gold/15 p-6">
-                  <h2 className="text-sm text-gold">الأرشيف الشهري</h2>
+              {(months.data ?? []).length > 0 && (
+                <section className="glass rounded-xl border border-gold/15 p-5" aria-labelledby="archive">
+                  <h2 id="archive" className="text-sm text-gold">الأرشيف الشهري</h2>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {["الكل", ...months].map((m) => (
+                    {[undefined, ...months.data!].map((m) => (
                       <button
-                        key={m}
-                        onClick={() => setMonth(m)}
+                        key={m ?? "all"}
+                        onClick={() => void navigate({ search: (prev) => ({ ...prev, month: m }) })}
                         className={`rounded-full border px-3 py-1 text-xs transition ${
-                          month === m
-                            ? "border-gold bg-gold/10 text-gold"
-                            : "border-border/70 text-muted-foreground hover:text-gold"
+                          search.month === m ? "border-gold bg-gold/10 text-gold" : "border-border/70 text-muted-foreground hover:text-gold"
                         }`}
                       >
-                        {m === "الكل" ? "كل الشهور" : archiveLabel(m)}
+                        {m ? archiveLabel(m) : "كل الشهور"}
                       </button>
                     ))}
                   </div>
