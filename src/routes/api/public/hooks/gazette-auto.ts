@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { GAZETTE_CATEGORIES, PUBLISHER, slugify, type GazetteCategory } from "@/lib/gazette";
 import { sourceHost } from "@/lib/content-sources";
-import { generateGazetteCover } from "@/lib/gazette-cover.server";
 
 /**
  * النشر التلقائي المجدول للجريدة، من المصادر المفعّلة في جدول content_sources.
@@ -42,7 +41,13 @@ function parseFeed(xml: string): FeedItem[] {
   return blocks
     .map((b) => {
       const linkTag = /<link[^>]*href="([^"]+)"/i.exec(b)?.[1] ?? pick(b, "link");
+      const image =
+        /<media:content[^>]*url="([^"]+)"[^>]*>/i.exec(b)?.[1] ??
+        /<media:thumbnail[^>]*url="([^"]+)"/i.exec(b)?.[1] ??
+        /<enclosure[^>]*type="image[^"]*"[^>]*url="([^"]+)"/i.exec(b)?.[1] ??
+        /<enclosure[^>]*url="([^"]+)"[^>]*type="image/i.exec(b)?.[1];
       return {
+        ...(image ? { image: image.replace(/&amp;/g, "&") } : {}),
         title: pick(b, "title"),
         summary: pick(b, "description") || pick(b, "summary") || pick(b, "content"),
         link: linkTag,
@@ -100,6 +105,26 @@ async function wikipediaItems(host: string): Promise<FeedItem[]> {
   return items.filter((i) => i.summary.replace(/\s+/g, " ").trim().length > 200);
 }
 
+
+/** يقرأ og:image من صفحة الخبر الأصلي (بحدّ زمني قصير). */
+async function ogImage(link: string): Promise<string | null> {
+  if (!/^https?:\/\//.test(link)) return null;
+  try {
+    const res = await fetch(link, {
+      headers: { "User-Agent": "TarchishLibraryBot/1.0", Accept: "text/html" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+    const html = (await res.text()).slice(0, 200_000);
+    const m =
+      /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i.exec(html) ??
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i.exec(html);
+    const url = m?.[1]?.replace(/&amp;/g, "&");
+    return url && /^https:\/\//.test(url) ? url : null;
+  } catch {
+    return null;
+  }
+}
 
 /** يكشف النسخ الحرفي: تطابق ستّ كلمات متتالية بين المادة الأصلية والمقال. */
 function sharesLongPhrase(original: string, article: string, n = 6) {
@@ -163,7 +188,7 @@ async function compose(apiKey: string, source: Source, item: FeedItem, restricte
     if (!p.title || content.length < 200) return null;
     const category: GazetteCategory = (GAZETTE_CATEGORIES as readonly string[]).includes(p.category ?? "")
       ? (p.category as GazetteCategory)
-      : "الثقافة";
+      : "ثقافة وكتب";
     let body = content;
 
     if (restricted) {
@@ -278,11 +303,9 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
               .limit(1);
             if (dupe && dupe.length > 0) continue;
 
-            // الغلاف: صورة من مصدر مفتوح الترخيص فعلياً (ويكيميديا/أرشيف) إن توفّرت،
-            // وإلّا غلاف مولّد بالذكاء الاصطناعي. ويُمنع منعاً باتاً استعمال صور
-            // المصادر الإخبارية محفوظة الحقوق مهما كانت متاحة تقنياً.
-            const openImage = restricted ? null : (item.image ?? null);
-            const cover = openImage ?? (await generateGazetteCover(apiKey, article.title, article.category));
+            // الصورة: رابطها الأصلي من الخبر نفسه (enclosure / media:content / og:image)
+            // تُعرض من مصدرها مباشرة دون تنزيل؛ وإن لم توجد يُنشر الخبر نصياً.
+            const cover = item.image ?? (await ogImage(item.link));
 
             const { error: insertError } = await supabaseAdmin.from("posts").insert({
               media_url: cover,
@@ -294,6 +317,7 @@ export const Route = createFileRoute("/api/public/hooks/gazette-auto")({
               section: "gazette",
               is_published: true,
               source_name: source.name,
+              source_url: item.link || null,
             });
             if (insertError) {
               console.error("gazette auto insert failed", insertError.message);

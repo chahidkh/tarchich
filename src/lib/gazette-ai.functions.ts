@@ -1,8 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { GAZETTE_CATEGORIES, PUBLISHER, type GazetteCategory } from "@/lib/gazette";
-import { generateGazetteCover } from "@/lib/gazette-cover.server";
+import { DEFAULT_CATEGORY, GAZETTE_CATEGORIES, PUBLISHER, type GazetteCategory } from "@/lib/gazette";
 
 const schema = z.object({
   source: z.string().trim().min(10).max(6000),
@@ -10,10 +9,15 @@ const schema = z.object({
 
 const SYSTEM = `أنت محرّرُ جريدة "${PUBLISHER}"، تكتب بعربية فصيحة بليغة، رصينةِ النبرة، عميقةِ الثقافة والتاريخ، بلا مبالغة ولا ركاكة.
 مهمتك: تحويل الخبر أو الموضوع الخام إلى مقال جريدة متكامل بصوت المكتبة، مع تصنيفه تصنيفاً دقيقاً في واحدة من هذه التصنيفات حصراً:
-- "عاجل": أخبار عاجلة وتطورات حرجة وآنية عالية الأولوية.
-- "سياسة": العلاقات الدولية والسياسات الحكومية والتطورات الجيوسياسية الإقليمية.
-- "التاريخ": التحليلات التاريخية والحضارات القديمة والسياق التاريخي.
-- "الثقافة": الأدب والمقالات الفكرية ومراجعات الكتب والفنون.
+- "عاجل": تطورات آنية حرجة عالية الأولوية.
+- "سياسة": الحكومات والانتخابات والعلاقات الدولية والنزاعات.
+- "اقتصاد وتجارة": الأسواق والطاقة والشركات والتجارة والمال.
+- "رياضة": المباريات والبطولات والرياضيون.
+- "تقنية": التكنولوجيا والذكاء الاصطناعي والإنترنت والأجهزة.
+- "علوم وصحة": الطب والصحة والعلوم والفضاء والمناخ والبيئة.
+- "ثقافة وكتب": الأدب والكتب والفكر والفنون والتراث الثقافي.
+- "التاريخ": الأحداث والشخصيات والحضارات التاريخية.
+- "منوعات": ما لا يندرج تحت ما سبق (سياحة، مجتمع، طرائف).
 أعد الجواب بصيغة JSON فقط دون أي نص خارجها، بالمفاتيح: category, title, excerpt, content.
 - title: عنوان جذّاب موجز (أقل من ١٠٠ حرف).
 - excerpt: ملخّص في سطرين (أقل من ٣٠٠ حرف).
@@ -25,7 +29,6 @@ export type ComposedArticle = {
   title: string;
   excerpt: string;
   content: string;
-  coverUrl: string | null;
 };
 
 export const composeGazetteArticle = createServerFn({ method: "POST" })
@@ -72,17 +75,15 @@ export const composeGazetteArticle = createServerFn({ method: "POST" })
 
     const category = (GAZETTE_CATEGORIES as readonly string[]).includes(parsed.category ?? "")
       ? (parsed.category as GazetteCategory)
-      : "الثقافة";
+      : DEFAULT_CATEGORY;
     const content = (parsed.content ?? "").trim();
     if (!parsed.title || !content) throw new Error("جاء المقال ناقصاً، أعد المحاولة.");
 
     const title = parsed.title.trim().slice(0, 160);
-    const coverUrl = await generateGazetteCover(apiKey, title, category);
 
     return {
       category,
       title,
-      coverUrl,
       excerpt: (parsed.excerpt ?? "").trim().slice(0, 300),
       content: content.includes(PUBLISHER) ? content : `${content}\n\nنشرته جريدة ${PUBLISHER}.`,
     };
