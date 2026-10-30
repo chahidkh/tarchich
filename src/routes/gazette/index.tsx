@@ -20,7 +20,7 @@ import {
 import { CategoryBadge, MetaRow, NewsCard, SourceImage, SourceLine } from "@/components/gazette-ui";
 import { InFeedAd, SponsoredAd, StickyBottomAd, useAds } from "@/components/ad-slot";
 
-type GazetteSearch = { section?: string; month?: string; q?: string };
+type GazetteSearch = { section?: string | undefined; month?: string | undefined; q?: string | undefined };
 
 export const Route = createFileRoute("/gazette/")({
   validateSearch: (s: Record<string, unknown>): GazetteSearch => ({
