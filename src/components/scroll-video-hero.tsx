@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import introVideo from "@/assets/cinematic_intro_hq.mp4.asset.json";
+import introVideo from "@/assets/library_scroll.mp4.asset.json";
 
-/** Full-screen intro video (parchment mode only), sticky over 600svh, scrubbed 1:1 by scroll. */
+/** Full-screen intro in both themes, sticky over 300svh, scrubbed by scroll. */
 export function ScrollVideoHero() {
   return <ScrollVideo />;
 }
