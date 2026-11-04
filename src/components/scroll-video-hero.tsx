@@ -4,8 +4,8 @@ import { usePrefs } from "@/lib/prefs";
 
 /** Full-screen intro video (parchment mode only), sticky over 600svh, scrubbed 1:1 by scroll. */
 export function ScrollVideoHero() {
-  const { prefs } = usePrefs();
-  if (prefs.theme !== "parchment") return null;
+  const { theme } = usePrefs();
+  if (theme !== "parchment") return null;
   return <ScrollVideo />;
 }
 
