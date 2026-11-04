@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import introVideo from "@/assets/library_scroll.mp4.asset.json";
+import desktopIntroVideo from "@/assets/library-scroll-desktop.mp4.asset.json";
 import mobileIntroVideo from "@/assets/library-scroll-mobile.mp4.asset.json";
 
 /** Full-screen intro: shorter phone scroll, unchanged desktop scroll. */
@@ -16,13 +16,18 @@ function ScrollVideo() {
     const video = videoRef.current;
     if (!wrap || !video) return;
     let raf = 0;
-    let last = -1;
     const mobileScreen = window.matchMedia("(max-width: 767px)");
     const reloadSource = () => {
-      last = -1;
       video.load();
     };
     mobileScreen.addEventListener("change", reloadSource);
+
+    // Ignore tiny drift so a settled frame is never re-decoded.
+    const DEAD_ZONE = 0.01;
+    // Largest time one desktop seek may cover, so a fast wheel flick — in
+    // either direction — moves the film in even steps instead of one hard jump.
+    const MAX_SEEK_STEP = 0.15;
+
     const tick = () => {
       const rect = wrap.getBoundingClientRect();
       // Use the actual sticky height on phones: browser bars change innerHeight
@@ -31,16 +36,18 @@ function ScrollVideo() {
       const total = wrap.offsetHeight - (mobileScreen.matches ? stickyHeight : window.innerHeight);
       const p = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
       const d = video.duration;
-      if (d && Number.isFinite(d)) {
-        const t = p * (d - 0.05);
-        // Let each phone seek finish before requesting the latest position,
-        // rather than continually aborting decoding during a finger swipe.
-        const shouldSeek = mobileScreen.matches
-          ? !video.seeking && video.readyState >= 2 && Math.abs(t - video.currentTime) > 0.02
-          : Math.abs(t - last) > 0.001;
-        if (shouldSeek) {
-          video.currentTime = t;
-          last = t;
+      // Never start a seek while one is still decoding: an aborted backward
+      // decode is what made scrolling up lag behind scrolling down.
+      if (d && Number.isFinite(d) && !video.seeking && video.readyState >= 2) {
+        const target = p * (d - 0.05);
+        const gap = target - video.currentTime;
+        const dead = mobileScreen.matches ? 0.02 : DEAD_ZONE;
+        if (Math.abs(gap) > dead) {
+          const step =
+            !mobileScreen.matches && Math.abs(gap) > MAX_SEEK_STEP
+              ? Math.sign(gap) * MAX_SEEK_STEP
+              : gap;
+          video.currentTime = video.currentTime + step;
         }
       }
       raf = requestAnimationFrame(tick);
@@ -65,7 +72,7 @@ function ScrollVideo() {
           className="h-full w-full object-cover object-center"
         >
           <source media="(max-width: 767px)" src={mobileIntroVideo.url} type="video/mp4" />
-          <source src={introVideo.url} type="video/mp4" />
+          <source src={desktopIntroVideo.url} type="video/mp4" />
         </video>
       </div>
     </div>
