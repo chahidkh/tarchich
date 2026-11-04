@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import introVideo from "@/assets/library_scroll.mp4.asset.json";
 import mobileIntroVideo from "@/assets/library-scroll-mobile.mp4.asset.json";
 
-/** Full-screen intro in both themes, sticky over 300svh, scrubbed by scroll. */
+/** Full-screen intro: shorter phone scroll, unchanged desktop scroll. */
 export function ScrollVideoHero() {
   return <ScrollVideo />;
 }
@@ -25,12 +25,20 @@ function ScrollVideo() {
     mobileScreen.addEventListener("change", reloadSource);
     const tick = () => {
       const rect = wrap.getBoundingClientRect();
-      const total = wrap.offsetHeight - window.innerHeight;
+      // Use the actual sticky height on phones: browser bars change innerHeight
+      // during touch scrolling and must not shift the same frame's position.
+      const stickyHeight = wrap.firstElementChild?.clientHeight ?? window.innerHeight;
+      const total = wrap.offsetHeight - (mobileScreen.matches ? stickyHeight : window.innerHeight);
       const p = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
       const d = video.duration;
       if (d && Number.isFinite(d)) {
         const t = p * (d - 0.05);
-        if (Math.abs(t - last) > 0.001) {
+        // Let each phone seek finish before requesting the latest position,
+        // rather than continually aborting decoding during a finger swipe.
+        const shouldSeek = mobileScreen.matches
+          ? !video.seeking && video.readyState >= 2 && Math.abs(t - video.currentTime) > 0.02
+          : Math.abs(t - last) > 0.001;
+        if (shouldSeek) {
           video.currentTime = t;
           last = t;
         }
@@ -46,7 +54,7 @@ function ScrollVideo() {
   }, []);
 
   return (
-    <div ref={wrapRef} className="relative h-[300svh]" aria-label="مقدمة سينمائية">
+    <div ref={wrapRef} className="relative h-[250svh] md:h-[300svh]" aria-label="مقدمة سينمائية">
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <video
           ref={videoRef}
