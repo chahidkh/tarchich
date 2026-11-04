@@ -1,9 +1,15 @@
 import { useEffect, useRef } from "react";
-import introVideo from "@/assets/cinematic_intro.mp4.asset.json";
-import introVideoMobile from "@/assets/cinematic_intro_mobile.mp4.asset.json";
+import introVideo from "@/assets/cinematic_intro_hq.mp4.asset.json";
+import { usePrefs } from "@/lib/prefs";
 
-/** Full-screen intro video, sticky over 600vh, playback scrubbed 1:1 by scroll. */
+/** Full-screen intro video (parchment mode only), sticky over 600svh, scrubbed 1:1 by scroll. */
 export function ScrollVideoHero() {
+  const { prefs } = usePrefs();
+  if (prefs.theme !== "parchment") return null;
+  return <ScrollVideo />;
+}
+
+function ScrollVideo() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -27,10 +33,6 @@ export function ScrollVideoHero() {
       }
       raf = requestAnimationFrame(tick);
     };
-    if (window.matchMedia("(max-width: 767px)").matches) {
-      video.src = introVideoMobile.url;
-      video.load();
-    }
     video.pause();
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
