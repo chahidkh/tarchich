@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import introVideo from "@/assets/cinematic_intro.mp4.asset.json";
+import introVideoMobile from "@/assets/cinematic_intro_mobile.mp4.asset.json";
 
 /** Full-screen intro video, sticky over 600vh, playback scrubbed 1:1 by scroll. */
 export function ScrollVideoHero() {
@@ -26,14 +27,18 @@ export function ScrollVideoHero() {
       }
       raf = requestAnimationFrame(tick);
     };
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      video.src = introVideoMobile.url;
+      video.load();
+    }
     video.pause();
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, []);
 
   return (
-    <div ref={wrapRef} className="relative h-[600vh]" aria-label="مقدمة سينمائية">
-      <div className="sticky top-0 h-screen w-full overflow-hidden home-charcoal">
+    <div ref={wrapRef} className="relative h-[600svh]" aria-label="مقدمة سينمائية">
+      <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <video
           ref={videoRef}
           src={introVideo.url}
@@ -41,7 +46,7 @@ export function ScrollVideoHero() {
           playsInline
           preload="auto"
           aria-hidden
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-center"
         />
       </div>
     </div>
