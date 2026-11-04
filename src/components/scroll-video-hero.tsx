@@ -36,7 +36,7 @@ function ScrollVideo() {
   }, []);
 
   return (
-    <div ref={wrapRef} className="relative h-[600svh]" aria-label="مقدمة سينمائية">
+    <div ref={wrapRef} className="relative h-[300svh]" aria-label="مقدمة سينمائية">
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <video
           ref={videoRef}
