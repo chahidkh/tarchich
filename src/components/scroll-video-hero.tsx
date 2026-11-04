@@ -24,9 +24,6 @@ function ScrollVideo() {
 
     // Ignore tiny drift so a settled frame is never re-decoded.
     const DEAD_ZONE = 0.01;
-    // Largest time one desktop seek may cover, so a fast wheel flick — in
-    // either direction — moves the film in even steps instead of one hard jump.
-    const MAX_SEEK_STEP = 0.15;
 
     const tick = () => {
       const rect = wrap.getBoundingClientRect();
@@ -37,17 +34,13 @@ function ScrollVideo() {
       const p = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
       const d = video.duration;
       // Never start a seek while one is still decoding: an aborted backward
-      // decode is what made scrolling up lag behind scrolling down.
+      // decode is what made scrolling up lag behind scrolling down. Each seek
+      // lands exactly on the scroll position, so both directions read alike.
       if (d && Number.isFinite(d) && !video.seeking && video.readyState >= 2) {
         const target = p * (d - 0.05);
-        const gap = target - video.currentTime;
         const dead = mobileScreen.matches ? 0.02 : DEAD_ZONE;
-        if (Math.abs(gap) > dead) {
-          const step =
-            !mobileScreen.matches && Math.abs(gap) > MAX_SEEK_STEP
-              ? Math.sign(gap) * MAX_SEEK_STEP
-              : gap;
-          video.currentTime = video.currentTime + step;
+        if (Math.abs(target - video.currentTime) > dead) {
+          video.currentTime = target;
         }
       }
       raf = requestAnimationFrame(tick);
