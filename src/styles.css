@@ -374,6 +374,3 @@ html[data-theme="parchment"] .hero-text {
   .gazette-ticker { overflow-x: auto; }
   .gazette-ticker-track { animation: none; }
 }
-
-/* Home page: solid deep charcoal behind content after the intro video */
-.home-charcoal { background-color: #1c1b1a; }

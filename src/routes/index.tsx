@@ -72,7 +72,7 @@ function Home() {
   });
 
   return (
-    <main className="overflow-x-clip home-charcoal">
+    <main className="overflow-x-clip">
       <ScrollVideoHero />
       <section className="relative isolate flex min-h-[34rem] items-center justify-center overflow-hidden sm:min-h-[88vh]">
         <div aria-hidden className="absolute inset-0 bg-background/35 sm:hidden" />
