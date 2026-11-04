@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Use media-selected video sources for the home scroll intro so phones load their portrait asset and desktop retains its existing asset and scroll behavior.

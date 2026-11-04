@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import introVideo from "@/assets/library_scroll.mp4.asset.json";
+import mobileIntroVideo from "@/assets/library-scroll-mobile.mp4.asset.json";
 
 /** Full-screen intro in both themes, sticky over 300svh, scrubbed by scroll. */
 export function ScrollVideoHero() {
@@ -16,6 +17,12 @@ function ScrollVideo() {
     if (!wrap || !video) return;
     let raf = 0;
     let last = -1;
+    const mobileScreen = window.matchMedia("(max-width: 767px)");
+    const reloadSource = () => {
+      last = -1;
+      video.load();
+    };
+    mobileScreen.addEventListener("change", reloadSource);
     const tick = () => {
       const rect = wrap.getBoundingClientRect();
       const total = wrap.offsetHeight - window.innerHeight;
@@ -32,7 +39,10 @@ function ScrollVideo() {
     };
     video.pause();
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      mobileScreen.removeEventListener("change", reloadSource);
+    };
   }, []);
 
   return (
@@ -40,13 +50,15 @@ function ScrollVideo() {
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
         <video
           ref={videoRef}
-          src={introVideo.url}
           muted
           playsInline
           preload="auto"
           aria-hidden
           className="h-full w-full object-cover object-center"
-        />
+        >
+          <source media="(max-width: 767px)" src={mobileIntroVideo.url} type="video/mp4" />
+          <source src={introVideo.url} type="video/mp4" />
+        </video>
       </div>
     </div>
   );
