@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Use media-selected video sources for the home scroll intro so phones load their portrait asset and desktop retains its existing asset and scroll behavior.
+- Encode any video scrubbed by scrolling with a keyframe at most every 0.5s; sparse keyframes make backward seeks decode from the start, so scrolling up lags scrolling down.
